@@ -1,0 +1,7 @@
+enabled: false
+role: external_validation_only
+raw_root: data/raw/bgl
+output_root: data/processed/bgl
+activate_only_after:
+  - hdfs_pipeline_complete
+  - imdb_pipeline_complete

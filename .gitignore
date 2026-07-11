@@ -14,3 +14,15 @@ Thumbs.db
 venv/
 .coverage
 htmlcov/
+
+# Step 9 datasets: never commit downloaded or generated data
+/data/raw/**
+/data/interim/**
+/data/processed/**
+!/data/raw/.gitkeep
+!/data/interim/.gitkeep
+!/data/processed/.gitkeep
+
+# Keep reproducibility metadata
+!/data/manifests/
+!/data/manifests/**

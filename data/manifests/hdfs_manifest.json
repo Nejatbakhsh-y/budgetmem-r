@@ -1,0 +1,25 @@
+{
+  "created_utc": "2026-07-11T04:05:50.813917+00:00",
+  "dataset": "LogHub HDFS_v1",
+  "raw_log": "data/raw/hdfs/HDFS.log",
+  "labels": "data/raw/hdfs/anomaly_label.csv",
+  "parsed_lines": 11175629,
+  "development_line_cap": null,
+  "parser": {
+    "name": "deterministic_regex_template_v1",
+    "batch_size": 20000,
+    "parquet_batch_blocks": 5000
+  },
+  "split_method": "stratified_block_hash",
+  "split_salt": "budgetmem-r-hdfs-v1-2026",
+  "counts": {
+    "train_blocks": 460193,
+    "train_anomalies": 13432,
+    "validation_blocks": 57383,
+    "validation_anomalies": 1677,
+    "test_blocks": 57485,
+    "test_anomalies": 1729
+  },
+  "template_count": 132,
+  "label_count": 575061
+}

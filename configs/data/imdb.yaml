@@ -1,0 +1,10 @@
+dataset_name: stanfordnlp/imdb
+revision: null
+output_root: data/processed/imdb
+manifest: data/manifests/imdb_manifest.json
+split_indices: data/manifests/imdb_split_indices.json
+validation_fraction: 0.10
+split_seed: 42026
+sequence_limits: [1024, 2048, 4096]
+input_mode: byte_or_character
+lock_official_test: true

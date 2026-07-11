@@ -1,0 +1,16 @@
+raw_log: data/raw/hdfs/HDFS.log
+labels: data/raw/hdfs/anomaly_label.csv
+output_root: data/processed/hdfs
+interim_db: data/interim/hdfs/hdfs_sequences.sqlite
+manifest: data/manifests/hdfs_manifest.json
+split_method: stratified_block_hash
+split_salt: budgetmem-r-hdfs-v1-2026
+split_proportions:
+  train: 0.80
+  validation: 0.10
+  test: 0.10
+dev_fraction: 0.02
+parser:
+  name: deterministic_regex_template_v1
+  batch_size: 20000
+  parquet_batch_blocks: 5000

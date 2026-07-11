@@ -1,0 +1,37 @@
+{
+  "created_utc": "2026-07-11T02:52:49.590041+00:00",
+  "dataset_name": "stanfordnlp/imdb",
+  "revision_requested": null,
+  "train_fingerprint": "b22c1504b46f1653",
+  "test_fingerprint": "41977005d781de1c",
+  "sequence_limits": [
+    1024,
+    2048,
+    4096
+  ],
+  "input_mode": "byte_or_character",
+  "official_test_locked": true,
+  "files": {
+    "train": {
+      "path": "data/processed/imdb/train/data.parquet",
+      "rows": 22500,
+      "sha256": "f20ba6f1ff7787b6e7785450571e653c4027d5509c06082469df3e806088c08b",
+      "positive": 11250,
+      "negative": 11250
+    },
+    "validation": {
+      "path": "data/processed/imdb/validation/data.parquet",
+      "rows": 2500,
+      "sha256": "ca628e17d244e340a6d8a88d15d26969ee0edbc3e9975f8e47af125ff0b92fe5",
+      "positive": 1250,
+      "negative": 1250
+    },
+    "test_locked": {
+      "path": "data/processed/imdb/test_locked/data.parquet",
+      "rows": 25000,
+      "sha256": "afdf7ab4f8689eca43a9d24fbd2ca9ab290b1f4e66e563fdf34be0f96afc0650",
+      "positive": 12500,
+      "negative": 12500
+    }
+  }
+}
