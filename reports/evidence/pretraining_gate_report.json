@@ -1,0 +1,31 @@
+{
+  "created_utc": "2026-07-15T03:13:20.242819+00:00",
+  "status": "PASS",
+  "cpu_only_validation": true,
+  "cuda_note": "The current laptop validation is CPU-only. CUDA reproducibility must be revalidated separately on the future GPU machine because some GPU kernels may be nondeterministic across hardware, drivers, or PyTorch builds.",
+  "require_data": true,
+  "all_required_dataset_partitions_present": true,
+  "missing_dataset_paths": [],
+  "pytest": {
+    "command": [
+      "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/models/test_budgetmem_r.py",
+      "tests/pretraining",
+      "-q"
+    ],
+    "returncode": 0,
+    "stdout": "........................                                                 [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.12/site-packages/torch/cuda/__init__.py:64\n  /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/.venv/lib/python3.12/site-packages/torch/cuda/__init__.py:64: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.\n    import pynvml  # type: ignore[import]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n24 passed, 1 warning in 64.69s (0:01:04)\n",
+    "stderr": ""
+  },
+  "dataset_validator": {
+    "command": [
+      "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/.venv/bin/python",
+      "scripts/data/validate_datasets.py"
+    ],
+    "returncode": 0,
+    "stdout": "{\n  \"status\": \"PASS\",\n  \"errors\": []\n}\n",
+    "stderr": ""
+  }
+}

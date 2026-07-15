@@ -26,3 +26,4 @@ htmlcov/
 # Keep reproducibility metadata
 !/data/manifests/
 !/data/manifests/**
+.section14_backup/
