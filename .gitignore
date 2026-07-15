@@ -27,3 +27,7 @@ htmlcov/
 !/data/manifests/
 !/data/manifests/**
 .section14_backup/
+
+# Section 15 pilot operational artifacts
+outputs/pilot/
+.section15_backup/
