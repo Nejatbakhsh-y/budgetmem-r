@@ -1,0 +1,60 @@
+Section 14.7 Git Verification
+=============================
+
+Repository: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r
+Feature branch: fix/section15-budgetmem-write-controller
+Validated commit: ce411750d17d807ed6b52d9c87ad680f0c04a5bf
+Remote: https://github.com/Nejatbakhsh-y/budgetmem-r.git
+Verification timestamp UTC: 2026-07-16T09:11:49Z
+
+Checks
+------
+[PASS] Work was committed on a feature branch.
+[PASS] Feature branch was pushed to origin.
+[PASS] Local and remote commit references matched.
+[PASS] Runtime-output exclusions were added to .gitignore.
+[PASS] Previously tracked ignored files were removed from the index.
+[PASS] Runtime files were preserved locally.
+[PASS] reports/evidence remains eligible for Git tracking.
+
+Runtime-output ignore rules
+---------------------------
+# BEGIN SECTION 14 RUNTIME OUTPUTS
+# Experiment execution directories
+.runtime/
+runtime/
+runs/
+checkpoints/
+wandb/
+mlruns/
+tensorboard/
+lightning_logs/
+
+# Temporary runtime reports
+reports/runtime/
+reports/tmp/
+artifacts/runtime/
+
+# Python and test caches
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Coverage and profiling outputs
+.coverage
+coverage.xml
+htmlcov/
+.prof/
+*.prof
+
+# Runtime logs and temporary files
+*.log
+*.tmp
+*.temp
+*.pid
+# END SECTION 14 RUNTIME OUTPUTS
+
+Final tracked-but-ignored file count: 0
