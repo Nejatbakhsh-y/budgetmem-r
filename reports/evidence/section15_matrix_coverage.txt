@@ -1,0 +1,39 @@
+SECTION 15 PILOT MATRIX COVERAGE
+============================================================
+
+Required tasks:
+  - selective_copy
+  - associative_recall
+  - distractor_retrieval
+
+Required models:
+  - GRU
+  - GRU + uniform cache
+  - GRU + reservoir cache
+  - BudgetMem-R
+
+Required sequence lengths: 256, 512, 1024
+Required memory budgets: 16, 32
+Required random seed: 2026
+
+Expected matrix calculation:
+  3 tasks x 4 models x 3 sequence lengths x 2 budgets x 1 seed
+  Expected total: 72 runs
+
+Scanned files: 60
+Successful unique combinations: 72
+Missing combinations: 0
+Failed-only combinations: 0
+
+Observed dimension coverage:
+  Tasks: associative_recall, distractor_retrieval, selective_copy
+  Models: BudgetMem-R, GRU, GRU + reservoir cache, GRU + uniform cache
+  Sequence lengths: 256, 512, 1024
+  Memory budgets: 16, 32
+
+FINAL RESULT
+============================================================
+PASS: All required tasks, models, sequence lengths, and memory budgets were tested successfully.
+
+Detailed coverage table: reports/evidence/section15_matrix_coverage.csv
+Machine-readable summary: reports/evidence/section15_matrix_coverage.json
