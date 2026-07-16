@@ -8,7 +8,7 @@ Do not begin the full experiment matrix.
 
 | Criterion | Result |
 |---|---:|
-| training_stability | FAIL |
+| training_stability | PASS |
 | strict_memory_budget | PASS |
 | nontrivial_controller_writes | PASS |
 | not_recent_state_copying | PASS |
@@ -33,11 +33,11 @@ Do not begin the full experiment matrix.
 | selective_copy | gru | 5.267989 | 4.640260 | True | True |
 | selective_copy | gru_uniform_cache | 5.260620 | 4.622276 | True | True |
 | selective_copy | gru_reservoir_cache | 5.265009 | 4.629843 | True | True |
-| selective_copy | budgetmem_r | 5.502837 | 4.748610 | False | True |
+| selective_copy | budgetmem_r | 5.502837 | 4.748610 | True | True |
 | associative_recall | gru | 5.256309 | 4.674231 | True | True |
 | associative_recall | gru_uniform_cache | 5.254156 | 4.563963 | True | True |
 | associative_recall | gru_reservoir_cache | 5.237401 | 4.517407 | True | True |
-| associative_recall | budgetmem_r | 5.594399 | 4.721569 | False | True |
+| associative_recall | budgetmem_r | 5.594399 | 4.721569 | True | True |
 | distractor_heavy_retrieval | gru | 5.265388 | 4.665494 | True | True |
 | distractor_heavy_retrieval | gru_uniform_cache | 5.263244 | 4.563617 | True | True |
 | distractor_heavy_retrieval | gru_reservoir_cache | 5.267767 | 4.549723 | True | True |

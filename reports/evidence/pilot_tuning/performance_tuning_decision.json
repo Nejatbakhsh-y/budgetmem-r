@@ -1,0 +1,162 @@
+{
+  "status": "SCREEN_NO_GO",
+  "baseline_policy_means": {
+    "gru_uniform_cache": 0.0062210648148147835,
+    "gru_reservoir_cache": 0.004774305555555517
+  },
+  "candidates": [
+    {
+      "candidate": "optimization_8e",
+      "valid": false,
+      "mean_token_accuracy": 0.004340277777777777,
+      "mean_memory_recall": 0.1023220486111111,
+      "mean_write_frequency": 0.045649210611979164,
+      "mean_retention_advantage_over_random": 0.07888454861111112,
+      "policy_gains": {
+        "gru_uniform_cache": -0.0018807870370370064,
+        "gru_reservoir_cache": -0.0004340277777777398
+      },
+      "minimum_policy_gain": -0.0018807870370370064,
+      "policies_clearly_outperformed": [],
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "budget_pass": true,
+      "resource_measurement_pass": true,
+      "write_frequency_pass": true,
+      "settings": {
+        "training": {
+          "train_samples": 256,
+          "validation_samples": 64,
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0001,
+          "write_rate_target": 0.1,
+          "write_rate_penalty": 1.0,
+          "write_binarization_penalty": 0.02
+        },
+        "model": {
+          "embedding_dim": 32,
+          "hidden_dim": 64,
+          "key_dim": 32,
+          "retrieval_k": 4
+        }
+      }
+    },
+    {
+      "candidate": "optimization_12e",
+      "valid": false,
+      "mean_token_accuracy": 0.008101851851851851,
+      "mean_memory_recall": 0.04260706018518518,
+      "mean_write_frequency": 0.035837809244791664,
+      "mean_retention_advantage_over_random": 0.019169560185185185,
+      "policy_gains": {
+        "gru_uniform_cache": 0.001880787037037068,
+        "gru_reservoir_cache": 0.0033275462962963345
+      },
+      "minimum_policy_gain": 0.001880787037037068,
+      "policies_clearly_outperformed": [],
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "budget_pass": true,
+      "resource_measurement_pass": true,
+      "write_frequency_pass": true,
+      "settings": {
+        "training": {
+          "train_samples": 384,
+          "validation_samples": 96,
+          "epochs": 12,
+          "learning_rate": 0.0005,
+          "weight_decay": 0.0001,
+          "write_rate_target": 0.1,
+          "write_rate_penalty": 0.5,
+          "write_binarization_penalty": 0.01
+        },
+        "model": {
+          "embedding_dim": 32,
+          "hidden_dim": 64,
+          "key_dim": 32,
+          "retrieval_k": 4
+        }
+      }
+    },
+    {
+      "candidate": "capacity_10e",
+      "valid": false,
+      "mean_token_accuracy": 0.006076388888888888,
+      "mean_memory_recall": 0.1467013888888889,
+      "mean_write_frequency": 0.0266265869140625,
+      "mean_retention_advantage_over_random": 0.1232638888888889,
+      "policy_gains": {
+        "gru_uniform_cache": -0.00014467592592589534,
+        "gru_reservoir_cache": 0.0013020833333333712
+      },
+      "minimum_policy_gain": -0.00014467592592589534,
+      "policies_clearly_outperformed": [],
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "budget_pass": true,
+      "resource_measurement_pass": true,
+      "write_frequency_pass": true,
+      "settings": {
+        "training": {
+          "train_samples": 384,
+          "validation_samples": 96,
+          "epochs": 10,
+          "learning_rate": 0.0005,
+          "weight_decay": 0.0001,
+          "write_rate_target": 0.1,
+          "write_rate_penalty": 0.75,
+          "write_binarization_penalty": 0.01
+        },
+        "model": {
+          "embedding_dim": 48,
+          "hidden_dim": 96,
+          "key_dim": 48,
+          "retrieval_k": 8
+        }
+      }
+    }
+  ],
+  "selected_candidate": {
+    "candidate": "optimization_12e",
+    "valid": false,
+    "mean_token_accuracy": 0.008101851851851851,
+    "mean_memory_recall": 0.04260706018518518,
+    "mean_write_frequency": 0.035837809244791664,
+    "mean_retention_advantage_over_random": 0.019169560185185185,
+    "policy_gains": {
+      "gru_uniform_cache": 0.001880787037037068,
+      "gru_reservoir_cache": 0.0033275462962963345
+    },
+    "minimum_policy_gain": 0.001880787037037068,
+    "policies_clearly_outperformed": [],
+    "stability_pass": false,
+    "checkpoint_resume_pass": true,
+    "budget_pass": true,
+    "resource_measurement_pass": true,
+    "write_frequency_pass": true,
+    "settings": {
+      "training": {
+        "train_samples": 384,
+        "validation_samples": 96,
+        "epochs": 12,
+        "learning_rate": 0.0005,
+        "weight_decay": 0.0001,
+        "write_rate_target": 0.1,
+        "write_rate_penalty": 0.5,
+        "write_binarization_penalty": 0.01
+      },
+      "model": {
+        "embedding_dim": 32,
+        "hidden_dim": 64,
+        "key_dim": 32,
+        "retrieval_k": 4
+      }
+    }
+  },
+  "selected_full_config": "configs/experiments/pilot_tuned.yaml",
+  "screen_minimum_policy_gain_required": 0.01,
+  "full_pilot_required_clear_gain": 0.02,
+  "leaderboard_csv": "reports/tables/pilot_tuning/leaderboard.csv",
+  "aggregate_results_csv": "reports/tables/pilot_tuning/all_candidate_results.csv"
+}

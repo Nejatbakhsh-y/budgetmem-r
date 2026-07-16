@@ -1,0 +1,39 @@
+Section 14 Configuration and Repository Provenance
+==================================================
+
+Generated UTC:       2026-07-16T09:07:34Z
+Generated local:     2026-07-16 05:07:34 EDT
+Repository root:     /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r
+Git remote:          https://github.com/Nejatbakhsh-y/budgetmem-r.git
+Feature branch:      fix/section15-budgetmem-write-controller
+HEAD before commit:  df24ecf64e8a9be7197cf5a879d7f9246942104d
+Python:              Python 3.12.3
+Pytest:              pytest 9.1.1
+
+Operating system:
+Linux DESKTOP-N66626H 6.18.33.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+Git remotes:
+origin	https://github.com/Nejatbakhsh-y/budgetmem-r.git (fetch)
+origin	https://github.com/Nejatbakhsh-y/budgetmem-r.git (push)
+
+Current Git status:
+ M reports/evidence/pilot_go_no_go.json
+ M reports/evidence/pilot_summary.json
+ M reports/pilot_report.md
+ M reports/tables/pilot_results.csv
+?? 14_4_verify_operational_gates.sh
+?? 15_tune_budgetmem_performance.sh
+?? configs/experiments/pilot_tuned.yaml
+?? configs/experiments/pilot_tuning_candidates/
+?? docs/section15_performance_tuning.md
+?? reports/evidence/pilot_tuning/
+?? reports/evidence/section14_3_budget_tests.log
+?? reports/evidence/section14_3_memory_budget_enforcement.txt
+?? reports/evidence/section14_4_operational_gate.json
+?? reports/evidence/section14_4_operational_gate.txt
+?? reports/evidence/section14_configuration_provenance.txt
+?? reports/tables/pilot_tuning/
+?? scripts/tune_budgetmem_performance.py
+?? section14_6_finalize.sh
+?? verify_section14_3.sh

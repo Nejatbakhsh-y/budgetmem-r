@@ -1,0 +1,72 @@
+Section 14 Staged Changes
+=========================
+
+Generated UTC: 2026-07-16T09:07:34Z
+Branch:        fix/section15-budgetmem-write-controller
+
+Files staged for commit:
+A	14_4_verify_operational_gates.sh
+A	15_tune_budgetmem_performance.sh
+A	configs/experiments/pilot_tuned.yaml
+A	configs/experiments/pilot_tuning_candidates/capacity_10e.yaml
+A	configs/experiments/pilot_tuning_candidates/optimization_12e.yaml
+A	configs/experiments/pilot_tuning_candidates/optimization_8e.yaml
+A	docs/section15_performance_tuning.md
+M	reports/evidence/pilot_go_no_go.json
+M	reports/evidence/pilot_summary.json
+A	reports/evidence/pilot_tuning/capacity_10e_summary.json
+A	reports/evidence/pilot_tuning/optimization_12e_summary.json
+A	reports/evidence/pilot_tuning/optimization_8e_summary.json
+A	reports/evidence/pilot_tuning/performance_tuning_decision.json
+A	reports/evidence/section14_3_budget_tests.log
+A	reports/evidence/section14_3_memory_budget_enforcement.txt
+A	reports/evidence/section14_4_operational_gate.json
+A	reports/evidence/section14_4_operational_gate.txt
+A	reports/evidence/section14_completion_summary.txt
+A	reports/evidence/section14_configuration_provenance.txt
+A	reports/evidence/section14_generated_artifact_inventory.txt
+A	reports/evidence/section14_results_evidence_manifest.txt
+M	reports/pilot_report.md
+M	reports/tables/pilot_results.csv
+A	reports/tables/pilot_tuning/all_candidate_results.csv
+A	reports/tables/pilot_tuning/capacity_10e_results.csv
+A	reports/tables/pilot_tuning/leaderboard.csv
+A	reports/tables/pilot_tuning/optimization_12e_results.csv
+A	reports/tables/pilot_tuning/optimization_8e_results.csv
+A	scripts/tune_budgetmem_performance.py
+A	section14_6_finalize.sh
+A	verify_section14_3.sh
+
+Staged diff summary:
+ 14_4_verify_operational_gates.sh                   | 546 +++++++++++++++++++
+ 15_tune_budgetmem_performance.sh                   | 596 +++++++++++++++++++++
+ configs/experiments/pilot_tuned.yaml               |  67 +++
+ .../pilot_tuning_candidates/capacity_10e.yaml      |  62 +++
+ .../pilot_tuning_candidates/optimization_12e.yaml  |  62 +++
+ .../pilot_tuning_candidates/optimization_8e.yaml   |  62 +++
+ docs/section15_performance_tuning.md               |  20 +
+ reports/evidence/pilot_go_no_go.json               |   2 +-
+ reports/evidence/pilot_summary.json                |  76 +--
+ .../pilot_tuning/capacity_10e_summary.json         |  78 +++
+ .../pilot_tuning/optimization_12e_summary.json     |  78 +++
+ .../pilot_tuning/optimization_8e_summary.json      |  78 +++
+ .../pilot_tuning/performance_tuning_decision.json  | 162 ++++++
+ reports/evidence/section14_3_budget_tests.log      |  32 ++
+ .../section14_3_memory_budget_enforcement.txt      |  22 +
+ reports/evidence/section14_4_operational_gate.json | 424 +++++++++++++++
+ reports/evidence/section14_4_operational_gate.txt  |  20 +
+ reports/evidence/section14_completion_summary.txt  |  17 +
+ .../section14_configuration_provenance.txt         |  39 ++
+ .../section14_generated_artifact_inventory.txt     | 184 +++++++
+ .../section14_results_evidence_manifest.txt        |  24 +
+ reports/pilot_report.md                            |   6 +-
+ reports/tables/pilot_results.csv                   | 146 ++---
+ .../tables/pilot_tuning/all_candidate_results.csv  |  19 +
+ .../tables/pilot_tuning/capacity_10e_results.csv   |   7 +
+ reports/tables/pilot_tuning/leaderboard.csv        |   4 +
+ .../pilot_tuning/optimization_12e_results.csv      |   7 +
+ .../pilot_tuning/optimization_8e_results.csv       |   7 +
+ scripts/tune_budgetmem_performance.py              | 439 +++++++++++++++
+ section14_6_finalize.sh                            | 330 ++++++++++++
+ verify_section14_3.sh                              | 515 ++++++++++++++++++
+ 31 files changed, 4016 insertions(+), 115 deletions(-)

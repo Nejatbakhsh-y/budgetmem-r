@@ -3,7 +3,7 @@
   "status": "NO_GO",
   "decision": "Do not begin the full experiment matrix.",
   "criteria": {
-    "training_stability": false,
+    "training_stability": true,
     "strict_memory_budget": true,
     "nontrivial_controller_writes": true,
     "not_recent_state_copying": true,

@@ -1,0 +1,184 @@
+Section 14 Generated-Artifact Inventory
+=======================================
+
+Generated UTC: 2026-07-16T09:07:34Z
+
+------------------------------------------------------------
+reports/evidence
+------------------------------------------------------------
+2026-07-14 23:13:20.1702962000 | 1775 bytes | reports/evidence/pretraining_gate_report.json
+2026-07-15 18:54:33.2461432000 | 44236 bytes | reports/evidence/section15_controller_diagnostic.txt
+2026-07-15 19:08:32.6690889000 | 8758 bytes | reports/evidence/section15_controller_repair_run.log
+2026-07-15 19:42:37.0105538000 | 2372 bytes | reports/evidence/pilot_controller_calibration_summary.json
+2026-07-15 19:42:52.1667955000 | 190 bytes | reports/evidence/section15_controller_fix_summary.json
+2026-07-15 21:09:21.1333948000 | 2864 bytes | reports/evidence/pilot_tuning/optimization_8e_summary.json
+2026-07-15 22:33:34.2138560000 | 2888 bytes | reports/evidence/pilot_tuning/optimization_12e_summary.json
+2026-07-15 23:54:38.0919966000 | 2852 bytes | reports/evidence/pilot_tuning/capacity_10e_summary.json
+2026-07-15 23:54:38.1618150000 | 5148 bytes | reports/evidence/pilot_tuning/performance_tuning_decision.json
+2026-07-16 04:30:25.7189408000 | 7686 bytes | reports/evidence/section15_matrix_coverage.csv
+2026-07-16 04:30:25.7249435000 | 644 bytes | reports/evidence/section15_matrix_coverage.json
+2026-07-16 04:30:25.7314173000 | 1143 bytes | reports/evidence/section15_matrix_coverage.txt
+2026-07-16 04:40:31.1293072000 | 2675 bytes | reports/evidence/section14_3_budget_tests.log
+2026-07-16 04:40:35.3707820000 | 767 bytes | reports/evidence/section14_3_memory_budget_enforcement.txt
+2026-07-16 04:53:41.1427584000 | 8488 bytes | reports/evidence/pilot_summary.json
+2026-07-16 04:53:41.1553499000 | 1080 bytes | reports/evidence/pilot_go_no_go.json
+2026-07-16 04:53:49.7601417000 | 15062 bytes | reports/evidence/section14_4_operational_gate.json
+2026-07-16 04:53:49.7601417000 | 545 bytes | reports/evidence/section14_4_operational_gate.txt
+2026-07-16 05:07:38.0000000000 | 2063 bytes | reports/evidence/section14_results_evidence_manifest.txt
+2026-07-16 05:07:38.3299715000 | 1642 bytes | reports/evidence/section14_configuration_provenance.txt
+2026-07-16 05:07:38.6652590000 | 257 bytes | reports/evidence/section14_generated_artifact_inventory.txt
+
+------------------------------------------------------------
+reports
+------------------------------------------------------------
+2026-07-10 16:17:13.4180484000 | 0 bytes | reports/figures/.gitkeep
+2026-07-10 16:17:13.4198198000 | 0 bytes | reports/logs/.gitkeep
+2026-07-10 16:17:13.4198198000 | 0 bytes | reports/tables/.gitkeep
+2026-07-10 16:17:13.4352023000 | 0 bytes | reports/checkpoints/.gitkeep
+2026-07-10 16:17:13.4409755000 | 0 bytes | reports/statistical_tests/.gitkeep
+2026-07-14 23:13:20.1702962000 | 1775 bytes | reports/evidence/pretraining_gate_report.json
+2026-07-15 18:54:33.2461432000 | 44236 bytes | reports/evidence/section15_controller_diagnostic.txt
+2026-07-15 19:08:32.6690889000 | 8758 bytes | reports/evidence/section15_controller_repair_run.log
+2026-07-15 19:42:36.9912354000 | 1328 bytes | reports/tables/pilot_controller_calibration_results.csv
+2026-07-15 19:42:37.0105538000 | 2372 bytes | reports/evidence/pilot_controller_calibration_summary.json
+2026-07-15 19:42:52.1667955000 | 190 bytes | reports/evidence/section15_controller_fix_summary.json
+2026-07-15 21:09:21.0832488000 | 4858 bytes | reports/tables/pilot_tuning/optimization_8e_results.csv
+2026-07-15 21:09:21.1333948000 | 2864 bytes | reports/evidence/pilot_tuning/optimization_8e_summary.json
+2026-07-15 22:33:34.1788238000 | 5038 bytes | reports/tables/pilot_tuning/optimization_12e_results.csv
+2026-07-15 22:33:34.2138560000 | 2888 bytes | reports/evidence/pilot_tuning/optimization_12e_summary.json
+2026-07-15 23:54:38.0665631000 | 5003 bytes | reports/tables/pilot_tuning/capacity_10e_results.csv
+2026-07-15 23:54:38.0919966000 | 2852 bytes | reports/evidence/pilot_tuning/capacity_10e_summary.json
+2026-07-15 23:54:38.1076266000 | 13541 bytes | reports/tables/pilot_tuning/all_candidate_results.csv
+2026-07-15 23:54:38.1268267000 | 724 bytes | reports/tables/pilot_tuning/leaderboard.csv
+2026-07-15 23:54:38.1618150000 | 5148 bytes | reports/evidence/pilot_tuning/performance_tuning_decision.json
+2026-07-16 04:30:25.7189408000 | 7686 bytes | reports/evidence/section15_matrix_coverage.csv
+2026-07-16 04:30:25.7249435000 | 644 bytes | reports/evidence/section15_matrix_coverage.json
+2026-07-16 04:30:25.7314173000 | 1143 bytes | reports/evidence/section15_matrix_coverage.txt
+2026-07-16 04:40:31.1293072000 | 2675 bytes | reports/evidence/section14_3_budget_tests.log
+2026-07-16 04:40:35.3707820000 | 767 bytes | reports/evidence/section14_3_memory_budget_enforcement.txt
+2026-07-16 04:53:41.1427584000 | 8488 bytes | reports/evidence/pilot_summary.json
+2026-07-16 04:53:41.1553499000 | 1080 bytes | reports/evidence/pilot_go_no_go.json
+2026-07-16 04:53:41.1633516000 | 8408 bytes | reports/pilot_report.md
+2026-07-16 04:53:49.7601417000 | 15062 bytes | reports/evidence/section14_4_operational_gate.json
+2026-07-16 04:53:49.7601417000 | 545 bytes | reports/evidence/section14_4_operational_gate.txt
+2026-07-16 04:56:57.4337115000 | 39981 bytes | reports/tables/pilot_results.csv
+2026-07-16 05:07:38.0000000000 | 2063 bytes | reports/evidence/section14_results_evidence_manifest.txt
+2026-07-16 05:07:38.3299715000 | 1642 bytes | reports/evidence/section14_configuration_provenance.txt
+2026-07-16 05:07:38.7083767000 | 2449 bytes | reports/evidence/section14_generated_artifact_inventory.txt
+
+------------------------------------------------------------
+configs
+------------------------------------------------------------
+2026-07-10 16:17:13.3385544000 | 0 bytes | configs/data/.gitkeep
+2026-07-10 16:17:13.3445510000 | 0 bytes | configs/models/.gitkeep
+2026-07-10 16:17:13.3525620000 | 0 bytes | configs/experiments/.gitkeep
+2026-07-10 16:17:13.3575976000 | 0 bytes | configs/sweeps/.gitkeep
+2026-07-10 22:48:22.0310275000 | 2068 bytes | configs/data/synthetic.yaml
+2026-07-10 22:48:22.0409646000 | 455 bytes | configs/data/hdfs.yaml
+2026-07-10 22:48:22.0500737000 | 312 bytes | configs/data/imdb.yaml
+2026-07-10 22:48:22.0610698000 | 176 bytes | configs/data/bgl.yaml
+2026-07-12 13:21:33.9533753000 | 0 bytes | configs/models/recurrent_baselines.yaml
+2026-07-14 20:39:42.2047601000 | 459 bytes | configs/models/budgetmem_r.yaml
+2026-07-15 19:37:41.7069262000 | 1605 bytes | configs/experiments/pilot.yaml
+2026-07-15 19:39:15.6222353000 | 1606 bytes | configs/experiments/pilot_controller_calibration.yaml
+2026-07-15 20:27:45.2313789000 | 1696 bytes | configs/experiments/pilot_tuning_candidates/optimization_8e.yaml
+2026-07-15 21:09:21.1672556000 | 1705 bytes | configs/experiments/pilot_tuning_candidates/optimization_12e.yaml
+2026-07-15 22:33:34.2363795000 | 1678 bytes | configs/experiments/pilot_tuning_candidates/capacity_10e.yaml
+2026-07-15 23:54:38.1430540000 | 1648 bytes | configs/experiments/pilot_tuned.yaml
+
+------------------------------------------------------------
+scripts
+------------------------------------------------------------
+2026-07-10 16:17:13.1592279000 | 0 bytes | scripts/download_data.py
+2026-07-10 16:17:13.1592279000 | 0 bytes | scripts/generate_synthetic.py
+2026-07-10 16:17:13.1687354000 | 0 bytes | scripts/preprocess_hdfs.py
+2026-07-10 16:17:13.1727334000 | 0 bytes | scripts/preprocess_imdb.py
+2026-07-10 16:17:13.1757327000 | 0 bytes | scripts/train.py
+2026-07-10 16:17:13.1807346000 | 0 bytes | scripts/evaluate.py
+2026-07-10 16:17:13.1857524000 | 0 bytes | scripts/run_scaling.py
+2026-07-10 16:17:13.1907482000 | 0 bytes | scripts/run_ablations.py
+2026-07-10 16:17:13.1957460000 | 0 bytes | scripts/run_statistics.py
+2026-07-10 16:17:13.2011249000 | 0 bytes | scripts/build_paper_assets.py
+2026-07-10 22:48:22.0716154000 | 13531 bytes | scripts/data/generate_synthetic.py
+2026-07-10 22:48:22.0816785000 | 4259 bytes | scripts/data/prepare_imdb.py
+2026-07-10 22:48:22.0941798000 | 8441 bytes | scripts/data/prepare_hdfs.py
+2026-07-10 22:48:22.1051701000 | 3962 bytes | scripts/data/validate_datasets.py
+2026-07-14 20:41:35.6607666000 | 2289 bytes | scripts/__pycache__/validate_budgetmem_r.cpython-312.pyc
+2026-07-14 20:50:54.2007067000 | 1221 bytes | scripts/validate_budgetmem_r.py
+2026-07-14 22:27:29.2777009000 | 6330 bytes | scripts/__pycache__/validate_pretraining_gates.cpython-312.pyc
+2026-07-14 22:27:30.4165614000 | 4388 bytes | scripts/validate_pretraining_gates.py
+2026-07-14 22:29:46.4348061000 | 19423 bytes | scripts/data/__pycache__/generate_synthetic.cpython-312.pyc
+2026-07-15 18:18:06.4109265000 | 987 bytes | scripts/run_pilot.py
+2026-07-15 18:18:07.3074898000 | 1672 bytes | scripts/__pycache__/run_pilot.cpython-312.pyc
+2026-07-15 20:26:58.5032205000 | 17503 bytes | scripts/__pycache__/tune_budgetmem_performance.cpython-312.pyc
+2026-07-15 20:26:59.1053157000 | 14947 bytes | scripts/tune_budgetmem_performance.py
+2026-07-16 04:30:23.8650194000 | 17497 bytes | scripts/verify_section15_matrix.sh
+
+------------------------------------------------------------
+tests
+------------------------------------------------------------
+2026-07-10 16:17:13.2187771000 | 0 bytes | tests/test_tasks.py
+2026-07-10 16:17:13.2289349000 | 0 bytes | tests/test_memory_budget.py
+2026-07-10 16:17:13.2360624000 | 0 bytes | tests/test_models.py
+2026-07-10 16:17:13.2410636000 | 0 bytes | tests/test_determinism.py
+2026-07-10 16:17:13.2440629000 | 0 bytes | tests/test_data_leakage.py
+2026-07-11 05:18:14.8921644000 | 52 bytes | tests/tasks/__init__.py
+2026-07-11 05:18:14.9101630000 | 4166 bytes | tests/tasks/test_selective_copy.py
+2026-07-11 05:18:41.6740106000 | 250 bytes | tests/tasks/__pycache__/__init__.cpython-312.pyc
+2026-07-11 05:18:41.7910263000 | 15406 bytes | tests/tasks/__pycache__/test_selective_copy.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:33:10.6556447000 | 4564 bytes | tests/tasks/test_associative_recall.py
+2026-07-11 05:34:27.9341025000 | 18319 bytes | tests/tasks/__pycache__/test_associative_recall.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:42:36.8152450000 | 4202 bytes | tests/tasks/test_multi_key_retrieval.py
+2026-07-11 05:42:54.9623614000 | 19770 bytes | tests/tasks/__pycache__/test_multi_key_retrieval.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:54:29.7159896000 | 7900 bytes | tests/tasks/test_delayed_xor.py
+2026-07-11 05:55:41.1488995000 | 36980 bytes | tests/tasks/__pycache__/test_delayed_xor.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:56:39.5445304000 | 193 bytes | tests/__pycache__/test_data_leakage.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:56:39.5908705000 | 192 bytes | tests/__pycache__/test_determinism.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:56:39.6334013000 | 194 bytes | tests/__pycache__/test_memory_budget.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:56:39.6872207000 | 187 bytes | tests/__pycache__/test_models.cpython-312-pytest-9.1.1.pyc
+2026-07-11 05:56:39.7372070000 | 186 bytes | tests/__pycache__/test_tasks.cpython-312-pytest-9.1.1.pyc
+2026-07-11 06:26:00.8115652000 | 5912 bytes | tests/tasks/test_rare_event_recall.py
+2026-07-11 06:26:57.1518365000 | 28012 bytes | tests/tasks/__pycache__/test_rare_event_recall.cpython-312-pytest-9.1.1.pyc
+2026-07-11 06:37:28.4120177000 | 7931 bytes | tests/tasks/test_distractor_retrieval.py
+2026-07-11 06:37:52.0425906000 | 34837 bytes | tests/tasks/__pycache__/test_distractor_retrieval.cpython-312-pytest-9.1.1.pyc
+2026-07-12 13:21:33.9282836000 | 0 bytes | tests/models/__init__.py
+2026-07-12 13:21:33.9332250000 | 0 bytes | tests/models/test_model_contract.py
+2026-07-12 13:21:33.9381148000 | 0 bytes | tests/models/test_rnn.py
+2026-07-12 13:21:33.9421609000 | 0 bytes | tests/models/test_gru.py
+2026-07-12 13:21:33.9482417000 | 0 bytes | tests/models/test_lstm.py
+2026-07-14 20:42:02.0187867000 | 191 bytes | tests/models/__pycache__/__init__.cpython-312.pyc
+2026-07-14 20:50:54.1649154000 | 3687 bytes | tests/models/test_budgetmem_r.py
+2026-07-14 20:51:22.9272855000 | 21174 bytes | tests/models/__pycache__/test_budgetmem_r.cpython-312-pytest-9.1.1.pyc
+2026-07-14 22:27:27.8417621000 | 0 bytes | tests/pretraining/__init__.py
+2026-07-14 22:27:28.2961456000 | 0 bytes | tests/__init__.py
+2026-07-14 22:27:28.9728264000 | 126 bytes | tests/pretraining/__pycache__/__init__.cpython-312.pyc
+2026-07-14 22:27:29.0176875000 | 4527 bytes | tests/pretraining/__pycache__/conftest.cpython-312.pyc
+2026-07-14 22:27:29.0624978000 | 4129 bytes | tests/pretraining/__pycache__/test_budget_and_causality.cpython-312.pyc
+2026-07-14 22:27:29.1232520000 | 5409 bytes | tests/pretraining/__pycache__/test_determinism.cpython-312.pyc
+2026-07-14 22:27:29.1796874000 | 5957 bytes | tests/pretraining/__pycache__/test_gradient_and_reset.cpython-312.pyc
+2026-07-14 22:27:29.2365190000 | 8282 bytes | tests/pretraining/__pycache__/test_split_leakage.cpython-312.pyc
+2026-07-14 22:27:30.4175663000 | 2498 bytes | tests/pretraining/test_budget_and_causality.py
+2026-07-14 22:27:30.4185695000 | 2885 bytes | tests/pretraining/conftest.py
+2026-07-14 22:27:30.4323924000 | 3574 bytes | tests/pretraining/test_determinism.py
+2026-07-14 22:27:46.3975353000 | 184 bytes | tests/__pycache__/__init__.cpython-312.pyc
+2026-07-14 22:27:46.5422851000 | 4709 bytes | tests/pretraining/__pycache__/conftest.cpython-312-pytest-9.1.1.pyc
+2026-07-14 22:28:44.5764644000 | 9389 bytes | tests/pretraining/__pycache__/test_budget_and_causality.cpython-312-pytest-9.1.1.pyc
+2026-07-14 22:28:44.6838747000 | 12470 bytes | tests/pretraining/__pycache__/test_determinism.cpython-312-pytest-9.1.1.pyc
+2026-07-14 22:29:05.0322541000 | 7997 bytes | tests/models/__pycache__/test_budgetmem_r.cpython-312.pyc
+2026-07-14 22:36:32.8596480000 | 4291 bytes | tests/pretraining/test_gradient_and_reset.py
+2026-07-14 22:40:57.8443631000 | 18776 bytes | tests/pretraining/__pycache__/test_gradient_and_reset.cpython-312-pytest-9.1.1.pyc
+2026-07-14 22:59:59.1727010000 | 5648 bytes | tests/pretraining/test_split_leakage.py
+2026-07-14 23:01:11.9018337000 | 27477 bytes | tests/pretraining/__pycache__/test_split_leakage.cpython-312-pytest-9.1.1.pyc
+2026-07-15 18:18:06.4793036000 | 3199 bytes | tests/pilot/test_pilot.py
+2026-07-15 18:18:06.7211287000 | 30 bytes | tests/pilot/__init__.py
+2026-07-15 18:18:07.3536805000 | 158 bytes | tests/pilot/__pycache__/__init__.cpython-312.pyc
+2026-07-15 18:18:07.4084811000 | 4326 bytes | tests/pilot/__pycache__/test_pilot.cpython-312.pyc
+2026-07-15 18:18:20.2891890000 | 9261 bytes | tests/pilot/__pycache__/test_pilot.cpython-312-pytest-9.1.1.pyc
+2026-07-15 19:37:41.7385022000 | 1573 bytes | tests/pilot/test_controller_calibration.py
+2026-07-15 19:37:42.4329680000 | 2405 bytes | tests/pilot/__pycache__/test_controller_calibration.cpython-312.pyc
+2026-07-15 19:38:01.8991976000 | 5385 bytes | tests/pilot/__pycache__/test_controller_calibration.cpython-312-pytest-9.1.1.pyc
+2026-07-16 04:39:10.9232305000 | 191 bytes | tests/models/__pycache__/test_gru.cpython-312-pytest-9.1.1.pyc
+2026-07-16 04:39:10.9798339000 | 192 bytes | tests/models/__pycache__/test_lstm.cpython-312-pytest-9.1.1.pyc
+2026-07-16 04:39:11.0538503000 | 202 bytes | tests/models/__pycache__/test_model_contract.cpython-312-pytest-9.1.1.pyc
+2026-07-16 04:39:11.1882076000 | 191 bytes | tests/models/__pycache__/test_rnn.cpython-312-pytest-9.1.1.pyc
+
