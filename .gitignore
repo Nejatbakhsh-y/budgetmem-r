@@ -71,3 +71,19 @@ htmlcov/
 *.temp
 *.pid
 # END SECTION 14 RUNTIME OUTPUTS
+# Python runtime outputs
+*.pyo
+.coverage.*
+# Virtual environments
+env/
+tmp/
+temp/
+logs/
+# Training runtime outputs
+*.ckpt
+*.pt
+*.pth
+# Editor and operating-system files
+.idea/
+*.swp
+*.swo
