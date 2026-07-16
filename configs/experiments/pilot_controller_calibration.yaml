@@ -8,20 +8,12 @@ pretraining_gate:
 matrix:
   tasks:
   - selective_copy
-  - associative_recall
-  - distractor_heavy_retrieval
   train_sequence_length: 256
   evaluation_sequence_lengths:
   - 256
-  - 512
-  - 1024
   memory_budgets:
   - 16
-  - 32
   models:
-  - gru
-  - gru_uniform_cache
-  - gru_reservoir_cache
   - budgetmem_r
 model:
   vocabulary_size: 192
@@ -32,8 +24,8 @@ model:
   max_target_length: 12
   dropout: 0.0
 training:
-  train_samples: 128
-  validation_samples: 48
+  train_samples: 64
+  validation_samples: 24
   batch_size: 8
   epochs: 4
   learning_rate: 0.001
@@ -59,9 +51,9 @@ evaluation:
   long_range_sequence_length: 1024
   resource_sample_interval_seconds: 0.01
 artifacts:
-  output_root: outputs/pilot
-  results_csv: reports/tables/pilot_results.csv
-  summary_json: reports/evidence/pilot_summary.json
-  gate_json: reports/evidence/pilot_go_no_go.json
-  report_markdown: reports/pilot_report.md
-  checkpoint_root: outputs/pilot/checkpoints
+  output_root: outputs/pilot_controller_calibration
+  results_csv: reports/tables/pilot_controller_calibration_results.csv
+  summary_json: reports/evidence/pilot_controller_calibration_summary.json
+  gate_json: reports/evidence/pilot_controller_calibration_gate.json
+  report_markdown: reports/pilot_controller_calibration_report.md
+  checkpoint_root: outputs/pilot_controller_calibration/checkpoints

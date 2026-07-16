@@ -466,6 +466,9 @@ class BudgetMemRAdapter(nn.Module):
         super().__init__()
         model_cfg = cfg["model"]
         matrix_cfg = cfg["matrix"]
+        training_cfg = cfg["training"]
+        self.write_threshold = float(training_cfg.get("write_threshold", 0.5))
+        self.write_temperature = float(training_cfg.get("write_temperature", 0.67))
         self.vocab_size = int(model_cfg["vocabulary_size"])
         self.embedding_dim = int(model_cfg["embedding_dim"])
         self.hidden_dim = int(model_cfg["hidden_dim"])
@@ -512,8 +515,9 @@ class BudgetMemRAdapter(nn.Module):
             "cell_type": "gru",
             "fusion": "gated",
             "fusion_type": "gated",
-            "write_threshold": 0.5,
-            "temperature": 1.0,
+            "write_threshold": self.write_threshold,
+            "write_temperature": self.write_temperature,
+            "temperature": self.write_temperature,
             "dropout": 0.0,
             "num_layers": 1,
             "detach_memory": False,
@@ -689,12 +693,21 @@ def total_training_loss(
         return loss
     training_cfg = cfg["training"]
     if output.write_probabilities is not None:
-        write_rate = output.write_probabilities.float().mean()
+        probabilities = output.write_probabilities.float()
+        threshold = float(training_cfg.get("write_threshold", 0.5))
+        hard = (probabilities >= threshold).to(probabilities.dtype)
+        straight_through = hard.detach() - probabilities.detach() + probabilities
+        per_sample_write_rate = straight_through.mean(dim=1)
         target_rate = float(training_cfg["write_rate_target"])
         loss = (
             loss
             + float(training_cfg["write_rate_penalty"])
-            * (write_rate - target_rate).square()
+            * (per_sample_write_rate - target_rate).square().mean()
+        )
+        loss = (
+            loss
+            + float(training_cfg.get("write_binarization_penalty", 0.0))
+            * (probabilities * (1.0 - probabilities)).mean()
         )
     if output.memory_sizes is not None:
         overflow = torch.relu(output.memory_sizes.float() - float(budget)).mean()
