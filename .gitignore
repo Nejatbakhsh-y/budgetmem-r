@@ -31,3 +31,5 @@ htmlcov/
 # Section 15 pilot operational artifacts
 outputs/pilot/
 .section15_backup/
+outputs/
+reports/evidence/section15_controller_repair_run.log
