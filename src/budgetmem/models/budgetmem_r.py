@@ -358,15 +358,14 @@ class BudgetMemR(nn.Module):
         return (similarity + 1.0) * 0.5
 
     def _write_gate(self, logits: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        # Training and evaluation must use the same deterministic hard decision.
+        # The relaxed value is retained only as the straight-through gradient path.
         probabilities = torch.sigmoid(logits)
+        hard = (probabilities >= self.write_threshold).to(logits.dtype)
         if self.training:
-            uniform = torch.rand_like(logits).clamp_(1.0e-6, 1.0 - 1.0e-6)
-            logistic_noise = torch.log(uniform) - torch.log1p(-uniform)
-            relaxed = torch.sigmoid((logits + logistic_noise) / self.write_temperature)
-            hard = (relaxed >= self.write_threshold).to(logits.dtype)
+            relaxed = torch.sigmoid(logits / self.write_temperature)
             straight_through = hard.detach() - relaxed.detach() + relaxed
             return probabilities, hard, straight_through
-        hard = (probabilities >= self.write_threshold).to(logits.dtype)
         return probabilities, hard, hard
 
     def _choose_write_slots(

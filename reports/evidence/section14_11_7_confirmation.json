@@ -1,0 +1,38 @@
+{
+  "analysis_json": "reports/evidence/section14_11_7_cell_analysis.json",
+  "analysis_json_sha256": "05e6751e073d02c644379c7414de4b5369395b2bd56edc57281aabc4cebd45e4",
+  "audited_cells": 6,
+  "decision": "PASS",
+  "generated_utc": "2026-07-20T00:17:19.514501+00:00",
+  "invalid_cells": [],
+  "long_range_minimum": 1024,
+  "metric": "token_accuracy",
+  "metric_direction": "higher",
+  "qualifying_cell_records": [
+    {
+      "budget": 32,
+      "budgetmem_minus_reservoir": 0.002604166666666667,
+      "budgetmem_minus_uniform": 0.005208333333333334,
+      "budgetmem_r": 0.0078125,
+      "gru_reservoir_cache": 0.005208333333333333,
+      "gru_uniform_cache": 0.0026041666666666665,
+      "long_range": true,
+      "metric": "token_accuracy",
+      "policy_wins": 2,
+      "qualifies": true,
+      "seed": "",
+      "sequence_length": 1024,
+      "task": "selective_copy"
+    }
+  ],
+  "qualifying_cells": 1,
+  "required_policies": [
+    "GRU + uniform cache",
+    "GRU + reservoir cache"
+  ],
+  "required_policy_wins": 2,
+  "required_qualifying_cells": 1,
+  "section": "14.11.7",
+  "source_csv": "reports/tables/section14_11_5_matched_comparison.csv",
+  "source_csv_sha256": "10b83b67b320e61713b9e5518c6c3e015afb69d15da040de44f27f1fc3afc7ae"
+}

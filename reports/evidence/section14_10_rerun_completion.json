@@ -1,0 +1,22 @@
+{
+  "status": "COMPLETE",
+  "requirement": "Rerun the Section 15 pilot with the improved configuration.",
+  "completed_at_utc": "2026-07-17T22:30:45.138049+00:00",
+  "configuration": "configs/experiments/pilot_tuned.yaml",
+  "configuration_sha256": "fad774b1ea1971e991b162a19526cd8c0273b6b488c76eeee9c27b6279f6704e",
+  "selected_candidate": "optimization_12e",
+  "tuning_screen_status": "SCREEN_NO_GO",
+  "pilot_gate_status": "NO_GO",
+  "pilot_decision": "Do not begin the full experiment matrix.",
+  "expected_matrix_rows": 72,
+  "observed_matrix_rows": 72,
+  "matrix_complete": true,
+  "all_budget_checks_passed": true,
+  "all_resource_checks_passed": true,
+  "results_csv": "reports/tables/pilot_tuned_results.csv",
+  "summary_json": "reports/evidence/pilot_tuned_summary.json",
+  "gate_json": "reports/evidence/pilot_tuned_go_no_go.json",
+  "report_markdown": "reports/pilot_tuned_report.md",
+  "terminal_log": "reports/evidence/section14_10_tuned_pilot_terminal.log",
+  "interpretation": "The Section 14.10 rerun requirement is complete. The separate research GO/NO_GO decision is preserved exactly as reported by the pilot gate."
+}

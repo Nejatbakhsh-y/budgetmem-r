@@ -1,0 +1,28 @@
+Section 14.11.7 Completion Summary
+=================================
+
+Generated UTC: 2026-07-20T00:21:57Z
+Branch: fix/section15-budgetmem-write-controller
+Source commit before finalization: 68d0a393beca1fad0cf713bf1147b64d1fb14818
+
+Decision: PASS
+Metric: token_accuracy
+Long-range minimum sequence length: 1024
+Required qualifying cells: 1
+Verified qualifying cells: 1 or more
+
+Verified conclusion:
+BudgetMem-R strictly outperforms both GRU + uniform cache and
+GRU + reservoir cache in at least one matched long-range cell
+at the same task, sequence length, seed, and memory budget.
+
+Retraining required: NO
+
+Evidence SHA-256:
+8786058694c9ab40f0beed4c2fab08deecfd7b5d971cb39f70fecfe654b3e5c6  reports/evidence/section14_11_7_confirmation.json
+487dcff2ffbc4b6a9629b3840f101cfcfc2ce16c7f38b147f0324e474a1a767c  reports/evidence/section14_11_7_confirmation.txt
+a7799e5d017d37309097295b80af19d2f089c58d90ed699072fc1574931fce87  reports/tables/section14_11_7_qualifying_cells.csv
+05e6751e073d02c644379c7414de4b5369395b2bd56edc57281aabc4cebd45e4  reports/evidence/section14_11_7_cell_analysis.json
+d978519d3b58b8bf6c9ade0111680797911105cd68d348692352602d69a336c2  reports/evidence/section14_11_7_cell_analysis.txt
+8786058694c9ab40f0beed4c2fab08deecfd7b5d971cb39f70fecfe654b3e5c6  reports/evidence/section14_11_5_confirmation.json
+487dcff2ffbc4b6a9629b3840f101cfcfc2ce16c7f38b147f0324e474a1a767c  reports/evidence/section14_11_5_confirmation.txt

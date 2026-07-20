@@ -27,3 +27,66 @@ htmlcov/
 !/data/manifests/
 !/data/manifests/**
 .section14_backup/
+
+# Section 15 pilot operational artifacts
+outputs/pilot/
+.section15_backup/
+outputs/
+reports/evidence/section15_controller_repair_run.log
+
+# BEGIN SECTION 14 RUNTIME OUTPUTS
+# Experiment execution directories
+.runtime/
+runtime/
+runs/
+checkpoints/
+wandb/
+mlruns/
+tensorboard/
+lightning_logs/
+
+# Temporary runtime reports
+reports/runtime/
+reports/tmp/
+artifacts/runtime/
+
+# Python and test caches
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Coverage and profiling outputs
+.coverage
+coverage.xml
+htmlcov/
+.prof/
+*.prof
+
+# Runtime logs and temporary files
+*.log
+*.tmp
+*.temp
+*.pid
+# END SECTION 14 RUNTIME OUTPUTS
+# Python runtime outputs
+*.pyo
+.coverage.*
+# Virtual environments
+env/
+tmp/
+temp/
+logs/
+# Training runtime outputs
+*.ckpt
+*.pt
+*.pth
+# Editor and operating-system files
+.idea/
+*.swp
+*.swo
+
+# Section 15 tuned-pilot runtime artifacts
+outputs/pilot_tuned/

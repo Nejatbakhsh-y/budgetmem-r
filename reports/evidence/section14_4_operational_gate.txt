@@ -1,0 +1,20 @@
+SECTION 14.4 OPERATIONAL VALIDATION
+===================================
+
+PASS: stability
+PASS: resource measurement
+PASS: configuration provenance
+PASS: checkpoint resumption
+
+FINAL STATUS: PASS
+
+Configuration SHA-256: 2d0d68dfd73270c7bcb12f39067e5fd2ee9af07dd6d6f74784e4f85e83c4c24a
+Pilot result rows: 72
+Checkpoint files found: 34
+Resource columns: peak_rss_mb
+
+Evidence files:
+  reports/evidence/pilot_summary.json
+  reports/evidence/pilot_go_no_go.json
+  reports/tables/pilot_results.csv
+  reports/evidence/section14_4_operational_gate.json

@@ -1,0 +1,24 @@
+Section 14 Results and Evidence Manifest
+========================================
+
+Generated UTC: 2026-07-16T09:07:34Z
+Branch:        fix/section15-budgetmem-write-controller
+
+Format:
+SHA256 | SIZE_BYTES | FILE
+
+6105104423cd9da5961f3eec2957c99f7b6aef06b22c041f5e2c9934689b1811 | 2372 | reports/evidence/pilot_controller_calibration_summary.json
+7ac99fe9afae42519a5471a42c0ea5cfdc34008509c2eafe9e254d0f7e8b177f | 1080 | reports/evidence/pilot_go_no_go.json
+650636cd8fa97ce0d040d15e3bac1c8027955143676b6330258969600684aead | 8488 | reports/evidence/pilot_summary.json
+76369d5a08c899d431020f8984fa5cf22a371eb83efaa80e3ac08449f5c796fb | 1775 | reports/evidence/pretraining_gate_report.json
+a2415bf829738f773b2ab99156891c96047deffc323b3fa85d934d49870e83c3 | 2675 | reports/evidence/section14_3_budget_tests.log
+12e61e4c8b285463022437678f768942f8d6ac016feea5054050621eaa38a01f | 767 | reports/evidence/section14_3_memory_budget_enforcement.txt
+cc558a51235373cfd1edc1081f2bac6dccfac9ea81f817b765bf7427606b21f6 | 15062 | reports/evidence/section14_4_operational_gate.json
+e2f0d0965e159b80e2b10a7839ca3f1a12e36160e3716f9c90160327be10aeaa | 545 | reports/evidence/section14_4_operational_gate.txt
+fbfc2d688567639137a9888eed1b0974f8f98f8016a212b596a8e8d493cf4c32 | 1642 | reports/evidence/section14_configuration_provenance.txt
+9cecc2719e06f692cf40ab0041615505d1d30df4b0f051959e5ed7f0cdf205ed | 44236 | reports/evidence/section15_controller_diagnostic.txt
+42a14dec8df2ae71e6d08949be9567028ed356d2a912ba4b7913750c6b512341 | 190 | reports/evidence/section15_controller_fix_summary.json
+7fa8fcb172eeb959f281cd3480413996d591a4d56d1db445607c8682e21c9e56 | 8758 | reports/evidence/section15_controller_repair_run.log
+25e0d2f77a811e7a7464e3d642b792381320500d609b3bae2cf873c280e12193 | 7686 | reports/evidence/section15_matrix_coverage.csv
+5192a9f2cdc88a561ad7b4e848cd397816512294053f0b05a657aa1019e8e0de | 644 | reports/evidence/section15_matrix_coverage.json
+c46e2bcefe80b8c621173964e8f4746405fb4e84aac2e51ad5d41f4ddfd5b72d | 1143 | reports/evidence/section15_matrix_coverage.txt

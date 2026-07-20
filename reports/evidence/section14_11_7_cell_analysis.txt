@@ -1,0 +1,53 @@
+====================================================================================================
+SECTION 14.11.7 — EXACT MATCHED-CELL ANALYSIS
+====================================================================================================
+Source: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/tables/section14_11_5_matched_comparison.csv
+Rows: 6
+Columns: 18
+
+task                       | sequence_length | seed | memory_budget | metric         | direction | clear_margin_required | budgetmem_r_score     | gru_uniform_cache_score | uniform_margin        | uniform_clearly_beaten | gru_reservoir_cache_score | reservoir_margin      | reservoir_clearly_beaten | policies_clearly_beaten | missing_roles | ambiguous_roles | status           
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+associative_recall         | 1024            | 2026 | 16            | token_accuracy | higher    | 0.02                  | 0.0                   | 0.020833333333333332    | -0.020833333333333332 | False                  | 0.0                       | 0.0                   | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+associative_recall         | 1024            | 2026 | 32            | token_accuracy | higher    | 0.02                  | 0.0                   | 0.0                     | 0.0                   | False                  | 0.0                       | 0.0                   | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+distractor_heavy_retrieval | 1024            | 2026 | 16            | token_accuracy | higher    | 0.02                  | 0.0                   | 0.006944444444444444    | -0.006944444444444444 | False                  | 0.006944444444444444      | -0.006944444444444444 | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+distractor_heavy_retrieval | 1024            | 2026 | 32            | token_accuracy | higher    | 0.02                  | 0.013888888888888888  | 0.006944444444444444    | 0.006944444444444444  | False                  | 0.013888888888888888      | 0.0                   | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+selective_copy             | 1024            | 2026 | 16            | token_accuracy | higher    | 0.02                  | 0.0026041666666666665 | 0.0                     | 0.0026041666666666665 | False                  | 0.0026041666666666665     | 0.0                   | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+selective_copy             | 1024            | 2026 | 32            | token_accuracy | higher    | 0.02                  | 0.0078125             | 0.0026041666666666665   | 0.005208333333333334  | False                  | 0.005208333333333333      | 0.002604166666666667  | False                    | 0                       |               |                 | MATCHED_NOT_CLEAR
+
+Detected wide/precomputed comparison format
+----------------------------------------------------------------------------------------------------
+BudgetMem-R score candidates: ['budgetmem_r_score']
+Uniform score candidates: ['gru_uniform_cache_score']
+Reservoir score candidates: ['gru_reservoir_cache_score']
+Numeric columns: ['sequence_length', 'seed', 'memory_budget', 'clear_margin_required', 'budgetmem_r_score', 'gru_uniform_cache_score', 'uniform_margin', 'gru_reservoir_cache_score', 'reservoir_margin', 'policies_clearly_beaten']
+
+row=1 task=associative_recall seq=1024 budget=16
+  BudgetMem-R=0.0; uniform=0.020833333333333332; reservoir=0.0
+  deltas: vs_uniform=-0.020833333333333332; vs_reservoir=0.0; wins=0/2; qualifies=False
+
+row=2 task=associative_recall seq=1024 budget=32
+  BudgetMem-R=0.0; uniform=0.0; reservoir=0.0
+  deltas: vs_uniform=0.0; vs_reservoir=0.0; wins=0/2; qualifies=False
+
+row=3 task=distractor_heavy_retrieval seq=1024 budget=16
+  BudgetMem-R=0.0; uniform=0.006944444444444444; reservoir=0.006944444444444444
+  deltas: vs_uniform=-0.006944444444444444; vs_reservoir=-0.006944444444444444; wins=0/2; qualifies=False
+
+row=4 task=distractor_heavy_retrieval seq=1024 budget=32
+  BudgetMem-R=0.013888888888888888; uniform=0.006944444444444444; reservoir=0.013888888888888888
+  deltas: vs_uniform=0.006944444444444444; vs_reservoir=0.0; wins=1/2; qualifies=False
+
+row=5 task=selective_copy seq=1024 budget=16
+  BudgetMem-R=0.0026041666666666665; uniform=0.0; reservoir=0.0026041666666666665
+  deltas: vs_uniform=0.0026041666666666665; vs_reservoir=0.0; wins=1/2; qualifies=False
+
+row=6 task=selective_copy seq=1024 budget=32
+  BudgetMem-R=0.0078125; uniform=0.0026041666666666665; reservoir=0.005208333333333333
+  deltas: vs_uniform=0.005208333333333334; vs_reservoir=0.002604166666666667; wins=2/2; qualifies=True
+
+
+FINAL DIAGNOSIS
+----------------------------------------------------------------------------------------------------
+Qualifying cells: 1
+Required qualifying cells: 1
+The score values appear to satisfy the performance rule. The confirmation script likely has a comparator-mapping or qualification-logic defect.

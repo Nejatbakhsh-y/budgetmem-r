@@ -1,0 +1,22 @@
+SECTION 14.3 — MEMORY-BUDGET ENFORCEMENT
+============================================================
+Generated UTC: 2026-07-16T08:40:35.343722+00:00
+Git commit: df24ecf64e8a9be7197cf5a879d7f9246942104d
+
+Budget-test status: PASS
+Pytest exit code: 0
+Pytest log: reports/evidence/section14_3_budget_tests.log
+
+Evidence status: PASS
+Evidence files checked: 11
+Budget/usage comparisons: 1
+Detected violations: 0
+Maximum observed usage/budget ratio: 1.000000
+Maximum observation: reports/evidence/pilot_controller_calibration_summary.json [root.result], max_memory_size=16, budget=16
+
+Violations
+- None detected.
+
+OVERALL RESULT: PASS
+
+Conclusion: Memory-budget enforcement passed. All relevant tests passed, and no observed memory usage exceeded its configured budget.
