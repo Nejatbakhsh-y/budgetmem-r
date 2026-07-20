@@ -1,0 +1,138 @@
+{
+  "checks": {
+    "required_files": true,
+    "policy_registry": true,
+    "baseline_registry": true,
+    "stage_1_simple_recurrent": true,
+    "stage_2_deterministic_caching": true,
+    "stage_3_attention": true,
+    "stage_4_modern_sequence": true,
+    "stage_5_recurrent_memory": true,
+    "stage_6_memory_caching": true,
+    "parameter_budget_calibration": true,
+    "training_token_budget_contract": true
+  },
+  "complete": true,
+  "state_space_backend": "s4d_reference",
+  "maximum_parameter_relative_error": 0.044476,
+  "policy_indices_smoke_test": {
+    "uniform": [
+      [
+        0,
+        5,
+        10,
+        15
+      ],
+      [
+        0,
+        5,
+        10,
+        15
+      ]
+    ],
+    "most_recent": [
+      [
+        12,
+        13,
+        14,
+        15
+      ],
+      [
+        12,
+        13,
+        14,
+        15
+      ]
+    ],
+    "fifo": [
+      [
+        12,
+        13,
+        14,
+        15
+      ],
+      [
+        12,
+        13,
+        14,
+        15
+      ]
+    ],
+    "lru": [
+      [
+        12,
+        13,
+        14,
+        15
+      ],
+      [
+        12,
+        13,
+        14,
+        15
+      ]
+    ],
+    "random": [
+      [
+        0,
+        1,
+        8,
+        10
+      ],
+      [
+        2,
+        3,
+        8,
+        9
+      ]
+    ],
+    "reservoir": [
+      [
+        2,
+        6,
+        7,
+        8
+      ],
+      [
+        6,
+        9,
+        11,
+        13
+      ]
+    ],
+    "novelty": [
+      [
+        0,
+        2,
+        8,
+        15
+      ],
+      [
+        0,
+        3,
+        7,
+        15
+      ]
+    ],
+    "surprise": [
+      [
+        1,
+        2,
+        11,
+        12
+      ],
+      [
+        1,
+        6,
+        14,
+        15
+      ]
+    ]
+  },
+  "parameter_counts_smoke_test": {
+    "rnn": 788,
+    "gru": 1876,
+    "lstm": 2420,
+    "s4d_reference": 496
+  }
+}

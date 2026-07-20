@@ -1,0 +1,59 @@
+{
+  "reference_model": "gru",
+  "reference_hidden_dim": 64,
+  "target_parameters": 28240,
+  "input_dim": 32,
+  "output_dim": 16,
+  "models": {
+    "vanilla_rnn": {
+      "hidden_dim": 108,
+      "parameters": 29068,
+      "relative_error": 0.02932
+    },
+    "gru": {
+      "hidden_dim": 64,
+      "parameters": 28240,
+      "relative_error": 0.0
+    },
+    "lstm": {
+      "hidden_dim": 56,
+      "parameters": 28408,
+      "relative_error": 0.005949
+    },
+    "transformer_full": {
+      "hidden_dim": 44,
+      "parameters": 29496,
+      "relative_error": 0.044476
+    },
+    "transformer_sliding": {
+      "hidden_dim": 44,
+      "parameters": 29496,
+      "relative_error": 0.044476
+    },
+    "state_space": {
+      "hidden_dim": 368,
+      "parameters": 28352,
+      "relative_error": 0.003966
+    },
+    "recurrent_memory_transformer": {
+      "hidden_dim": 56,
+      "parameters": 28800,
+      "relative_error": 0.01983
+    },
+    "memory_caching_mean": {
+      "hidden_dim": 48,
+      "parameters": 28336,
+      "relative_error": 0.003399
+    },
+    "memory_caching_gated": {
+      "hidden_dim": 48,
+      "parameters": 28336,
+      "relative_error": 0.003399
+    },
+    "memory_caching_sparse_selective": {
+      "hidden_dim": 48,
+      "parameters": 28336,
+      "relative_error": 0.003399
+    }
+  }
+}

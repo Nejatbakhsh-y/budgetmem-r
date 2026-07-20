@@ -1,0 +1,16 @@
+Section 12 — Controlled Baseline Verification
+============================================
+Required implementation files: PASS
+Stage 1 — Simple recurrent baselines: PASS
+Stage 2 — Deterministic caching baselines: PASS
+Stage 3 — Attention baselines: PASS
+Stage 4 — Modern sequence baseline: PASS
+Stage 4 backend used: s4d_reference
+Stage 5 — Recurrent-memory baseline: PASS
+Stage 6 — Memory Caching baseline: PASS
+Baseline registry: PASS
+Policy registry: PASS
+Parameter-budget calibration: PASS
+Maximum parameter relative error: 0.0445
+Equal training-token contract: PASS
+Section 12: COMPLETE
