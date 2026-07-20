@@ -1,24 +1,41 @@
-name: budgetmem_r
-input_dim: 8
-hidden_dim: 128
-output_dim: 2
-backbone: gru
-fusion: gated
-max_budget: 128
-allowed_budgets: [8, 16, 32, 64, 128]
-key_dim: 64
-value_dim: 128
-budget_embedding_dim: 16
-retrieval_k: 4
-write_threshold: 0.5
-write_temperature: 0.67
-detach_memory_writes: false
-
+model:
+  name: budgetmem_r
+  backbone: gru
+  hidden_dim: 128
+  key_dim: 64
+  value_dim: 128
+  budget_embedding_dim: 16
+  controller_dim: 64
+  max_budget: 128
+  training_budgets: [8, 16, 32, 64, 128]
+  retrieval:
+    top_k: 4
+  fusion:
+    mode: gated
+    comparison_modes: [concatenation, residual, gated, attention]
+  write:
+    threshold: 0.5
+    temperature: 0.67
+    differentiable_training: straight_through_relaxed_bernoulli
+    evaluation_selection: hard_threshold
+  eviction:
+    learned_policy: lowest_predicted_future_utility
+    comparison_policies:
+      - fifo
+      - lru
+      - random
+      - reservoir
+      - lowest_novelty
+      - lowest_retrieval_frequency
+  leakage_control:
+    final_task_label_available_to_controller: false
+    self_supervised_signal: next_input_prediction
 loss:
-  task_kind: classification
-  sequence_task: false
   lambda_budget: 1.0
   lambda_write: 0.01
-  lambda_auxiliary: 0.1
+  lambda_aux: 0.1
   lambda_diversity: 0.01
-  max_write_fraction: 0.25
+  target_write_rate: 0.25
+invariants:
+  hard_memory_budget: true
+  maximum_resident_slots_per_sample: requested_budget

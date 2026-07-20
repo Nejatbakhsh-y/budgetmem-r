@@ -1,0 +1,20 @@
+Section 13 BudgetMem-R Model-Package Repair
+UTC timestamp: 20260720T025554Z
+
+Root cause:
+The previous compatibility repair replaced the first line of a parenthesized
+import in src/budgetmem/models/__init__.py but left its indented continuation
+lines, producing an IndentationError.
+
+Repair status:
+Model package syntax: PASS
+BudgetMemR package import: PASS
+BudgetMemROutput package import: PASS
+Output adapter compatibility: PASS
+Hard memory-budget enforcement: PASS
+Section 13 unit tests: PASS
+Section 13 verifier: PASS
+Final decision: PASS
+
+Log: reports/evidence/logs/section13_models_init_repair_20260720T025554Z.log
+Backup: reports/evidence/backups/section13_models_init_repair_20260720T025554Z
