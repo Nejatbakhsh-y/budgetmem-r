@@ -1,0 +1,2 @@
+task,sequence_length,budget,seed,metric,budgetmem_r,gru_uniform_cache,gru_reservoir_cache,budgetmem_minus_uniform,budgetmem_minus_reservoir,policy_wins,long_range,qualifies
+selective_copy,1024,32,,token_accuracy,0.0078125,0.0026041666666666665,0.005208333333333333,0.005208333333333334,0.002604166666666667,2,True,True

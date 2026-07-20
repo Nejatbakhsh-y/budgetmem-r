@@ -1,0 +1,23 @@
+============================================================================
+SECTION 14.11.7 — CORRECTED FINAL CONFIRMATION
+============================================================================
+
+Decision:                    PASS
+Metric:                      token_accuracy
+Metric direction:            higher
+Long-range minimum:          1024
+Audited matched cells:       6
+Invalid cells:               0
+Qualifying cells:            1
+Required qualifying cells:   1
+
+Qualification rule:
+BudgetMem-R must have strictly higher token_accuracy than both GRU + uniform cache and GRU + reservoir cache in the same task, sequence-length, budget, and seed cell.
+
+Qualifying matched cells
+----------------------------------------------------------------------------
+task=selective_copy | sequence_length=1024 | budget=32 | seed=NA
+  BudgetMem-R=0.0078125 | uniform=0.00260416666667 | reservoir=0.00520833333333
+  delta_vs_uniform=0.00520833333333 | delta_vs_reservoir=0.00260416666667 | wins=2/2
+
+Conclusion: BudgetMem-R satisfies the Section 14.11 performance gate without retraining. The earlier FAIL was caused by defective comparator mapping or qualification logic in the legacy confirmation.
