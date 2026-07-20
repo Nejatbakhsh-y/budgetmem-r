@@ -1,0 +1,25 @@
+====================================================================================================
+DETACHED-MEMORY TARGETED SCREEN
+====================================================================================================
+
+Recorded decision:             TARGETED_NO_GO
+Maximum gradient norm:         181.897781
+Allowed gradient norm:         100.000000
+Gradient margin:               -81.897781
+Stability pass:                False
+Qualified policies:            2/2
+Strict budget pass:            True
+Resource measurement pass:     True
+Write-frequency pass:          True
+Mean write frequency:          0.2651621500651042
+detach_memory_writes:          True
+
+Policy comparison:
+             policy  matched_budgets  mean_gain  minimum_gain  clear_win_rate  qualifies
+gru_reservoir_cache                2   0.260417      0.145833             1.0       True
+  gru_uniform_cache                2   0.317708      0.197917             1.0       True
+
+====================================================================================================
+FINAL TARGETED STATUS
+====================================================================================================
+TARGETED DECISION: NO-GO

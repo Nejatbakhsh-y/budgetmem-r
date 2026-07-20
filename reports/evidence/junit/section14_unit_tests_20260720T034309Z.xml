@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="30" skipped="0" tests="158" time="140.179" timestamp="2026-07-19T23:44:19.321833-04:00" hostname="DESKTOP-N66626H"><testcase classname="tests.models.test_budgetmem_r" name="test_strict_budget_is_never_violated" time="0.111"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_strict_budget_is_never_violated() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model().eval()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_eval_is_deterministic" time="0.088"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_eval_is_deterministic() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model(write_threshold=0.5).eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'write_threshold': 0.5}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_forward_api_does_not_accept_task_labels" time="0.003" /><testcase classname="tests.models.test_budgetmem_r" name="test_training_loss_backpropagates_to_write_controller" time="0.094"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_training_loss_backpropagates_to_write_controller() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model(write_threshold=0.0).train()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'write_threshold': 0.0}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_budget_sampler_uses_only_allowed_values" time="0.080"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_budget_sampler_uses_only_allowed_values() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model().train()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_fusion_modes_produce_expected_shapes[concatenation]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">fusion = 'concatenation'
+
+    @pytest.mark.parametrize(
+        "fusion",
+        ["concatenation", "residual", "gated", "attention"],
+    )
+    def test_all_fusion_modes_produce_expected_shapes(fusion: str) -&gt; None:
+&gt;       model = _model(fusion=fusion).eval()
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'fusion': 'concatenation'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_fusion_modes_produce_expected_shapes[residual]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">fusion = 'residual'
+
+    @pytest.mark.parametrize(
+        "fusion",
+        ["concatenation", "residual", "gated", "attention"],
+    )
+    def test_all_fusion_modes_produce_expected_shapes(fusion: str) -&gt; None:
+&gt;       model = _model(fusion=fusion).eval()
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'fusion': 'residual'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_fusion_modes_produce_expected_shapes[gated]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">fusion = 'gated'
+
+    @pytest.mark.parametrize(
+        "fusion",
+        ["concatenation", "residual", "gated", "attention"],
+    )
+    def test_all_fusion_modes_produce_expected_shapes(fusion: str) -&gt; None:
+&gt;       model = _model(fusion=fusion).eval()
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'fusion': 'gated'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_fusion_modes_produce_expected_shapes[attention]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">fusion = 'attention'
+
+    @pytest.mark.parametrize(
+        "fusion",
+        ["concatenation", "residual", "gated", "attention"],
+    )
+    def test_all_fusion_modes_produce_expected_shapes(fusion: str) -&gt; None:
+&gt;       model = _model(fusion=fusion).eval()
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'fusion': 'attention'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_recurrent_backbones_run[rnn]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">backbone = 'rnn'
+
+    @pytest.mark.parametrize("backbone", ["rnn", "gru", "lstm"])
+    def test_all_recurrent_backbones_run(backbone: str) -&gt; None:
+&gt;       model = _model(backbone=backbone).eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'backbone': 'rnn'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_recurrent_backbones_run[gru]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">backbone = 'gru'
+
+    @pytest.mark.parametrize("backbone", ["rnn", "gru", "lstm"])
+    def test_all_recurrent_backbones_run(backbone: str) -&gt; None:
+&gt;       model = _model(backbone=backbone).eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'backbone': 'gru'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_all_recurrent_backbones_run[lstm]" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">backbone = 'lstm'
+
+    @pytest.mark.parametrize("backbone", ["rnn", "gru", "lstm"])
+    def test_all_recurrent_backbones_run(backbone: str) -&gt; None:
+&gt;       model = _model(backbone=backbone).eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {'backbone': 'lstm'}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_invalid_budget_is_rejected" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_invalid_budget_is_rejected() -&gt; None:
+&gt;       model = _model().eval()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r_straight_through_repair" name="test_empty_memory_is_filled_before_replacement_control" time="0.087"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_empty_memory_is_filled_before_replacement_control() -&gt; None:
+        torch.manual_seed(2026)
+    
+&gt;       model = _model().eval()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r_straight_through_repair.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _model() -&gt; BudgetMemR:
+&gt;       return BudgetMemR(
+            input_dim=6,
+            hidden_dim=12,
+            output_dim=4,
+            max_budget=4,
+            allowed_budgets=(2, 4),
+            key_dim=8,
+            value_dim=10,
+            retrieval_k=2,
+            write_threshold=1.0,
+        )
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r_straight_through_repair.py:11: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r_straight_through_repair" name="test_task_path_reaches_write_controller_after_memory_is_full" time="0.092"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_task_path_reaches_write_controller_after_memory_is_full() -&gt; None:
+        torch.manual_seed(2026)
+    
+&gt;       model = _model().train()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r_straight_through_repair.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _model() -&gt; BudgetMemR:
+&gt;       return BudgetMemR(
+            input_dim=6,
+            hidden_dim=12,
+            output_dim=4,
+            max_budget=4,
+            allowed_budgets=(2, 4),
+            key_dim=8,
+            value_dim=10,
+            retrieval_k=2,
+            write_threshold=1.0,
+        )
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r_straight_through_repair.py:11: TypeError</failure></testcase><testcase classname="tests.pilot.test_controller_calibration" name="test_training_and_evaluation_use_the_same_hard_write_decision" time="0.028"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">def test_training_and_evaluation_use_the_same_hard_write_decision() -&gt; None:
+&gt;       model = BudgetMemR(
+            input_dim=4,
+            hidden_dim=8,
+            output_dim=3,
+            max_budget=4,
+            allowed_budgets=(2, 4),
+            write_threshold=0.5,
+        )
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/pilot/test_controller_calibration.py:12: TypeError</failure></testcase><testcase classname="tests.pilot.test_controller_calibration" name="test_write_rate_loss_pushes_collapsed_probabilities_upward" time="0.143" /><testcase classname="tests.pilot.test_detached_memory_adapter" name="test_pilot_adapter_passes_detach_memory_writes" time="0.024"><failure message="ValueError: Every training budget must be &lt;= max_budget">def test_pilot_adapter_passes_detach_memory_writes() -&gt; None:
+        path = Path(
+            "configs/experiments/"
+            "pilot_assoc_detached_memory.yaml"
+        )
+    
+        cfg = yaml.safe_load(
+            path.read_text(encoding="utf-8")
+        )
+    
+&gt;       adapter = BudgetMemRAdapter(cfg)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pilot/test_detached_memory_adapter.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/budgetmem/experiments/pilot.py:489: in __init__
+    self.core = budgetmem_class(**kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BudgetMemR(), input_dim = 32, hidden_dim = 64, output_dim = 2304
+key_dim = 32, value_dim = 64, budget_embedding_dim = 8, controller_dim = 64
+max_budget = 32, training_budgets = (8, 16, 32, 64, 128), top_k = 4
+fusion_mode = 'gated', write_threshold = 0.5, write_temperature = 0.67
+
+    def __init__(
+        self,
+        *,
+        input_dim: int,
+        hidden_dim: int,
+        output_dim: int,
+        key_dim: int = 64,
+        value_dim: int | None = None,
+        budget_embedding_dim: int = 16,
+        controller_dim: int = 64,
+        max_budget: int = 128,
+        training_budgets: Sequence[int] = DEFAULT_TRAINING_BUDGETS,
+        top_k: int = 4,
+        fusion_mode: str = "gated",
+        write_threshold: float = 0.5,
+        write_temperature: float = 0.67,
+    ) -&gt; None:
+        super().__init__()
+        if input_dim &lt;= 0 or hidden_dim &lt;= 0 or output_dim &lt;= 0:
+            raise ValueError("input_dim, hidden_dim, and output_dim must be positive")
+        if max_budget &lt;= 0:
+            raise ValueError("max_budget must be positive")
+        if not training_budgets:
+            raise ValueError("training_budgets cannot be empty")
+        if max(training_budgets) &gt; max_budget:
+&gt;           raise ValueError("Every training budget must be &lt;= max_budget")
+E           ValueError: Every training budget must be &lt;= max_budget
+
+src/budgetmem/models/budgetmem_r.py:66: ValueError</failure></testcase><testcase classname="tests.pilot.test_pilot" name="test_pilot_matrix_is_exact" time="0.018" /><testcase classname="tests.pilot.test_pilot" name="test_uniform_and_reservoir_never_exceed_budget" time="0.214" /><testcase classname="tests.pilot.test_pilot" name="test_go_no_go_requires_both_memory_policy_wins" time="0.018" /><testcase classname="tests.pilot.test_pilot" name="test_go_no_go_fails_when_one_policy_is_not_clearly_beaten" time="0.020" /><testcase classname="tests.pretraining.test_budget_and_causality" name="test_memory_never_exceeds_configured_budget_at_any_forward_step" time="0.047"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_never_exceeds_configured_budget_at_any_forward_step() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_budget_and_causality.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.pretraining.test_budget_and_causality" name="test_future_tokens_do_not_change_earlier_memory_decisions" time="0.001"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_future_tokens_do_not_change_earlier_memory_decisions() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_budget_and_causality.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_and_configuration_produce_identical_synthetic_example" time="0.026" /><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_model_initialization_and_evaluation" time="26.586"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_same_seed_produces_identical_model_initialization_and_evaluation() -&gt; None:
+        seed_everything(2026)
+&gt;       first_model = build_budgetmem_model().eval()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_determinism.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_training_order" time="0.041" /><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_controllers_receive_gradients_and_graph_policy_is_explicit" time="0.122"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_controllers_receive_gradients_and_graph_policy_is_explicit() -&gt; None:
+        # Test the write controller under its normal, nonsaturated initialization.
+        torch.manual_seed(12000)
+&gt;       write_model = build_budgetmem_model().train()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_gradient_and_reset.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_is_reset_between_unrelated_forward_calls" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_is_reset_between_unrelated_forward_calls() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_gradient_and_reset.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+overrides = {}
+
+    def _model(**overrides: object) -&gt; BudgetMemR:
+        config: dict[str, object] = {
+            "input_dim": 6,
+            "hidden_dim": 12,
+            "output_dim": 3,
+            "max_budget": 5,
+            "allowed_budgets": (1, 2, 3, 4, 5),
+            "key_dim": 8,
+            "value_dim": 10,
+            "retrieval_k": 2,
+            "write_threshold": 0.0,
+        }
+        config.update(overrides)
+&gt;       return BudgetMemR(**config)
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'allowed_budgets'
+
+tests/models/test_budgetmem_r.py:27: TypeError</failure></testcase><testcase classname="tests.pretraining.test_split_leakage" name="test_synthetic_split_and_task_seeds_do_not_overlap" time="0.025" /><testcase classname="tests.pretraining.test_split_leakage" name="test_generated_synthetic_sample_ids_do_not_cross_splits" time="1.244" /><testcase classname="tests.pretraining.test_split_leakage" name="test_hdfs_block_ids_do_not_cross_splits" time="1.442" /><testcase classname="tests.pretraining.test_split_leakage" name="test_imdb_official_test_examples_are_not_in_train_or_validation" time="3.245" /><testcase classname="tests.tasks.test_associative_recall" name="test_same_configuration_is_identical" time="0.144" /><testcase classname="tests.tasks.test_associative_recall" name="test_different_seeds_normally_differ" time="0.002" /><testcase classname="tests.tasks.test_associative_recall" name="test_output_sequence_length_is_correct" time="0.004" /><testcase classname="tests.tasks.test_associative_recall" name="test_relevant_positions_are_valid_indices" time="0.002" /><testcase classname="tests.tasks.test_associative_recall" name="test_distractor_positions_are_valid_indices" time="0.004" /><testcase classname="tests.tasks.test_associative_recall" name="test_position_categories_are_disjoint_and_complete" time="0.004" /><testcase classname="tests.tasks.test_associative_recall" name="test_oracle_required_positions_define_the_target" time="0.003" /><testcase classname="tests.tasks.test_associative_recall" name="test_input_and_target_shapes_are_correct" time="0.004" /><testcase classname="tests.tasks.test_delayed_xor" name="test_same_seed_produces_identical_output" time="0.009" /><testcase classname="tests.tasks.test_delayed_xor" name="test_different_seeds_can_produce_different_instances" time="0.005" /><testcase classname="tests.tasks.test_delayed_xor" name="test_return_schema_is_complete" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_input_and_target_shapes_and_dtypes" time="0.008" /><testcase classname="tests.tasks.test_delayed_xor" name="test_operand_positions_are_delayed_and_query_is_last" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_relevant_distractor_and_query_positions_are_valid" time="0.004" /><testcase classname="tests.tasks.test_delayed_xor" name="test_role_markers_match_position_categories" time="0.005" /><testcase classname="tests.tasks.test_delayed_xor" name="test_target_is_xor_of_relevant_operand_bits" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_oracle_matches_public_position_fields" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7-16-TypeError0]" time="0.004" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7.5-16-TypeError]" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[True-16-TypeError]" time="0.005" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[-1-16-ValueError]" time="0.009" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7-16-TypeError1]" time="0.002" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7-16.5-TypeError]" time="0.008" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7-True-TypeError]" time="0.003" /><testcase classname="tests.tasks.test_delayed_xor" name="test_invalid_arguments_raise_clear_errors[7-7-ValueError]" time="0.004" /><testcase classname="tests.tasks.test_delayed_xor" name="test_minimum_sequence_length_is_supported" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_output_schema_shapes_and_dtypes" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[0-8]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[19-31]" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[2026-128]" time="0.005" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_different_seeds_change_the_generated_example" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_position_sets_are_valid_and_complete[8]" time="0.007" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_position_sets_are_valid_and_complete[37]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_position_sets_are_valid_and_complete[128]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_target_query_distractors_and_oracle_are_correct[3-8]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_target_query_distractors_and_oracle_are_correct[41-64]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_target_query_distractors_and_oracle_are_correct[999-256]" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_seed_types_raise_type_error[True]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_seed_types_raise_type_error[1.5]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_seed_types_raise_type_error[7]" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_seed_types_raise_type_error[None]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_sequence_length_types_raise_type_error[True]" time="0.005" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_sequence_length_types_raise_type_error[8.5]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_sequence_length_types_raise_type_error[32]" time="0.005" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_invalid_sequence_length_types_raise_type_error[None]" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_negative_seed_raises_value_error" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_short_sequence_length_raises_value_error[-1]" time="0.009" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_short_sequence_length_raises_value_error[0]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_short_sequence_length_raises_value_error[7]" time="0.002" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_same_configuration_is_identical" time="0.004" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_different_seeds_normally_differ" time="0.005" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_output_sequence_length_is_correct" time="0.003" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_multiple_queries_and_targets_are_returned" time="0.008" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_relevant_positions_are_valid_indices" time="0.002" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_distractor_positions_are_valid_indices" time="0.003" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_position_categories_are_disjoint_and_complete" time="0.003" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_oracle_required_positions_define_the_target" time="0.006" /><testcase classname="tests.tasks.test_multi_key_retrieval" name="test_input_and_target_shapes_are_correct" time="0.003" /><testcase classname="tests.tasks.test_pilot_oracle_alignment" name="test_pilot_associative_oracle_contains_only_queried_values" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_same_configuration_is_identical" time="0.008" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_different_seeds_normally_differ" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_output_shapes_and_dtypes_are_correct" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_relevant_positions_are_valid_unique_indices" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_distractor_positions_are_valid_indices" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_position_categories_are_disjoint_and_complete" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_role_markers_identify_events_queries_and_plain_distractors" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_query_tokens_select_the_target_events" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_oracle_required_positions_define_target" time="0.006" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_unqueried_rare_events_are_task_distractors" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_seed_is_rejected[-1]" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_seed_is_rejected[1.5]" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_seed_is_rejected[105]" time="0.002" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_seed_is_rejected[True]" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_sequence_length_is_rejected[11]" time="0.002" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_sequence_length_is_rejected[64.0]" time="0.004" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_sequence_length_is_rejected[64]" time="0.003" /><testcase classname="tests.tasks.test_rare_event_recall" name="test_invalid_sequence_length_is_rejected[True]" time="0.005" /><testcase classname="tests.tasks.test_selective_copy" name="test_same_configuration_is_identical" time="0.008" /><testcase classname="tests.tasks.test_selective_copy" name="test_different_seeds_normally_differ" time="0.005" /><testcase classname="tests.tasks.test_selective_copy" name="test_output_sequence_length_is_correct" time="0.006" /><testcase classname="tests.tasks.test_selective_copy" name="test_relevant_positions_are_valid_indices" time="0.004" /><testcase classname="tests.tasks.test_selective_copy" name="test_distractor_positions_are_valid_indices" time="0.004" /><testcase classname="tests.tasks.test_selective_copy" name="test_relevant_and_distractor_positions_do_not_overlap" time="0.008" /><testcase classname="tests.tasks.test_selective_copy" name="test_oracle_required_positions_define_the_target" time="0.003" /><testcase classname="tests.tasks.test_selective_copy" name="test_input_and_target_shapes_are_correct" time="0.003" /><testcase classname="tests.test_budgetmem_r" name="test_training_budget_sampling_uses_only_controlled_choices" time="0.004" /><testcase classname="tests.test_budgetmem_r" name="test_hard_budget_is_never_violated_even_when_every_step_writes" time="0.139" /><testcase classname="tests.test_budgetmem_r" name="test_forward_api_prevents_final_label_leakage" time="0.002" /><testcase classname="tests.test_budgetmem_r" name="test_all_fusion_comparison_modes_execute" time="0.072" /><testcase classname="tests.test_budgetmem_r" name="test_composite_objective_is_finite_and_controller_receives_gradient" time="0.192" /><testcase classname="tests.test_budgetmem_r" name="test_invalid_budget_fails_fast" time="0.006" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model0]" time="0.009" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model1]" time="0.009" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model2]" time="0.207" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[fifo]" time="0.002" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[lru]" time="0.006" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[most_recent]" time="0.003" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[novelty]" time="0.006" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[random]" time="0.012" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[reservoir]" time="0.006" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[surprise]" time="0.004" /><testcase classname="tests.test_section12_baselines" name="test_cache_policies_respect_budget[uniform]" time="0.019" /><testcase classname="tests.test_section12_baselines" name="test_seeded_policies_are_reproducible" time="0.007" /><testcase classname="tests.test_section12_baselines" name="test_attention_baselines[full]" time="0.048" /><testcase classname="tests.test_section12_baselines" name="test_attention_baselines[sliding]" time="0.008" /><testcase classname="tests.test_section12_baselines" name="test_state_space_baseline_cpu_fallback" time="0.023" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_memory_transformer_preserves_length" time="0.013" /><testcase classname="tests.test_section12_baselines" name="test_memory_caching_variants[mean]" time="0.013" /><testcase classname="tests.test_section12_baselines" name="test_memory_caching_variants[gated]" time="0.014" /><testcase classname="tests.test_section12_baselines" name="test_memory_caching_variants[sparse_selective]" time="0.013" /><testcase classname="tests.test_section12_baselines" name="test_registries_cover_all_required_baselines" time="0.002" /><testcase classname="tests.test_section12_baselines" name="test_parameter_budget_guard" time="0.006" /><testcase classname="tests.test_section14_required" name="test_14_01_budget_correctness_every_forward_step" time="0.573"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16">def test_14_01_budget_correctness_every_forward_step() -&gt; None:
+        budget = 4
+        model = build_model(seed=2026, budget=budget)
+        model.eval()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=12)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 12
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        for x in _candidate_inputs(model, seq_len=seq_len):
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                failures.append(f"shape={tuple(x.shape)}, dtype={x.dtype}: {type(exc).__name__}: {exc}")
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+
+tests/section14_runtime.py:438: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_02_causality_future_tokens_do_not_change_earlier_steps" time="0.584"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16">def test_14_02_causality_future_tokens_do_not_change_earlier_steps() -&gt; None:
+        seed = 2026
+        model_a = build_model(seed=seed, budget=4)
+        model_b = build_model(seed=seed, budget=4)
+        assert state_dict_equal(model_a, model_b), "Models are not identically initialized."
+    
+        model_a.eval()
+        model_b.eval()
+&gt;       x = compatible_input(model_a, seq_len=12)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 12
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        for x in _candidate_inputs(model, seq_len=seq_len):
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                failures.append(f"shape={tuple(x.shape)}, dtype={x.dtype}: {type(exc).__name__}: {exc}")
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+
+tests/section14_runtime.py:438: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_03_deterministic_dataset_generation" time="0.462"><failure message="KeyError: 0">def test_14_03_deterministic_dataset_generation() -&gt; None:
+        try:
+            first = build_synthetic_dataset(seed=2026, split="train")
+            second = build_synthetic_dataset(seed=2026, split="train")
+        except Section14DiscoveryError:
+            assert existing_test_has(
+                ("synthetic", "dataset"),
+                ("determin", "same seed", "reproduc"),
+            ), (
+                "Synthetic dataset factory was not discovered and no existing deterministic "
+                "synthetic-dataset test was found."
+            )
+            return
+    
+&gt;       assert dataset_fingerprint(first) == dataset_fingerprint(second), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "The same synthetic seed and configuration produced different datasets."
+        )
+
+tests/test_section14_required.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+dataset = {'input': array([[294,   0],
+       [612,   0],
+       [ 69,   1],
+       [128,   2],
+       [715,   0],
+       [860, ...,   3]]), 'target': array([191]), 'relevant_positions': [14, 15], 'distractor_positions': [0, 1, 2, 3, 4, 5, ...], ...}
+limit = 16
+
+    def dataset_fingerprint(dataset: Any, limit: int = 16) -&gt; str:
+        digest = hashlib.sha256()
+        if hasattr(dataset, "__len__") and hasattr(dataset, "__getitem__"):
+            count = min(int(len(dataset)), limit)
+            for index in range(count):
+&gt;               digest.update(_stable_serialize(dataset[index]))
+                                                ^^^^^^^^^^^^^^
+E               KeyError: 0
+
+tests/section14_runtime.py:850: KeyError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_04_deterministic_initialization" time="0.532" /><testcase classname="tests.test_section14_required" name="test_14_05_deterministic_training_order" time="0.159" /><testcase classname="tests.test_section14_required" name="test_14_06_deterministic_evaluation_output" time="0.521"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16">def test_14_06_deterministic_evaluation_output() -&gt; None:
+        first = build_model(seed=2026, budget=4)
+        second = build_model(seed=2026, budget=4)
+        second.load_state_dict(copy.deepcopy(first.state_dict()))
+        first.eval()
+        second.eval()
+&gt;       x = compatible_input(first, seq_len=10)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 10
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        for x in _candidate_inputs(model, seq_len=seq_len):
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                failures.append(f"shape={tuple(x.shape)}, dtype={x.dtype}: {type(exc).__name__}: {exc}")
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+
+tests/section14_runtime.py:438: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_07_synthetic_seeds_do_not_overlap" time="0.459" /><testcase classname="tests.test_section14_required" name="test_14_08_hdfs_block_ids_do_not_overlap" time="48.887"><failure message="AssertionError: HDFS validation block IDs and HDFS test block IDs overlap. Overlap count=1076; sample=['3ecfd3001fb7e1934778640b8a7aa1531898b58d0039e8982783664de0bb11dd', 'c27e86abcfce2396d87a207794a3b8c106f962fc8167cb69bf58bca56210585f', 'baab6ce0fc4fc320f77c37c9710eab66d3a446911d8128cf3d14d372d365b5de', 'f0b121e239599845ee70b9063590343ef93f1567974369b2f03a1c9cfe6e3230', 'c1a63135f2b95c67c93b272985bd71caef18450b5daea0ad3bf9cefa84839afe']&#10;assert not {'0016b84f3949f649498252e4b0f939205a30e5fe3656ba4bf1a60109cf88e70a', '00737b976f412cdb80c23cd569690a8c0af71b674373d506...5b6561922d8a75c862877997175a0dfb3c3fd99fd053', '010e6dfda9be9a66256feb437832a2fbdc14a9f136201af48b9589bed620cad8', ...}">def test_14_08_hdfs_block_ids_do_not_overlap() -&gt; None:
+        identities = local_split_identities(
+            "hdfs",
+            ("block_id", "blockid", "block", "id"),
+        )
+        if all(identities.values()):
+            _assert_no_overlap("HDFS train block IDs", identities["train"], "HDFS validation block IDs", identities["validation"])
+            _assert_no_overlap("HDFS train block IDs", identities["train"], "HDFS test block IDs", identities["test"])
+&gt;           _assert_no_overlap("HDFS validation block IDs", identities["validation"], "HDFS test block IDs", identities["test"])
+
+tests/test_section14_required.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+left_name = 'HDFS validation block IDs'
+left = {'0000736555729ebf8f7619b630724e5fb941cdd10e91a3d2d623599e0f4007e1', '0000bb100e882c03576c9c434a6267cfb8d64c45c9d93120...2fa867ecfebee955fdff415a6f414301179edca2865d', '000260a1c380a294e64d6aa72d2feeab1871495d3800d24cde120f8ea97580cd', ...}
+right_name = 'HDFS test block IDs'
+right = {'000015e1af0c39b3446d14a18caed9fb195cec3d580007bb66ba5b7420b0468f', '0002c9fb4276276a450169a696d3141d7e20241d2673877a...2244e1579689dcb969a72f7ba9f74bd6bfb4f631dbce', '00060b1eaeff15eb4b02d411a846659c868a0167c512fd8b54b414440d3b2541', ...}
+
+    def _assert_no_overlap(
+        left_name: str,
+        left: set[object],
+        right_name: str,
+        right: set[object],
+    ) -&gt; None:
+        overlap = left &amp; right
+&gt;       assert not overlap, (
+            f"{left_name} and {right_name} overlap. "
+            f"Overlap count={len(overlap)}; sample={list(overlap)[:5]}"
+        )
+E       AssertionError: HDFS validation block IDs and HDFS test block IDs overlap. Overlap count=1076; sample=['3ecfd3001fb7e1934778640b8a7aa1531898b58d0039e8982783664de0bb11dd', 'c27e86abcfce2396d87a207794a3b8c106f962fc8167cb69bf58bca56210585f', 'baab6ce0fc4fc320f77c37c9710eab66d3a446911d8128cf3d14d372d365b5de', 'f0b121e239599845ee70b9063590343ef93f1567974369b2f03a1c9cfe6e3230', 'c1a63135f2b95c67c93b272985bd71caef18450b5daea0ad3bf9cefa84839afe']
+E       assert not {'0016b84f3949f649498252e4b0f939205a30e5fe3656ba4bf1a60109cf88e70a', '00737b976f412cdb80c23cd569690a8c0af71b674373d506...5b6561922d8a75c862877997175a0dfb3c3fd99fd053', '010e6dfda9be9a66256feb437832a2fbdc14a9f136201af48b9589bed620cad8', ...}
+
+tests/test_section14_required.py:61: AssertionError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_09_imdb_test_examples_not_in_train_or_validation" time="6.398"><failure message="AssertionError: IMDb train examples and IMDb official test examples overlap. Overlap count=111; sample=['abba3b0a48bc1cfe280ba1a7bd01a413e2a35e8053195452b91ff9c4a8d63979', '513430c5c9a417662aacac576af3569ff05cd828ad03dd71d3216be064199f05', '19c4cbbd01b4f0f9aea0cefe5a2b0b016c7b878f4423ec552f27e5f8225a2377', '24107cbd7b0ae0bb6465bcc677f6cc077a92b37e92399f4c9aaaf8bd79c70ed0', '0c8400dc3d320f1447599c45d904a17fc8c9819bdc7125a5b08fd5307f3953c6']&#10;assert not {'011e8663d9447492d45d42f75d15e1d5cc0785417a0688d1d7964f10f976e1a6', '032e389b75ac2a7532d0288c717a675f0303ca9525e4e1cd...bfa4f5b37e33b56747b483dd95ce06df26a72fe44184', '0a8a8468e8866f975f173234fe98065e0c6251ad7fed0873437e3ef3510d3820', ...}">def test_14_09_imdb_test_examples_not_in_train_or_validation() -&gt; None:
+        identities = local_split_identities(
+            "imdb",
+            ("text", "review", "content", "sentence", "example_id", "id"),
+        )
+        if identities["test"] and (identities["train"] or identities["validation"]):
+&gt;           _assert_no_overlap("IMDb train examples", identities["train"], "IMDb official test examples", identities["test"])
+
+tests/test_section14_required.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+left_name = 'IMDb train examples'
+left = {'00008ec0634b4913256640a57e47eebed9eb84b82db8c64c5454cfd5c9f37757', '00009d65489a12e1cfc1792b9a145f21a1a867deb23ac090...905dd8a20654a95bd51533c189bb5307a811ed7f2bc0', '000c66ec00d1c35b7bed4141068ca449bb1439b211ce91b1d69c2ed754a40786', ...}
+right_name = 'IMDb official test examples'
+right = {'0006bbe6e89fcd304f525a8252b11613e58e4fd8ba8191e6e38db531923e59f5', '000d0169055ede575221339cc924461120313cc237628518...8d9c5d3a173e22e6c9123d30a334516ba76fe32c7690', '0013fad67e05b34397f9177cb2b14b03bf71634bed7d4360f778843ce030f64f', ...}
+
+    def _assert_no_overlap(
+        left_name: str,
+        left: set[object],
+        right_name: str,
+        right: set[object],
+    ) -&gt; None:
+        overlap = left &amp; right
+&gt;       assert not overlap, (
+            f"{left_name} and {right_name} overlap. "
+            f"Overlap count={len(overlap)}; sample={list(overlap)[:5]}"
+        )
+E       AssertionError: IMDb train examples and IMDb official test examples overlap. Overlap count=111; sample=['abba3b0a48bc1cfe280ba1a7bd01a413e2a35e8053195452b91ff9c4a8d63979', '513430c5c9a417662aacac576af3569ff05cd828ad03dd71d3216be064199f05', '19c4cbbd01b4f0f9aea0cefe5a2b0b016c7b878f4423ec552f27e5f8225a2377', '24107cbd7b0ae0bb6465bcc677f6cc077a92b37e92399f4c9aaaf8bd79c70ed0', '0c8400dc3d320f1447599c45d904a17fc8c9819bdc7125a5b08fd5307f3953c6']
+E       assert not {'011e8663d9447492d45d42f75d15e1d5cc0785417a0688d1d7964f10f976e1a6', '032e389b75ac2a7532d0288c717a675f0303ca9525e4e1cd...bfa4f5b37e33b56747b483dd95ce06df26a72fe44184', '0a8a8468e8866f975f173234fe98065e0c6251ad7fed0873437e3ef3510d3820', ...}
+
+tests/test_section14_required.py:61: AssertionError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_10_memory_controller_parameters_receive_gradients" time="0.331"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16">def test_14_10_memory_controller_parameters_receive_gradients() -&gt; None:
+        model = build_model(seed=2026, budget=4, force_detach=False)
+        model.train()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=10)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 10
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        for x in _candidate_inputs(model, seq_len=seq_len):
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                failures.append(f"shape={tuple(x.shape)}, dtype={x.dtype}: {type(exc).__name__}: {exc}")
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+
+tests/section14_runtime.py:438: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_11_detached_cached_states_are_intentionally_detached" time="0.984" /><testcase classname="tests.test_section14_required" name="test_14_12_trainable_cached_states_remain_connected" time="0.430"><failure message="AssertionError: No explicit trainable cached-state path was found. Expose a configuration such as detach_cached_states=False or trainable_memory=True.&#10;assert False">def test_14_12_trainable_cached_states_remain_connected() -&gt; None:
+        evidence = cache_graph_policy_evidence()
+&gt;       assert evidence["trainable_path"], (
+            "No explicit trainable cached-state path was found. Expose a configuration such as "
+            "detach_cached_states=False or trainable_memory=True."
+        )
+E       AssertionError: No explicit trainable cached-state path was found. Expose a configuration such as detach_cached_states=False or trainable_memory=True.
+E       assert False
+
+tests/test_section14_required.py:333: AssertionError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_13_memory_reset_between_unrelated_sequences" time="0.313"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16">def test_14_13_memory_reset_between_unrelated_sequences() -&gt; None:
+        model = build_model(seed=2026, budget=4)
+        model.eval()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=10)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 10
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        for x in _candidate_inputs(model, seq_len=seq_len):
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                failures.append(f"shape={tuple(x.shape)}, dtype={x.dtype}: {type(exc).__name__}: {exc}")
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+
+tests/section14_runtime.py:438: Section14DiscoveryError</failure></testcase></testsuite></testsuites>

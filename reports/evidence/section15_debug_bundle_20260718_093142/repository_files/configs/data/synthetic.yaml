@@ -1,0 +1,99 @@
+output_root: data/processed/synthetic
+schema_version: "1.0"
+split_sizes:
+  train: 2000
+  validation: 500
+  test: 500
+split_seeds:
+  train: 11001
+  validation: 22001
+  test: 33001
+
+tasks:
+  selective_copy:
+    enabled: true
+    sequence_length: 256
+    vocabulary_size: 128
+    number_keys: 8
+    number_queries: 1
+    delay_length: 32
+    distractor_percentage: 80
+    number_relevant_events: 8
+    random_seed: 101
+
+  associative_recall:
+    enabled: true
+    sequence_length: 256
+    vocabulary_size: 128
+    number_keys: 12
+    number_queries: 1
+    delay_length: 32
+    distractor_percentage: 65
+    number_relevant_events: 12
+    random_seed: 102
+
+  multiple_key_retrieval:
+    enabled: true
+    sequence_length: 384
+    vocabulary_size: 192
+    number_keys: 16
+    number_queries: 4
+    delay_length: 64
+    distractor_percentage: 70
+    number_relevant_events: 16
+    random_seed: 103
+
+  delayed_xor:
+    enabled: true
+    sequence_length: 256
+    vocabulary_size: 32
+    number_keys: 2
+    number_queries: 1
+    delay_length: 128
+    distractor_percentage: 90
+    number_relevant_events: 2
+    random_seed: 104
+
+  rare_event_recall:
+    enabled: true
+    sequence_length: 512
+    vocabulary_size: 128
+    number_keys: 8
+    number_queries: 2
+    delay_length: 128
+    distractor_percentage: 95
+    number_relevant_events: 4
+    random_seed: 105
+
+  distractor_heavy_retrieval:
+    enabled: true
+    sequence_length: 512
+    vocabulary_size: 192
+    number_keys: 12
+    number_queries: 3
+    delay_length: 128
+    distractor_percentage: 97
+    number_relevant_events: 12
+    random_seed: 106
+
+  sequence_reversal:
+    enabled: false
+    sequence_length: 256
+    vocabulary_size: 128
+    number_keys: 8
+    number_queries: 1
+    delay_length: 32
+    distractor_percentage: 50
+    number_relevant_events: 32
+    random_seed: 201
+
+  nested_parentheses:
+    enabled: false
+    sequence_length: 256
+    vocabulary_size: 32
+    number_keys: 2
+    number_queries: 1
+    delay_length: 32
+    distractor_percentage: 50
+    number_relevant_events: 32
+    random_seed: 202

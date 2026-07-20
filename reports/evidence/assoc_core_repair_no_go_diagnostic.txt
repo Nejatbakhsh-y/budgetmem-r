@@ -1,0 +1,46 @@
+====================================================================================================
+ASSOCIATIVE-RECALL CORE-REPAIR DIAGNOSTIC
+====================================================================================================
+
+Recorded decision: TARGETED_NO_GO
+
+====================================================================================================
+AUXILIARY CRITERIA
+====================================================================================================
+stability_pass: False
+budget_pass: True
+resource_pass: True
+write_frequency_pass: True
+write_frequency: 0.6020406087239583
+outperforms_both_policies: True
+
+====================================================================================================
+PERFORMANCE GATE
+====================================================================================================
+Qualified policies: 2/2
+
+             policy  matched_budgets  mean_gain  minimum_gain  clear_win_rate  qualifies
+gru_reservoir_cache                2   0.442708      0.312500             1.0       True
+  gru_uniform_cache                2   0.500000      0.364583             1.0       True
+
+====================================================================================================
+BUDGETMEM-R RESULT ROWS
+====================================================================================================
+              task       model  sequence_length  memory_budget  memory_recall  token_accuracy  write_frequency  stability_pass  budget_pass  resource_measurement_pass
+associative_recall budgetmem_r             1024             16       0.364583        0.000000         0.612823           False         True                       True
+associative_recall budgetmem_r             1024             32       0.635417        0.010417         0.591258           False         True                       True
+
+====================================================================================================
+FAILED CONDITIONS
+====================================================================================================
+FAIL: stability_pass = False
+
+====================================================================================================
+INTERPRETATION
+====================================================================================================
+PASS: BudgetMem-R clearly outperformed both deterministic memory policies on matched-budget long-range recall.
+
+The recorded NO-GO was caused by the auxiliary condition(s):
+- stability_pass
+
+Do not rerun training until the failed condition is repaired or confirmed to be a reporting defect.

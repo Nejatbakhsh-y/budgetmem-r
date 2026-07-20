@@ -8,15 +8,15 @@
     {
       "candidate": "optimization_8e",
       "valid": false,
-      "mean_token_accuracy": 0.004340277777777777,
-      "mean_memory_recall": 0.1023220486111111,
-      "mean_write_frequency": 0.045649210611979164,
-      "mean_retention_advantage_over_random": 0.07888454861111112,
+      "mean_token_accuracy": 0.003472222222222222,
+      "mean_memory_recall": 0.40386284722222227,
+      "mean_write_frequency": 0.026598612467447918,
+      "mean_retention_advantage_over_random": 0.38042534722222227,
       "policy_gains": {
-        "gru_uniform_cache": -0.0018807870370370064,
-        "gru_reservoir_cache": -0.0004340277777777398
+        "gru_uniform_cache": -0.0027488425925925614,
+        "gru_reservoir_cache": -0.0013020833333332949
       },
-      "minimum_policy_gain": -0.0018807870370370064,
+      "minimum_policy_gain": -0.0027488425925925614,
       "policies_clearly_outperformed": [],
       "stability_pass": false,
       "checkpoint_resume_pass": true,
@@ -45,15 +45,15 @@
     {
       "candidate": "optimization_12e",
       "valid": false,
-      "mean_token_accuracy": 0.008101851851851851,
-      "mean_memory_recall": 0.04260706018518518,
-      "mean_write_frequency": 0.035837809244791664,
-      "mean_retention_advantage_over_random": 0.019169560185185185,
+      "mean_token_accuracy": 0.00636574074074074,
+      "mean_memory_recall": 0.2844328703703704,
+      "mean_write_frequency": 0.08887736002604167,
+      "mean_retention_advantage_over_random": 0.2609953703703704,
       "policy_gains": {
-        "gru_uniform_cache": 0.001880787037037068,
-        "gru_reservoir_cache": 0.0033275462962963345
+        "gru_uniform_cache": 0.00014467592592595693,
+        "gru_reservoir_cache": 0.0015914351851852235
       },
-      "minimum_policy_gain": 0.001880787037037068,
+      "minimum_policy_gain": 0.00014467592592595693,
       "policies_clearly_outperformed": [],
       "stability_pass": false,
       "checkpoint_resume_pass": true,
@@ -82,15 +82,15 @@
     {
       "candidate": "capacity_10e",
       "valid": false,
-      "mean_token_accuracy": 0.006076388888888888,
-      "mean_memory_recall": 0.1467013888888889,
-      "mean_write_frequency": 0.0266265869140625,
-      "mean_retention_advantage_over_random": 0.1232638888888889,
+      "mean_token_accuracy": 0.005642361111111111,
+      "mean_memory_recall": 0.32783564814814814,
+      "mean_write_frequency": 0.12160237630208333,
+      "mean_retention_advantage_over_random": 0.30439814814814814,
       "policy_gains": {
-        "gru_uniform_cache": -0.00014467592592589534,
-        "gru_reservoir_cache": 0.0013020833333333712
+        "gru_uniform_cache": -0.0005787037037036724,
+        "gru_reservoir_cache": 0.0008680555555555941
       },
-      "minimum_policy_gain": -0.00014467592592589534,
+      "minimum_policy_gain": -0.0005787037037036724,
       "policies_clearly_outperformed": [],
       "stability_pass": false,
       "checkpoint_resume_pass": true,
@@ -120,15 +120,15 @@
   "selected_candidate": {
     "candidate": "optimization_12e",
     "valid": false,
-    "mean_token_accuracy": 0.008101851851851851,
-    "mean_memory_recall": 0.04260706018518518,
-    "mean_write_frequency": 0.035837809244791664,
-    "mean_retention_advantage_over_random": 0.019169560185185185,
+    "mean_token_accuracy": 0.00636574074074074,
+    "mean_memory_recall": 0.2844328703703704,
+    "mean_write_frequency": 0.08887736002604167,
+    "mean_retention_advantage_over_random": 0.2609953703703704,
     "policy_gains": {
-      "gru_uniform_cache": 0.001880787037037068,
-      "gru_reservoir_cache": 0.0033275462962963345
+      "gru_uniform_cache": 0.00014467592592595693,
+      "gru_reservoir_cache": 0.0015914351851852235
     },
-    "minimum_policy_gain": 0.001880787037037068,
+    "minimum_policy_gain": 0.00014467592592595693,
     "policies_clearly_outperformed": [],
     "stability_pass": false,
     "checkpoint_resume_pass": true,

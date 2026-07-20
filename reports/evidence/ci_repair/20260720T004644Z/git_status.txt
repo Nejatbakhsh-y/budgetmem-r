@@ -1,0 +1,102 @@
+## recovery/restored-project-work-20260720-004252
+ M configs/experiments/pilot.yaml
+ M reports/evidence/pilot_tuned_go_no_go.json
+ M reports/evidence/pilot_tuned_summary.json
+ M reports/evidence/pilot_tuning/capacity_10e_summary.json
+ M reports/evidence/pilot_tuning/optimization_12e_summary.json
+ M reports/evidence/pilot_tuning/optimization_8e_summary.json
+ M reports/evidence/pilot_tuning/performance_tuning_decision.json
+ M reports/pilot_tuned_report.md
+ M reports/tables/pilot_results.csv
+ M reports/tables/pilot_tuned_results.csv
+ M reports/tables/pilot_tuning/all_candidate_results.csv
+ M reports/tables/pilot_tuning/capacity_10e_results.csv
+ M reports/tables/pilot_tuning/leaderboard.csv
+ M reports/tables/pilot_tuning/optimization_12e_results.csv
+ M reports/tables/pilot_tuning/optimization_8e_results.csv
+ M scripts/data/generate_synthetic.py
+ M src/budgetmem/experiments/pilot.py
+ M src/budgetmem/models/budgetmem_r.py
+?? 14_11_2_fix_gradient_stability.sh
+?? 14_11_2_recover_current_pilot_results.sh
+?? 14_11_2_stabilize_gradient_and_rerun.sh
+?? 16_confirm_section_14_11_5.sh
+?? 17_section15_final_go_decision.sh
+?? 17_section15_final_go_decision.sh.before_syntax_repair_20260719T182505Z.bak
+?? 18_run_tuned_pilot_and_final_gate.sh
+?? 19_diagnose_section15_no_go.sh
+?? 20_finalize_section_14_11_7.sh
+?? 20_repair_associative_recall_and_rerun.sh
+?? 20_repair_associative_recall_and_rerun.sh.before_fix
+?? 21_inspect_targeted_candidate_outputs.sh
+?? 21_recover_after_merged_pr.sh
+?? 22_collect_associative_recall_debug_bundle.sh
+?? 23_repair_core_and_screen_associative_recall.sh
+?? 24_diagnose_core_repair_no_go.sh
+?? 25_identify_stability_failure.sh
+?? 26_stabilize_and_screen_associative_recall.sh
+?? 27_summarize_stability_candidates.sh
+?? 28_detach_memory_gradient_and_screen.sh
+?? 29_fix_adapter_scope_and_resume.sh
+?? 30_fix_missing_model_cfg_and_resume.sh
+?? 31_create_missing_test_and_resume.sh
+?? 32_identify_detached_memory_blocker.sh
+?? 33_profile_gradient_sources.sh
+?? 34_trace_training_gradient_spikes.sh
+?? configs/experiments/assoc_stability_candidates/
+?? configs/experiments/pilot_assoc_core_repair_screen.yaml
+?? configs/experiments/pilot_assoc_detached_memory.yaml
+?? configs/experiments/targeted_associative_recall/
+?? reports/evidence/assoc_core_repair_no_go_diagnostic.txt
+?? reports/evidence/assoc_core_repair_screen_decision.json
+?? reports/evidence/assoc_core_repair_screen_decision.txt
+?? reports/evidence/assoc_core_repair_screen_summary.json
+?? reports/evidence/assoc_core_repair_stability_diagnostic.json
+?? reports/evidence/assoc_core_repair_stability_diagnostic.txt
+?? reports/evidence/assoc_detached_memory_blocker.txt
+?? reports/evidence/assoc_detached_memory_decision.json
+?? reports/evidence/assoc_detached_memory_decision.txt
+?? reports/evidence/assoc_detached_memory_diagnostic.txt
+?? reports/evidence/assoc_detached_memory_summary.json
+?? reports/evidence/assoc_gradient_source_profile.txt
+?? reports/evidence/assoc_gradient_training_trace.txt
+?? reports/evidence/assoc_stability_candidate_diagnostic.txt
+?? reports/evidence/assoc_stability_candidates/
+?? reports/evidence/assoc_stability_sweep_summary.txt
+?? reports/evidence/backups/
+?? reports/evidence/ci_repair/
+?? reports/evidence/section14_11_2_failure_source.json
+?? reports/evidence/section14_11_2_gradient_stability.json
+?? reports/evidence/section14_11_2_gradient_stability.txt
+?? reports/evidence/section14_11_2_lr_patch_history.jsonl
+?? reports/evidence/section14_11_2_stabilization_summary.json
+?? reports/evidence/section14_11_2_stabilization_summary.txt
+?? reports/evidence/section14_11_2_test_status.json
+?? reports/evidence/section14_11_7_failure_diagnostic.txt
+?? reports/evidence/section14_11_budget_repair_20260719T135658Z.csv
+?? reports/evidence/section14_11_budget_repair_20260719T135658Z.txt
+?? reports/evidence/section14_11_budget_repair_20260719T142115Z.csv
+?? reports/evidence/section14_11_budget_repair_20260719T142115Z.txt
+?? reports/evidence/section14_11_distractor_targets_20260719T182138Z.txt
+?? reports/evidence/section14_11_gate_syntax_repair_20260719T182505Z.txt
+?? reports/evidence/section15_debug_bundle_20260718_093142.tar.gz
+?? reports/evidence/section15_debug_bundle_20260718_093142.txt
+?? reports/evidence/section15_debug_bundle_20260718_093142/
+?? reports/evidence/section15_final_go_decision.json
+?? reports/evidence/section15_final_go_decision.txt
+?? reports/evidence/section15_no_go_diagnostic.txt
+?? reports/evidence/section15_targeted_tuning_inputs.txt
+?? reports/evidence/targeted_associative_recall_output_inspection.txt
+?? reports/tables/assoc_core_repair_screen_results.csv
+?? reports/tables/assoc_detached_memory_results.csv
+?? reports/tables/assoc_gradient_source_profile.csv
+?? reports/tables/assoc_gradient_training_trace.csv
+?? reports/tables/assoc_stability_candidates/
+?? reports/tables/section14_11_5_matched_comparison.csv
+?? reports/tables/section15_final_go_comparison.csv
+?? reports/tables/section15_final_go_matched_cells.csv
+?? scripts/run_assoc_core_repair_screen.py
+?? scripts/section14_11_2_gradient_gate.py
+?? tests/models/test_budgetmem_r_straight_through_repair.py
+?? tests/pilot/test_detached_memory_adapter.py
+?? tests/tasks/test_pilot_oracle_alignment.py

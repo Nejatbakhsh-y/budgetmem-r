@@ -1,0 +1,19 @@
+Section 14.11 Targeted Tuning Scope
+task=distractor_heavy_retrieval
+sequence_length=1024
+seed=2026
+
+budget=16
+current_budgetmem_recall=0.006944444444444444
+uniform_recall=0.027777777777777777
+reservoir_recall=0.010416666666666666
+required_budgetmem_recall=0.04777777777777778
+
+budget=32
+current_budgetmem_recall=0.03472222222222222
+uniform_recall=0.03125
+reservoir_recall=0.04513888888888888
+required_budgetmem_recall=0.06513888888888889
+
+minimum_clear_accuracy_gain=0.02
+threshold_must_not_be_lowered=true

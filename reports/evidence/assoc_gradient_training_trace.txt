@@ -1,0 +1,42 @@
+====================================================================================================
+TRAINING-WIDE GRADIENT TRACE
+====================================================================================================
+
+Model source:                 src/budgetmem/models/budgetmem_r.py
+Task:                         associative_recall
+Training sequence length:     96
+Epochs:                       24
+Training samples:             384
+Batch size:                   8
+Learning rate:                0.0001
+Gradient clipping norm:       0.25
+Maximum acceptable raw norm:  100.0
+detach_memory_writes:         True
+
+Epoch 01: maximum raw gradient=37.350914
+Epoch 02: maximum raw gradient=33.951520
+Epoch 03: maximum raw gradient=41.298278
+Epoch 04: maximum raw gradient=36.585288
+SPIKE FOUND: epoch=5, batch=9, budget=16, loss=5.130735, raw_norm=122.637893
+Epoch 05: maximum raw gradient=122.637893
+
+====================================================================================================
+FINAL TRACE STATUS
+====================================================================================================
+Status: SPIKE_REPRODUCED
+Elapsed seconds: 175.52
+
+The training-wide instability was reproduced.
+First offending step: epoch 5, batch 9
+Raw gradient norm: 122.637893
+
+Component profile:
+- task_loss: loss=5.124245, raw_norm=123.320077
+- write_rate_penalty: loss=0.004013, raw_norm=0.094407
+- write_binarization_penalty: loss=0.002477, raw_norm=0.001006
+- budget_violation_penalty: loss=0.000000, raw_norm=0.000000
+- total_training_loss: loss=5.130735, raw_norm=122.807539
+
+Files:
+- reports/tables/assoc_gradient_training_trace.csv
+- reports/evidence/assoc_gradient_training_trace.json

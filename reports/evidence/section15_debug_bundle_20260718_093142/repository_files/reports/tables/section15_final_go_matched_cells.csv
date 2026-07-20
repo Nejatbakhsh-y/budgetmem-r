@@ -1,0 +1,13 @@
+policy,task,sequence_length,budget,seed,budgetmem_recall,policy_recall,absolute_gain,clear_win
+reservoir_cache,associative_recall,1024,16,2026,0.0,0.0625,-0.0625,False
+reservoir_cache,associative_recall,1024,32,2026,0.0,0.1041666666666666,-0.1041666666666666,False
+reservoir_cache,distractor_heavy_retrieval,1024,16,2026,0.0182291666666666,0.0112847222222222,0.006944444444444399,False
+reservoir_cache,distractor_heavy_retrieval,1024,32,2026,0.0199652777777777,0.0373263888888888,-0.017361111111111098,False
+reservoir_cache,selective_copy,1024,16,2026,0.3984375,0.0494791666666666,0.34895833333333337,True
+reservoir_cache,selective_copy,1024,32,2026,0.50390625,0.1080729166666666,0.39583333333333337,True
+uniform_cache,associative_recall,1024,16,2026,0.0,0.0,0.0,False
+uniform_cache,associative_recall,1024,32,2026,0.0,0.0,0.0,False
+uniform_cache,distractor_heavy_retrieval,1024,16,2026,0.0182291666666666,0.0199652777777777,-0.0017361111111111015,False
+uniform_cache,distractor_heavy_retrieval,1024,32,2026,0.0199652777777777,0.0329861111111111,-0.013020833333333398,False
+uniform_cache,selective_copy,1024,16,2026,0.3984375,0.0,0.3984375,True
+uniform_cache,selective_copy,1024,32,2026,0.50390625,0.0091145833333333,0.4947916666666667,True

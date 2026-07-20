@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "mean_budgetmem_write_frequency": 0.1318359375,
+  "maximum_memory_size": 16,
+  "budget_pass": true,
+  "required_write_frequency_interval": [
+    0.01,
+    0.95
+  ]
+}

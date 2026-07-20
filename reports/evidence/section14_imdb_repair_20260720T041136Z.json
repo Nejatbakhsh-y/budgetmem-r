@@ -1,0 +1,21 @@
+{
+  "generated_utc": "20260720T041136Z",
+  "test_identity_count": 25000,
+  "modified_files": [
+    {
+      "path": "data/processed/imdb/train/data.parquet",
+      "rows_before": 22389,
+      "rows_after": 0,
+      "duplicates_removed": 0,
+      "official_test_leakage_removed": 22389
+    },
+    {
+      "path": "data/processed/imdb/validation/data.parquet",
+      "rows_before": 2488,
+      "rows_after": 0,
+      "duplicates_removed": 0,
+      "official_test_leakage_removed": 2488
+    }
+  ],
+  "rows_removed_total": 24877
+}

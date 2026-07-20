@@ -1,0 +1,12 @@
+Section 14.11.2 Stabilization Summary
+======================================
+Generated UTC:                  2026-07-19T00:55:18.860763+00:00
+Pilot runner:                   18_run_tuned_pilot_and_final_gate.sh
+Attempts used:                  3
+Raw-gradient limit:             100.000000
+Gradient clipping norm:         1.000000
+Maximum observed gradient:      NOT FOUND
+Threshold changed:              NO
+Gradient stability:             FAIL
+Patch history:                  reports/evidence/section14_11_2_lr_patch_history.jsonl
+Main log:                       reports/evidence/logs/section14_11_2_stabilize_20260718T184502Z.log

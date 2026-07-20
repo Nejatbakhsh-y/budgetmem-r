@@ -1,0 +1,203 @@
+========================================================================
+SECTION 14.11.7 — MATCHED-CELL FAILURE DIAGNOSTIC
+========================================================================
+
+CSV:  /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/tables/section14_11_5_matched_comparison.csv
+TXT:  /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_11_5_confirmation.txt
+JSON: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_11_5_confirmation.json
+
+Matched rows found: 6
+Columns (18): task, sequence_length, seed, memory_budget, metric, direction, clear_margin_required, budgetmem_r_score, gru_uniform_cache_score, uniform_margin, uniform_clearly_beaten, gru_reservoir_cache_score, reservoir_margin, reservoir_clearly_beaten, policies_clearly_beaten, missing_roles, ambiguous_roles, status
+
+Per-cell records
+------------------------------------------------------------------------
+[ROW 1]
+task: associative_recall
+sequence_length: 1024
+seed: 2026
+memory_budget: 16
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.0
+gru_uniform_cache_score: 0.020833333333333332
+uniform_margin: -0.020833333333333332
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.0
+reservoir_margin: 0.0
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+[ROW 2]
+task: associative_recall
+sequence_length: 1024
+seed: 2026
+memory_budget: 32
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.0
+gru_uniform_cache_score: 0.0
+uniform_margin: 0.0
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.0
+reservoir_margin: 0.0
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+[ROW 3]
+task: distractor_heavy_retrieval
+sequence_length: 1024
+seed: 2026
+memory_budget: 16
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.0
+gru_uniform_cache_score: 0.006944444444444444
+uniform_margin: -0.006944444444444444
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.006944444444444444
+reservoir_margin: -0.006944444444444444
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+[ROW 4]
+task: distractor_heavy_retrieval
+sequence_length: 1024
+seed: 2026
+memory_budget: 32
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.013888888888888888
+gru_uniform_cache_score: 0.006944444444444444
+uniform_margin: 0.006944444444444444
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.013888888888888888
+reservoir_margin: 0.0
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+[ROW 5]
+task: selective_copy
+sequence_length: 1024
+seed: 2026
+memory_budget: 16
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.0026041666666666665
+gru_uniform_cache_score: 0.0
+uniform_margin: 0.0026041666666666665
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.0026041666666666665
+reservoir_margin: 0.0
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+[ROW 6]
+task: selective_copy
+sequence_length: 1024
+seed: 2026
+memory_budget: 32
+metric: token_accuracy
+direction: higher
+clear_margin_required: 0.02
+budgetmem_r_score: 0.0078125
+gru_uniform_cache_score: 0.0026041666666666665
+uniform_margin: 0.005208333333333334
+uniform_clearly_beaten: False
+gru_reservoir_cache_score: 0.005208333333333333
+reservoir_margin: 0.002604166666666667
+reservoir_clearly_beaten: False
+policies_clearly_beaten: 0
+status: MATCHED_NOT_CLEAR
+
+Numeric-column ranges
+------------------------------------------------------------------------
+sequence_length: min=1024, max=1024, mean=1024
+seed: min=2026, max=2026, mean=2026
+memory_budget: min=16, max=32, mean=24
+clear_margin_required: min=0.02, max=0.02, mean=0.02
+budgetmem_r_score: min=0, max=0.01388888889, mean=0.004050925926
+gru_uniform_cache_score: min=0, max=0.02083333333, mean=0.006221064815
+uniform_margin: min=-0.02083333333, max=0.006944444444, mean=-0.002170138889
+gru_reservoir_cache_score: min=0, max=0.01388888889, mean=0.004774305556
+reservoir_margin: min=-0.006944444444, max=0.002604166667, mean=-0.0007233796296
+policies_clearly_beaten: min=0, max=0, mean=0
+
+Existing text confirmation
+------------------------------------------------------------------------
+Section 14.11.5 Same-Cell Policy Confirmation
+================================================
+
+OVERALL DECISION: FAIL
+
+Source CSV: reports/tables/pilot_results.csv
+Source SHA-256: a392a5f0966c877610b4fdd5ae870d5386c3106ce5531c6b4fe478eea8418052
+Metric: token_accuracy
+Direction: higher is better
+Long-range minimum sequence length: 1024
+Required qualifying matched cells: 1
+Qualifying matched cells: 0
+Complete matched cells: 6
+Incomplete cells: 0
+Ambiguous cells: 0
+Invalid source rows: 0
+
+Matched-cell key:
+task + sequence length + seed + memory budget
+
+A cell passes only when BudgetMem-R clearly beats both:
+1. GRU + uniform cache
+2. GRU + reservoir cache
+
+Clear-margin rule:
+0.02 for a 0-1 scale or 2.0 for a 0-100 scale, unless
+CLEAR_MARGIN is supplied explicitly.
+
+This is an operational single-seed comparison and is not evidence
+of statistical significance across multiple random seeds.
+
+Cell results:
+- associative_recall | length=1024 | seed=2026 | budget=16 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+- associative_recall | length=1024 | seed=2026 | budget=32 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+- distractor_heavy_retrieval | length=1024 | seed=2026 | budget=16 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+- distractor_heavy_retrieval | length=1024 | seed=2026 | budget=32 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+- selective_copy | length=1024 | seed=2026 | budget=16 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+- selective_copy | length=1024 | seed=2026 | budget=32 | status=MATCHED_NOT_CLEAR | policies clearly beaten=0
+
+CONFIRMATION NOT ESTABLISHED:
+Review the comparison CSV for missing, ambiguous, or
+insufficient-margin cells.
+
+Existing JSON confirmation
+------------------------------------------------------------------------
+{
+  "ambiguous_cells": 0,
+  "clear_margin_setting": "auto",
+  "complete_matched_cells": 6,
+  "decision": "FAIL",
+  "generated_utc": "2026-07-19T23:43:42.956250+00:00",
+  "incomplete_cells": 0,
+  "invalid_rows": [],
+  "long_range_minimum": 1024,
+  "metric": "token_accuracy",
+  "metric_direction": "higher",
+  "qualifying_cells": 0,
+  "required_qualifying_cells": 1,
+  "section": "14.11.5",
+  "source_csv": "reports/tables/pilot_results.csv",
+  "source_sha256": "a392a5f0966c877610b4fdd5ae870d5386c3106ce5531c6b4fe478eea8418052"
+}
+
+Interpretation
+------------------------------------------------------------------------
+The parser has already accepted all six matched cells. Therefore, the earlier unrecognized-metric-column problem is resolved. A result of zero qualifying cells must now be explained by the actual per-cell comparison values, the qualification threshold, or the comparator-selection logic.
+Do not rerun the full pilot until the per-cell deficits in this report have been reviewed.

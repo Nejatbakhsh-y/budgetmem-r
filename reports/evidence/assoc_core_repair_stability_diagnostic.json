@@ -1,0 +1,46 @@
+{
+  "diagnosis": "GRADIENT_NORM_FAILURE",
+  "performance_requirement_pass": true,
+  "recorded_stability_pass": false,
+  "recomputed_stability_pass": false,
+  "failed_conditions": [
+    "EXCESSIVE_PRECLIP_GRADIENT_NORM"
+  ],
+  "training_record": {
+    "first_loss": 5.365081369876862,
+    "final_loss": 4.391060774525006,
+    "loss_growth_limit": 10.730162739753723,
+    "final_to_first_ratio": 0.8184518503632293,
+    "maximum_gradient_norm": 140.03993225097656,
+    "maximum_allowed_gradient_norm": 100.0,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0005,
+    "epochs": 12,
+    "finite_losses": true
+  },
+  "checkpoint": {
+    "path": "outputs/assoc_core_repair_screen/checkpoints/associative_recall/budgetmem_r/last.pt",
+    "exists": true,
+    "epoch": 11,
+    "config_sha256": "5ff632c0fecc60054205f794349864d3151e2f342cc114eae79a71f2f546dc8a",
+    "history_length": 12,
+    "history_finite": true,
+    "minimum_loss": 4.391060774525006,
+    "maximum_loss": 5.365081369876862,
+    "best_epoch": 12,
+    "history": [
+      5.365081369876862,
+      5.163433541854222,
+      5.017488211393356,
+      4.97023618221283,
+      4.927241812149684,
+      4.882506628831227,
+      4.85310427347819,
+      4.798833290735881,
+      4.720073650280635,
+      4.673396031061809,
+      4.523691097895305,
+      4.391060774525006
+    ]
+  }
+}

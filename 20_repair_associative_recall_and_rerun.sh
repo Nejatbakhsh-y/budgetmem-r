@@ -1,0 +1,973 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT"
+
+PYTHON="$ROOT/.venv/bin/python"
+RUNNER="scripts/run_pilot.py"
+BASE_CONFIG="configs/experiments/pilot_tuned.yaml"
+FINAL_GATE="17_section15_final_go_decision.sh"
+
+CONFIG_DIR="configs/experiments/targeted_associative_recall"
+RESULT_DIR="reports/tables/targeted_associative_recall"
+EVIDENCE_DIR="reports/evidence/targeted_associative_recall"
+LOG_DIR="reports/logs/targeted_associative_recall"
+
+LEADERBOARD="$RESULT_DIR/targeted_leaderboard.csv"
+DECISION_JSON="$EVIDENCE_DIR/targeted_decision.json"
+DECISION_TXT="$EVIDENCE_DIR/targeted_decision.txt"
+SELECTED_PATH="$EVIDENCE_DIR/selected_full_config.txt"
+
+FINAL_CONFIG="configs/experiments/pilot_associative_recall_repaired.yaml"
+FINAL_RESULTS="reports/tables/pilot_associative_recall_repaired_results.csv"
+
+MIN_GAIN="0.02"
+
+mkdir -p \
+    "$CONFIG_DIR" \
+    "$RESULT_DIR" \
+    "$EVIDENCE_DIR" \
+    "$LOG_DIR"
+
+echo "============================================================"
+echo " Targeted Associative-Recall Repair"
+echo "============================================================"
+echo "Repository:      $ROOT"
+echo "Target task:     associative_recall"
+echo "Sequence length: 1024"
+echo "Memory budget:   16"
+echo "Required gain:   $MIN_GAIN over both policies"
+echo
+
+for required_path in \
+    "$PYTHON" \
+    "$RUNNER" \
+    "$BASE_CONFIG" \
+    "$FINAL_GATE"; do
+
+    if [[ ! -e "$required_path" ]]; then
+        echo "ERROR: Required path is missing:"
+        echo "  $required_path"
+        exit 1
+    fi
+done
+
+export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
+
+echo "Creating focused and full candidate configurations."
+
+"$PYTHON" - <<'PY'
+from __future__ import annotations
+
+import copy
+from pathlib import Path
+
+import yaml
+
+
+base_path = Path("configs/experiments/pilot_tuned.yaml")
+config_dir = Path(
+    "configs/experiments/targeted_associative_recall"
+)
+
+base = yaml.safe_load(
+    base_path.read_text(encoding="utf-8")
+)
+
+if not isinstance(base, dict):
+    raise SystemExit("The base YAML configuration is invalid.")
+
+config_dir.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+
+def set_first_existing(
+    mapping: dict,
+    possible_names: list[str],
+    value,
+) -> None:
+    """
+    Update the configuration key already used by the repository.
+
+    When none of the alternatives exists, use the first canonical name.
+    """
+    for name in possible_names:
+        if name in mapping:
+            mapping[name] = value
+            return
+
+    mapping[possible_names[0]] = value
+
+
+def apply_candidate(
+    configuration: dict,
+    candidate: dict,
+) -> None:
+    training = configuration.setdefault(
+        "training",
+        {},
+    )
+
+    model = configuration.setdefault(
+        "model",
+        {},
+    )
+
+    set_first_existing(
+        training,
+        [
+            "epochs",
+            "num_epochs",
+            "max_epochs",
+        ],
+        candidate["epochs"],
+    )
+
+    set_first_existing(
+        training,
+        [
+            "learning_rate",
+            "lr",
+        ],
+        candidate["learning_rate"],
+    )
+
+    training["weight_decay"] = (
+        candidate["weight_decay"]
+    )
+
+    training["write_rate_target"] = (
+        candidate["write_rate_target"]
+    )
+
+    training["write_rate_penalty"] = (
+        candidate["write_rate_penalty"]
+    )
+
+    training["write_binarization_penalty"] = (
+        candidate["write_binarization_penalty"]
+    )
+
+    model["embedding_dim"] = (
+        candidate["embedding_dim"]
+    )
+
+    model["hidden_dim"] = (
+        candidate["hidden_dim"]
+    )
+
+    model["key_dim"] = (
+        candidate["key_dim"]
+    )
+
+    model["retrieval_k"] = (
+        candidate["retrieval_k"]
+    )
+
+
+candidates = [
+    {
+        "name": "assoc_repair_24e",
+        "epochs": 24,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "write_rate_target": 0.15,
+        "write_rate_penalty": 0.25,
+        "write_binarization_penalty": 0.005,
+        "embedding_dim": 48,
+        "hidden_dim": 96,
+        "key_dim": 48,
+        "retrieval_k": 8,
+    },
+    {
+        "name": "assoc_repair_32e",
+        "epochs": 32,
+        "learning_rate": 0.00075,
+        "weight_decay": 0.0001,
+        "write_rate_target": 0.20,
+        "write_rate_penalty": 0.15,
+        "write_binarization_penalty": 0.002,
+        "embedding_dim": 64,
+        "hidden_dim": 128,
+        "key_dim": 64,
+        "retrieval_k": 8,
+    },
+    {
+        "name": "assoc_repair_40e",
+        "epochs": 40,
+        "learning_rate": 0.0005,
+        "weight_decay": 0.00005,
+        "write_rate_target": 0.25,
+        "write_rate_penalty": 0.10,
+        "write_binarization_penalty": 0.001,
+        "embedding_dim": 64,
+        "hidden_dim": 128,
+        "key_dim": 64,
+        "retrieval_k": 12,
+    },
+]
+
+for candidate in candidates:
+    name = candidate["name"]
+
+    full_configuration = copy.deepcopy(base)
+    apply_candidate(
+        full_configuration,
+        candidate,
+    )
+
+    full_path = config_dir / f"{name}_full.yaml"
+    full_path.write_text(
+        yaml.safe_dump(
+            full_configuration,
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    focused_configuration = copy.deepcopy(
+        full_configuration
+    )
+
+    # Keep the complete official Section 15 matrix.
+    # The project validator requires all three tasks, all sequence
+    # lengths, both memory budgets, and all four models.
+    # Stage 1 uses --smoke to reduce screening runtime.
+
+    focused_path = (
+        config_dir / f"{name}_focused.yaml"
+    )
+
+    focused_path.write_text(
+        yaml.safe_dump(
+            focused_configuration,
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    print(f"Created: {focused_path}")
+    print(f"Created: {full_path}")
+PY
+
+echo
+echo "Candidate configurations created."
+echo
+
+rm -f \
+    "$RESULT_DIR"/assoc_repair_*_results.csv \
+    "$LEADERBOARD" \
+    "$DECISION_JSON" \
+    "$DECISION_TXT" \
+    "$SELECTED_PATH"
+
+capture_result() {
+    local started_at="$1"
+    local destination="$2"
+
+    "$PYTHON" - "$started_at" "$destination" <<'PY'
+from __future__ import annotations
+
+import shutil
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+
+started_at = float(sys.argv[1])
+destination = Path(sys.argv[2])
+
+required_columns = {
+    "task",
+    "model",
+    "sequence_length",
+    "memory_budget",
+    "memory_recall",
+}
+
+candidates: list[tuple[float, Path]] = []
+
+for path in Path("reports").rglob("*.csv"):
+    try:
+        modified = path.stat().st_mtime
+
+        if modified < started_at - 3:
+            continue
+
+        frame = pd.read_csv(path)
+
+        if not required_columns.issubset(
+            frame.columns
+        ):
+            continue
+
+        filtered = frame[
+            (
+                frame["task"].astype(str)
+                == "associative_recall"
+            )
+            & (
+                frame["sequence_length"]
+                .astype(int)
+                == 1024
+            )
+            & (
+                frame["memory_budget"]
+                .astype(int)
+                == 16
+            )
+        ]
+
+        models = set(
+            filtered["model"].astype(str)
+        )
+
+        required_models = {
+            "gru_uniform_cache",
+            "gru_reservoir_cache",
+            "budgetmem_r",
+        }
+
+        if required_models.issubset(models):
+            candidates.append(
+                (
+                    modified,
+                    path,
+                )
+            )
+
+    except Exception:
+        continue
+
+if not candidates:
+    raise SystemExit(
+        "No compatible focused result table was generated."
+    )
+
+source = max(
+    candidates,
+    key=lambda item: item[0],
+)[1]
+
+destination.parent.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+shutil.copy2(
+    source,
+    destination,
+)
+
+print(source)
+PY
+}
+
+echo "============================================================"
+echo " Stage 1 — Focused Candidate Search"
+echo "============================================================"
+
+successful_candidate_count=0
+
+for config in "$CONFIG_DIR"/*_focused.yaml; do
+    candidate="$(
+        basename "$config" _focused.yaml
+    )"
+
+    result_file="$RESULT_DIR/${candidate}_results.csv"
+    log_file="$LOG_DIR/${candidate}.log"
+
+    echo
+    echo "------------------------------------------------------------"
+    echo "Running candidate: $candidate"
+    echo "Configuration:     $config"
+    echo "------------------------------------------------------------"
+
+    started_at="$(
+        "$PYTHON" -c \
+        'import time; print(time.time())'
+    )"
+
+    set +e
+
+    "$PYTHON" "$RUNNER" \
+        --config "$config" \
+        --smoke \
+        2>&1 | tee "$log_file"
+
+    runner_status="${PIPESTATUS[0]}"
+
+    set -e
+
+    if [[ "$runner_status" -ne 0 ]]; then
+        echo
+        echo "Candidate failed: $candidate"
+        echo "Log: $log_file"
+        continue
+    fi
+
+    set +e
+
+    captured_source="$(
+        capture_result \
+            "$started_at" \
+            "$result_file"
+    )"
+
+    capture_status=$?
+
+    set -e
+
+    if [[ "$capture_status" -ne 0 ]]; then
+        echo
+        echo "Could not capture results for: $candidate"
+        continue
+    fi
+
+    successful_candidate_count=$(
+        (
+            successful_candidate_count + 1
+        )
+    )
+
+    echo
+    echo "Captured result source:"
+    echo "  $captured_source"
+    echo
+    echo "Saved candidate result:"
+    echo "  $result_file"
+done
+
+if [[ "$successful_candidate_count" -eq 0 ]]; then
+    echo
+    echo "ERROR: All focused candidates failed."
+    echo "Inspect:"
+    echo "  $LOG_DIR"
+    exit 1
+fi
+
+echo
+echo "Evaluating focused candidates."
+
+set +e
+
+MIN_GAIN="$MIN_GAIN" \
+"$PYTHON" - <<'PY'
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+import pandas as pd
+
+
+result_dir = Path(
+    "reports/tables/targeted_associative_recall"
+)
+
+evidence_dir = Path(
+    "reports/evidence/targeted_associative_recall"
+)
+
+config_dir = Path(
+    "configs/experiments/targeted_associative_recall"
+)
+
+leaderboard_path = (
+    result_dir / "targeted_leaderboard.csv"
+)
+
+decision_json_path = (
+    evidence_dir / "targeted_decision.json"
+)
+
+decision_txt_path = (
+    evidence_dir / "targeted_decision.txt"
+)
+
+selected_path_file = (
+    evidence_dir / "selected_full_config.txt"
+)
+
+minimum_gain = float(
+    os.environ["MIN_GAIN"]
+)
+
+
+def standardized_model(value: object) -> str:
+    text = (
+        str(value)
+        .strip()
+        .lower()
+        .replace("-", "_")
+        .replace(" ", "_")
+    )
+
+    if "budgetmem" in text:
+        return "budgetmem_r"
+
+    if "uniform" in text:
+        return "gru_uniform_cache"
+
+    if "reservoir" in text:
+        return "gru_reservoir_cache"
+
+    return text
+
+
+rows: list[dict[str, object]] = []
+
+for result_path in sorted(
+    result_dir.glob(
+        "assoc_repair_*_results.csv"
+    )
+):
+    candidate = result_path.name.removesuffix(
+        "_results.csv"
+    )
+
+    frame = pd.read_csv(result_path)
+    frame["model_standard"] = (
+        frame["model"].map(
+            standardized_model
+        )
+    )
+
+    frame = frame[
+        (
+            frame["task"].astype(str)
+            == "associative_recall"
+        )
+        & (
+            frame["sequence_length"]
+            .astype(int)
+            == 1024
+        )
+        & (
+            frame["memory_budget"]
+            .astype(int)
+            == 16
+        )
+    ]
+
+    means = (
+        frame.groupby(
+            "model_standard"
+        )["memory_recall"]
+        .mean()
+        .to_dict()
+    )
+
+    required = {
+        "budgetmem_r",
+        "gru_uniform_cache",
+        "gru_reservoir_cache",
+    }
+
+    if not required.issubset(means):
+        continue
+
+    budgetmem_recall = float(
+        means["budgetmem_r"]
+    )
+
+    uniform_recall = float(
+        means["gru_uniform_cache"]
+    )
+
+    reservoir_recall = float(
+        means["gru_reservoir_cache"]
+    )
+
+    uniform_gain = (
+        budgetmem_recall
+        - uniform_recall
+    )
+
+    reservoir_gain = (
+        budgetmem_recall
+        - reservoir_recall
+    )
+
+    minimum_policy_gain = min(
+        uniform_gain,
+        reservoir_gain,
+    )
+
+    qualifies = bool(
+        uniform_gain >= minimum_gain
+        and reservoir_gain >= minimum_gain
+    )
+
+    rows.append(
+        {
+            "candidate": candidate,
+            "budgetmem_recall": (
+                budgetmem_recall
+            ),
+            "uniform_recall": (
+                uniform_recall
+            ),
+            "reservoir_recall": (
+                reservoir_recall
+            ),
+            "gain_over_uniform": (
+                uniform_gain
+            ),
+            "gain_over_reservoir": (
+                reservoir_gain
+            ),
+            "minimum_policy_gain": (
+                minimum_policy_gain
+            ),
+            "qualifies": qualifies,
+            "focused_result_file": str(
+                result_path
+            ),
+            "full_config": str(
+                config_dir
+                / f"{candidate}_full.yaml"
+            ),
+        }
+    )
+
+if not rows:
+    raise SystemExit(
+        "No valid candidate comparisons were available."
+    )
+
+leaderboard = pd.DataFrame(rows)
+
+leaderboard = leaderboard.sort_values(
+    by=[
+        "qualifies",
+        "minimum_policy_gain",
+        "budgetmem_recall",
+    ],
+    ascending=[
+        False,
+        False,
+        False,
+    ],
+)
+
+leaderboard.to_csv(
+    leaderboard_path,
+    index=False,
+)
+
+qualified = leaderboard[
+    leaderboard["qualifies"]
+]
+
+if qualified.empty:
+    decision = "TARGETED_NO_GO"
+    selected_candidate = None
+    selected_config = None
+else:
+    decision = "TARGETED_GO"
+
+    winner = qualified.iloc[0]
+
+    selected_candidate = str(
+        winner["candidate"]
+    )
+
+    selected_config = str(
+        winner["full_config"]
+    )
+
+    selected_path_file.write_text(
+        selected_config + "\n",
+        encoding="utf-8",
+    )
+
+payload = {
+    "decision": decision,
+    "minimum_required_gain": minimum_gain,
+    "selected_candidate": selected_candidate,
+    "selected_full_config": selected_config,
+    "leaderboard": leaderboard.to_dict(
+        orient="records"
+    ),
+}
+
+decision_json_path.write_text(
+    json.dumps(
+        payload,
+        indent=2,
+    ),
+    encoding="utf-8",
+)
+
+lines = [
+    "TARGETED ASSOCIATIVE-RECALL DECISION",
+    "====================================",
+    f"Decision: {decision}",
+    (
+        "Required gain over uniform and "
+        f"reservoir policies: {minimum_gain:.4f}"
+    ),
+    "",
+    leaderboard.to_string(index=False),
+    "",
+]
+
+if selected_candidate is None:
+    lines.extend(
+        [
+            "Interpretation:",
+            (
+                "No candidate clearly beat both "
+                "deterministic policies."
+            ),
+            (
+                "The full 72-cell pilot was not started."
+            ),
+        ]
+    )
+else:
+    lines.extend(
+        [
+            "Selected candidate:",
+            f"- {selected_candidate}",
+            "",
+            "Selected full configuration:",
+            f"- {selected_config}",
+        ]
+    )
+
+decision_txt_path.write_text(
+    "\n".join(lines) + "\n",
+    encoding="utf-8",
+)
+
+print(
+    decision_txt_path.read_text(
+        encoding="utf-8"
+    )
+)
+
+raise SystemExit(
+    0
+    if decision == "TARGETED_GO"
+    else 2
+)
+PY
+
+targeted_status=$?
+
+set -e
+
+if [[ "$targeted_status" -eq 2 ]]; then
+    echo
+    echo "============================================================"
+    echo " TARGETED DECISION: NO-GO"
+    echo "============================================================"
+    echo
+    echo "None of the focused associative-recall candidates"
+    echo "beat both deterministic policies by at least $MIN_GAIN."
+    echo
+    echo "The full pilot was not rerun."
+    echo
+    echo "Inspect:"
+    echo "  $DECISION_TXT"
+    echo "  $LEADERBOARD"
+    echo
+    echo "Section 14.11 remains incomplete."
+    exit 2
+fi
+
+if [[ "$targeted_status" -ne 0 ]]; then
+    echo
+    echo "ERROR: Targeted candidate evaluation failed."
+    exit "$targeted_status"
+fi
+
+selected_full_config="$(
+    tr -d '\r\n' < "$SELECTED_PATH"
+)"
+
+if [[ ! -f "$selected_full_config" ]]; then
+    echo "ERROR: Selected configuration is missing:"
+    echo "  $selected_full_config"
+    exit 1
+fi
+
+cp -f \
+    "$selected_full_config" \
+    "$FINAL_CONFIG"
+
+echo
+echo "============================================================"
+echo " TARGETED DECISION: GO"
+echo "============================================================"
+echo
+echo "Selected configuration:"
+echo "  $selected_full_config"
+echo
+echo "Copied to:"
+echo "  $FINAL_CONFIG"
+
+echo
+echo "============================================================"
+echo " Stage 2 — Full 72-Cell Pilot"
+echo "============================================================"
+echo
+
+full_started_at="$(
+    "$PYTHON" -c \
+    'import time; print(time.time())'
+)"
+
+"$PYTHON" "$RUNNER" \
+    --config "$FINAL_CONFIG" \
+    2>&1 | tee \
+    "$LOG_DIR/full_repaired_pilot.log"
+
+capture_result \
+    "$full_started_at" \
+    "$FINAL_RESULTS" >/dev/null
+
+echo
+echo "Validating the full result matrix."
+
+"$PYTHON" - <<'PY'
+from pathlib import Path
+
+import pandas as pd
+
+
+path = Path(
+    "reports/tables/"
+    "pilot_associative_recall_repaired_results.csv"
+)
+
+if not path.exists():
+    raise SystemExit(
+        f"Missing full result table: {path}"
+    )
+
+frame = pd.read_csv(path)
+
+required_columns = {
+    "task",
+    "model",
+    "sequence_length",
+    "memory_budget",
+    "memory_recall",
+    "budget_pass",
+    "resource_measurement_pass",
+}
+
+missing = required_columns - set(
+    frame.columns
+)
+
+if missing:
+    raise SystemExit(
+        "Missing required columns: "
+        f"{sorted(missing)}"
+    )
+
+expected_tasks = 3
+expected_models = 4
+expected_lengths = 3
+expected_budgets = 2
+
+expected_rows = (
+    expected_tasks
+    * expected_models
+    * expected_lengths
+    * expected_budgets
+)
+
+print(
+    f"Rows found: {len(frame)}"
+)
+print(
+    f"Rows expected: {expected_rows}"
+)
+
+if len(frame) != expected_rows:
+    raise SystemExit(
+        "The full pilot matrix is incomplete."
+    )
+
+if not frame["budget_pass"].astype(bool).all():
+    raise SystemExit(
+        "At least one memory-budget check failed."
+    )
+
+if not frame[
+    "resource_measurement_pass"
+].astype(bool).all():
+    raise SystemExit(
+        "At least one resource-measurement check failed."
+    )
+
+print("Full matrix: PASS")
+print("Budget enforcement: PASS")
+print("Resource measurement: PASS")
+PY
+
+echo
+echo "============================================================"
+echo " Stage 3 — Final Section 14.11 Gate"
+echo "============================================================"
+echo
+
+set +e
+
+RESULT_FILE="$FINAL_RESULTS" \
+AUTO_COMMIT=0 \
+AUTO_PUSH=0 \
+bash "$FINAL_GATE"
+
+final_status=$?
+
+set -e
+
+if [[ "$final_status" -eq 0 ]]; then
+    echo
+    echo "============================================================"
+    echo " FINAL DECISION: GO"
+    echo "============================================================"
+    echo
+    echo "Section 14.10: COMPLETE"
+    echo "Section 14.11: COMPLETE — GO"
+    echo
+    echo "Review before committing:"
+    echo "  reports/evidence/section15_final_go_decision.txt"
+    echo "  reports/tables/section15_final_go_comparison.csv"
+    echo
+    echo "No automatic commit or push was performed."
+    exit 0
+fi
+
+if [[ "$final_status" -eq 2 ]]; then
+    echo
+    echo "============================================================"
+    echo " FINAL DECISION: NO-GO"
+    echo "============================================================"
+    echo
+    echo "The focused repair passed, but the complete pilot"
+    echo "still failed the final multi-task recall gate."
+    echo
+    echo "Section 14.10: COMPLETE"
+    echo "Section 14.11: NOT COMPLETE — NO-GO"
+    echo
+    echo "Inspect:"
+    echo "  reports/evidence/section15_final_go_decision.txt"
+    echo "  reports/tables/section15_final_go_comparison.csv"
+    exit 2
+fi
+
+echo
+echo "ERROR: Final gate failed with status $final_status."
+exit "$final_status"

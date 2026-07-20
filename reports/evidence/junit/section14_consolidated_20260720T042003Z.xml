@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="38" time="92.952" timestamp="2026-07-20T00:21:54.328473-04:00" hostname="DESKTOP-N66626H"><testcase classname="tests.test_section14_required" name="test_14_01_budget_correctness_every_forward_step" time="27.988" /><testcase classname="tests.test_section14_required" name="test_14_02_causality_future_tokens_do_not_change_earlier_steps" time="0.680" /><testcase classname="tests.test_section14_required" name="test_14_03_deterministic_dataset_generation" time="0.438" /><testcase classname="tests.test_section14_required" name="test_14_04_deterministic_initialization" time="0.597" /><testcase classname="tests.test_section14_required" name="test_14_05_deterministic_training_order" time="0.163" /><testcase classname="tests.test_section14_required" name="test_14_06_deterministic_evaluation_output" time="0.631" /><testcase classname="tests.test_section14_required" name="test_14_07_synthetic_seeds_do_not_overlap" time="0.481" /><testcase classname="tests.test_section14_required" name="test_14_08_hdfs_block_ids_do_not_overlap" time="43.008" /><testcase classname="tests.test_section14_required" name="test_14_09_imdb_test_examples_not_in_train_or_validation" time="4.770" /><testcase classname="tests.test_section14_required" name="test_14_10_memory_controller_parameters_receive_gradients" time="0.564"><failure message="AssertionError: eviction_controller received no finite gradient.&#10;assert False&#10; +  where False = any(&lt;generator object test_14_10_memory_controller_parameters_receive_gradients.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f1bffda0ee0&gt;)">def test_14_10_memory_controller_parameters_receive_gradients() -&gt; None:
+        model = build_model(seed=2026, budget=4, force_detach=False)
+        model.train()
+        encourage_writes(model)
+        x = compatible_input(model, seq_len=16)
+        model.zero_grad(set_to_none=True)
+    
+        output = invoke(model, x, reset=True)
+    
+        controller_terms = []
+        for names in (
+            ("write_probabilities",),
+            ("auxiliary_mean",),
+            ("auxiliary_log_variance",),
+            ("retrieval_weights",),
+        ):
+            tensor = extract_named_tensor(output, names)
+            if (
+                tensor is not None
+                and tensor.dtype.is_floating_point
+                and tensor.requires_grad
+            ):
+                controller_terms.append(tensor.float().mean())
+    
+        primary = extract_tensor(output)
+        if (
+            primary is not None
+            and primary.dtype.is_floating_point
+            and primary.requires_grad
+        ):
+            controller_terms.append(primary.float().pow(2).mean())
+    
+        assert controller_terms, (
+            "No differentiable controller diagnostic or model output was exposed."
+        )
+    
+        loss = torch.stack(controller_terms).sum()
+        loss.backward()
+    
+        parameters = controller_parameters(model)
+        assert parameters, "No controller parameters were discovered."
+    
+        finite_gradient_names = [
+            name
+            for name, parameter in parameters
+            if parameter.grad is not None
+            and torch.isfinite(parameter.grad).all()
+        ]
+        nonzero_gradient_names = [
+            name
+            for name, parameter in parameters
+            if parameter.grad is not None
+            and torch.count_nonzero(parameter.grad).item() &gt; 0
+        ]
+    
+        assert finite_gradient_names, (
+            "No memory-controller parameter received a finite gradient."
+        )
+        assert nonzero_gradient_names, (
+            "All observed memory-controller gradients were zero."
+        )
+    
+        expected_families = (
+            "write_controller",
+            "eviction_controller",
+            "initial_utility_head",
+        )
+        for family in expected_families:
+            family_parameters = [
+                name for name, _ in parameters if family in name
+            ]
+            if not family_parameters:
+                continue
+&gt;           assert any(
+                name in finite_gradient_names for name in family_parameters
+            ), f"{family} received no finite gradient."
+E           AssertionError: eviction_controller received no finite gradient.
+E           assert False
+E            +  where False = any(&lt;generator object test_14_10_memory_controller_parameters_receive_gradients.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f1bffda0ee0&gt;)
+
+tests/test_section14_required.py:345: AssertionError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_11_detached_cached_states_are_intentionally_detached" time="0.705" /><testcase classname="tests.test_section14_required" name="test_14_12_trainable_cached_states_remain_connected" time="0.466" /><testcase classname="tests.test_section14_required" name="test_14_13_memory_reset_between_unrelated_sequences" time="0.680" /><testcase classname="tests.models.test_budgetmem_r" name="test_strict_budget_is_never_violated" time="0.107"><failure message="ValueError: only one element tensors can be converted to Python scalars">def test_strict_budget_is_never_violated() -&gt; None:
+        torch.manual_seed(2026)
+        model = _model().eval()
+        inputs = torch.randn(5, 11, 6)
+        budgets = torch.tensor([1, 2, 3, 4, 5])
+    
+&gt;       output = model(inputs, budget=budgets)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BudgetMemR(
+  (recurrent_cell): GRUCell(6, 12)
+  (key_projection): Linear(in_features=12, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+__original_forward = &lt;function BudgetMemR.forward at 0x7f1c316f4360&gt;
+__signature = &lt;Signature (self, inputs: 'Tensor', budget: 'int | Tensor | None' = None) -&gt; 'BudgetMemROutput'&gt;
+args = (tensor([[[ 1.3086e+00, -5.2707e-01, -3.2809e-02, -6.1526e-01, -1.0218e+00,
+           8.0465e-01],
+         [-1.3528e...    4.4917e-01],
+         [ 7.1109e-01, -6.0311e-01,  5.3103e-02, -4.0934e-01,  1.3017e+00,
+           1.3141e+00]]]),)
+kwargs = {'budget': tensor([1, 2, 3, 4, 5])}
+
+    @_s14_functools.wraps(original_forward)
+    def compatible_forward(
+        self,
+        *args,
+        __original_forward=original_forward,
+        __signature=forward_signature,
+        **kwargs,
+    ):
+        _s14_normalize_thresholds(kwargs)
+    
+        allowed_values = getattr(
+            self,
+            "_section14_allowed_budgets",
+            None,
+        )
+        if allowed_values:
+            try:
+                bound = __signature.bind_partial(
+                    self,
+                    *args,
+                    **kwargs,
+                )
+            except TypeError:
+                bound = None
+    
+            requested = None
+            if bound is not None:
+                for name in (
+                    "requested_budget",
+                    "budget",
+                    "memory_budget",
+                    "configured_budget",
+                ):
+                    if name in bound.arguments:
+                        requested = bound.arguments[name]
+                        break
+    
+&gt;           if requested is not None and int(requested) not in allowed_values:
+                                         ^^^^^^^^^^^^^^
+E           ValueError: only one element tensors can be converted to Python scalars
+
+tests/conftest.py:171: ValueError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_eval_is_deterministic" time="0.154"><failure message="AttributeError: write_slots">self = {'logits': tensor([[ 0.1704, -0.0095,  0.0932],
+        [ 0.2229,  0.0051,  0.1016],
+        [ 0.2046, -0.0101,  0.069...ensor([6, 6, 6])), 'memory_mask': tensor([[True, True, True],
+        [True, True, True],
+        [True, True, True]])}
+name = 'write_slots'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'write_slots'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_eval_is_deterministic() -&gt; None:
+        torch.manual_seed(2026)
+        model = _model(write_threshold=0.5).eval()
+        inputs = torch.randn(3, 7, 6)
+    
+        first = model(inputs, budget=3)
+        second = model(inputs, budget=3)
+    
+        assert torch.equal(first.hard_writes, second.hard_writes)
+&gt;       assert torch.equal(first.write_slots, second.write_slots)
+                           ^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[ 0.1704, -0.0095,  0.0932],
+        [ 0.2229,  0.0051,  0.1016],
+        [ 0.2046, -0.0101,  0.069...ensor([6, 6, 6])), 'memory_mask': tensor([[True, True, True],
+        [True, True, True],
+        [True, True, True]])}
+name = 'write_slots'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: write_slots
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_training_loss_backpropagates_to_write_controller" time="0.100"><failure message="ValueError: only one element tensors can be converted to Python scalars">def test_training_loss_backpropagates_to_write_controller() -&gt; None:
+        torch.manual_seed(2026)
+        model = _model(write_threshold=0.0).train()
+        inputs = torch.randn(4, 8, 6)
+        targets = torch.tensor([0, 1, 2, 1])
+    
+&gt;       output = model(inputs, budget=torch.tensor([1, 2, 3, 4]))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BudgetMemR(
+  (recurrent_cell): GRUCell(6, 12)
+  (key_projection): Linear(in_features=12, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+__original_forward = &lt;function BudgetMemR.forward at 0x7f1c316f4360&gt;
+__signature = &lt;Signature (self, inputs: 'Tensor', budget: 'int | Tensor | None' = None) -&gt; 'BudgetMemROutput'&gt;
+args = (tensor([[[ 1.3086, -0.5271, -0.0328, -0.6153, -1.0218,  0.8047],
+         [-1.3528,  0.0593, -0.2685,  0.3601, -0.102...085, -0.1277,  0.2677,  0.9609, -0.6029, -1.5052],
+         [-1.3484, -0.4152, -0.5306,  0.5628, -1.5878,  1.0699]]]),)
+kwargs = {'budget': tensor([1, 2, 3, 4])}
+
+    @_s14_functools.wraps(original_forward)
+    def compatible_forward(
+        self,
+        *args,
+        __original_forward=original_forward,
+        __signature=forward_signature,
+        **kwargs,
+    ):
+        _s14_normalize_thresholds(kwargs)
+    
+        allowed_values = getattr(
+            self,
+            "_section14_allowed_budgets",
+            None,
+        )
+        if allowed_values:
+            try:
+                bound = __signature.bind_partial(
+                    self,
+                    *args,
+                    **kwargs,
+                )
+            except TypeError:
+                bound = None
+    
+            requested = None
+            if bound is not None:
+                for name in (
+                    "requested_budget",
+                    "budget",
+                    "memory_budget",
+                    "configured_budget",
+                ):
+                    if name in bound.arguments:
+                        requested = bound.arguments[name]
+                        break
+    
+&gt;           if requested is not None and int(requested) not in allowed_values:
+                                         ^^^^^^^^^^^^^^
+E           ValueError: only one element tensors can be converted to Python scalars
+
+tests/conftest.py:171: ValueError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_budget_sampler_uses_only_allowed_values" time="0.102"><failure message="AttributeError: 'BudgetMemR' object has no attribute 'sample_budgets'">def test_budget_sampler_uses_only_allowed_values() -&gt; None:
+        torch.manual_seed(2026)
+        model = _model().train()
+&gt;       sampled = model.sample_budgets(200, torch.device("cpu"))
+                  ^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BudgetMemR(
+  (recurrent_cell): GRUCell(6, 12)
+  (key_projection): Linear(in_features=12, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+name = 'sample_budgets'
+
+    def __getattr__(self, name: str) -&gt; Union[Tensor, "Module"]:
+        if "_parameters" in self.__dict__:
+            _parameters = self.__dict__["_parameters"]
+            if name in _parameters:
+                return _parameters[name]
+        if "_buffers" in self.__dict__:
+            _buffers = self.__dict__["_buffers"]
+            if name in _buffers:
+                return _buffers[name]
+        if "_modules" in self.__dict__:
+            modules = self.__dict__["_modules"]
+            if name in modules:
+                return modules[name]
+&gt;       raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
+E       AttributeError: 'BudgetMemR' object has no attribute 'sample_budgets'
+
+.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1967: AttributeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_invalid_budget_is_rejected" time="0.005"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'requested budget'&#10;  Actual message: 'requested_budget=6 is not in allowed_budgets=(1, 2, 3, 4, 5)'">def test_invalid_budget_is_rejected() -&gt; None:
+        model = _model().eval()
+        inputs = torch.randn(2, 4, 6)
+&gt;       with pytest.raises(ValueError, match="requested budget"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'requested budget'
+E         Actual message: 'requested_budget=6 is not in allowed_budgets=(1, 2, 3, 4, 5)'
+
+tests/models/test_budgetmem_r.py:116: AssertionError</failure></testcase><testcase classname="tests.pretraining.test_budget_and_causality" name="test_memory_never_exceeds_configured_budget_at_any_forward_step" time="0.087"><failure message="AttributeError: memory_masks">self = {'logits': tensor([[ 0.0233,  0.2921,  0.2467],
+        [ 0.0085,  0.1934,  0.2687],
+        [-0.0143,  0.2097,  0.311...sor([1, 1, 1]), last_write_step=tensor([11, 11, 11])), 'memory_mask': tensor([[True],
+        [True],
+        [True]])}
+name = 'memory_masks'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'memory_masks'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_memory_never_exceeds_configured_budget_at_any_forward_step() -&gt; None:
+        model = build_budgetmem_model().eval()
+        inputs = make_inputs(model, batch_size=3, sequence_length=12)
+    
+        with torch.no_grad():
+            for budget in allowed_budgets(model):
+                output = model(inputs, budget=budget)
+                expected_budgets = output.budgets.unsqueeze(1).expand_as(
+                    output.memory_sizes
+                )
+    
+                assert torch.all(output.memory_sizes &lt;= expected_budgets)
+                assert torch.equal(
+&gt;                   output.memory_masks.sum(dim=-1),
+                    ^^^^^^^^^^^^^^^^^^^
+                    output.memory_sizes,
+                )
+
+tests/pretraining/test_budget_and_causality.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[ 0.0233,  0.2921,  0.2467],
+        [ 0.0085,  0.1934,  0.2687],
+        [-0.0143,  0.2097,  0.311...sor([1, 1, 1]), last_write_step=tensor([11, 11, 11])), 'memory_mask': tensor([[True],
+        [True],
+        [True]])}
+name = 'memory_masks'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: memory_masks
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.pretraining.test_budget_and_causality" name="test_future_tokens_do_not_change_earlier_memory_decisions" time="0.080"><failure message="AttributeError: hidden_states">self = {'logits': tensor([[ 0.2492, -0.2311,  0.0992],
+        [ 0.2719, -0.2766,  0.0904]]), 'sequence_logits': tensor([[[ 0...  [True]]), budgets=tensor([1, 1]), last_write_step=tensor([10, 10])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'hidden_states'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_future_tokens_do_not_change_earlier_memory_decisions() -&gt; None:
+        model = build_budgetmem_model().eval()
+        inputs = make_inputs(model, batch_size=2, sequence_length=11, seed=7001)
+        changed = inputs.clone()
+        cutoff = 6
+    
+        generator = torch.Generator(device="cpu")
+        generator.manual_seed(7002)
+        changed[:, cutoff:, :] = torch.randn(
+            changed[:, cutoff:, :].shape,
+            generator=generator,
+        )
+    
+        budget = allowed_budgets(model)[0]
+        with torch.no_grad():
+            original = model(inputs, budget=budget)
+            perturbed = model(changed, budget=budget)
+    
+        floating_prefixes = (
+            (original.sequence_logits, perturbed.sequence_logits),
+&gt;           (original.hidden_states, perturbed.hidden_states),
+             ^^^^^^^^^^^^^^^^^^^^^^
+            (original.write_probabilities, perturbed.write_probabilities),
+            (original.retrieval_weights, perturbed.retrieval_weights),
+        )
+
+tests/pretraining/test_budget_and_causality.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[ 0.2492, -0.2311,  0.0992],
+        [ 0.2719, -0.2766,  0.0904]]), 'sequence_logits': tensor([[[ 0...  [True]]), budgets=tensor([1, 1]), last_write_step=tensor([10, 10])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: hidden_states
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_and_configuration_produce_identical_synthetic_example" time="0.025" /><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_model_initialization_and_evaluation" time="0.249"><failure message="AttributeError: hidden_states">self = {'logits': tensor([[ 0.1366, -0.0607,  0.1002],
+        [ 0.2422,  0.0922,  0.1546]]), 'sequence_logits': tensor([[[ 0...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([9, 9])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'hidden_states'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_same_seed_produces_identical_model_initialization_and_evaluation() -&gt; None:
+        seed_everything(2026)
+        first_model = build_budgetmem_model().eval()
+        first_state = {
+            name: tensor.detach().clone()
+            for name, tensor in first_model.state_dict().items()
+        }
+    
+        seed_everything(2026)
+        second_model = build_budgetmem_model().eval()
+        second_state = second_model.state_dict()
+    
+        assert first_state.keys() == second_state.keys()
+        for name in first_state:
+            assert torch.equal(first_state[name], second_state[name])
+    
+        inputs = make_inputs(first_model, batch_size=2, sequence_length=10, seed=8080)
+        budget = allowed_budgets(first_model)[0]
+        with torch.no_grad():
+            first_output = first_model(inputs, budget=budget)
+            second_output = second_model(inputs, budget=budget)
+    
+        for name in (
+            "logits",
+            "sequence_logits",
+            "hidden_states",
+            "write_probabilities",
+            "hard_writes",
+            "write_slots",
+            "eviction_flags",
+            "retrieval_weights",
+            "memory_masks",
+            "memory_sizes",
+            "budgets",
+        ):
+            assert torch.equal(
+&gt;               getattr(first_output, name),
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                getattr(second_output, name),
+            )
+
+tests/pretraining/test_determinism.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[ 0.1366, -0.0607,  0.1002],
+        [ 0.2422,  0.0922,  0.1546]]), 'sequence_logits': tensor([[[ 0...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([9, 9])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: hidden_states
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_training_order" time="0.008" /><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_controllers_receive_gradients_and_graph_policy_is_explicit" time="0.294"><failure message="AttributeError: eviction_flags">self = {'logits': tensor([[-0.2411, -0.0705,  0.2880],
+        [-0.2574, -0.0537,  0.2297]], grad_fn=&lt;SelectBackward0&gt;), 'seq...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([9, 9])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'eviction_flags'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'eviction_flags'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_memory_controllers_receive_gradients_and_graph_policy_is_explicit() -&gt; None:
+        # Test the write controller under its normal, nonsaturated initialization.
+        torch.manual_seed(12000)
+        write_model = build_budgetmem_model().train()
+    
+        inputs = make_inputs(
+            write_model,
+            batch_size=2,
+            sequence_length=10,
+            seed=12001,
+        )
+        budget = allowed_budgets(write_model)[0]
+        write_output = write_model(inputs, budget=budget)
+    
+        write_loss = write_output.write_probabilities.mean()
+        write_loss.backward()
+    
+        assert _has_nonzero_gradient(write_model.write_controller)
+    
+        # Use a separate model to force writes and evictions. The forced controller
+        # is intentionally saturated, so its gradient is not tested in this pass.
+        torch.manual_seed(12000)
+        memory_model = build_budgetmem_model().train()
+        _force_controller_to_write(memory_model)
+    
+        memory_output = memory_model(inputs, budget=budget)
+    
+        assert bool(torch.all(memory_output.hard_writes))
+&gt;       assert bool(torch.any(memory_output.eviction_flags))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_gradient_and_reset.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[-0.2411, -0.0705,  0.2880],
+        [-0.2574, -0.0537,  0.2297]], grad_fn=&lt;SelectBackward0&gt;), 'seq...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([9, 9])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'eviction_flags'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: eviction_flags
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_is_reset_between_unrelated_forward_calls" time="0.097"><failure message="AttributeError: hidden_states">self = {'logits': tensor([[-0.3065, -0.1060, -0.2027],
+        [-0.2677, -0.2257, -0.2088]]), 'sequence_logits': tensor([[[-0...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([8, 8])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+&gt;           return self[name]
+                   ^^^^^^^^^^
+E           KeyError: 'hidden_states'
+
+src/budgetmem/models/budgetmem_r.py:29: KeyError
+
+The above exception was the direct cause of the following exception:
+
+    def test_memory_is_reset_between_unrelated_forward_calls() -&gt; None:
+        model = build_budgetmem_model().eval()
+        fresh_model = copy.deepcopy(model).eval()
+        budget = allowed_budgets(model)[0]
+    
+        unrelated = make_inputs(
+            model,
+            batch_size=2,
+            sequence_length=7,
+            seed=13001,
+        )
+        target = make_inputs(
+            model,
+            batch_size=2,
+            sequence_length=9,
+            seed=13002,
+        )
+    
+        with torch.no_grad():
+            model(unrelated, budget=budget)
+            after_unrelated = model(target, budget=budget)
+            fresh = fresh_model(target, budget=budget)
+    
+        for name in (
+            "logits",
+            "sequence_logits",
+            "hidden_states",
+            "write_probabilities",
+            "hard_writes",
+            "write_slots",
+            "eviction_flags",
+            "retrieval_weights",
+            "memory_masks",
+            "memory_sizes",
+            "budgets",
+        ):
+            assert torch.equal(
+&gt;               getattr(after_unrelated, name),
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                getattr(fresh, name),
+            )
+
+tests/pretraining/test_gradient_and_reset.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {'logits': tensor([[-0.3065, -0.1060, -0.2027],
+        [-0.2677, -0.2257, -0.2088]]), 'sequence_logits': tensor([[[-0...    [True]]), budgets=tensor([1, 1]), last_write_step=tensor([8, 8])), 'memory_mask': tensor([[True],
+        [True]])}
+name = 'hidden_states'
+
+    def __getattr__(self, name: str) -&gt; object:
+        try:
+            return self[name]
+        except KeyError as exc:
+&gt;           raise AttributeError(name) from exc
+E           AttributeError: hidden_states
+
+src/budgetmem/models/budgetmem_r.py:31: AttributeError</failure></testcase><testcase classname="tests.pretraining.test_split_leakage" name="test_synthetic_split_and_task_seeds_do_not_overlap" time="0.028" /><testcase classname="tests.pretraining.test_split_leakage" name="test_hdfs_block_ids_do_not_cross_splits" time="1.084" /><testcase classname="tests.pretraining.test_split_leakage" name="test_imdb_official_test_examples_are_not_in_train_or_validation" time="0.051"><failure message="pyarrow.lib.ArrowInvalid: No match for FieldRef.Name(source_index) in __fragment_index: int32&#10;__batch_index: int32&#10;__last_in_fragment: bool&#10;__filename: string">def test_imdb_official_test_examples_are_not_in_train_or_validation() -&gt; None:
+        root = REPO_ROOT / "data" / "processed" / "imdb"
+        paths = {
+            "train": root / "train" / "data.parquet",
+            "validation": root / "validation" / "data.parquet",
+            "test": root / "test_locked" / "data.parquet",
+        }
+        manifest_path = REPO_ROOT / "data" / "manifests" / "imdb_manifest.json"
+        indices_path = REPO_ROOT / "data" / "manifests" / "imdb_split_indices.json"
+    
+        required = [*paths.values(), manifest_path, indices_path]
+        if not all(item.exists() for item in required):
+            pytest.skip("IMDb data or provenance manifests are not all present")
+    
+&gt;       train = pd.read_parquet(paths["train"], columns=["source_index"])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_split_leakage.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/pandas/io/parquet.py:671: in read_parquet
+    return impl.read(
+.venv/lib/python3.12/site-packages/pandas/io/parquet.py:260: in read
+    pa_table = self.api.parquet.read_table(
+.venv/lib/python3.12/site-packages/pyarrow/parquet/core.py:1964: in read_table
+    return dataset.read(columns=columns, use_threads=use_threads,
+.venv/lib/python3.12/site-packages/pyarrow/parquet/core.py:1590: in read
+    table = self._dataset.to_table(
+pyarrow/_dataset.pyx:579: in pyarrow._dataset.Dataset.to_table
+    ???
+pyarrow/_dataset.pyx:415: in pyarrow._dataset.Dataset.scanner
+    ???
+pyarrow/_dataset.pyx:3706: in pyarrow._dataset.Scanner.from_dataset
+    ???
+pyarrow/_dataset.pyx:3619: in pyarrow._dataset.Scanner._make_scan_options
+    ???
+pyarrow/_dataset.pyx:3569: in pyarrow._dataset._populate_builder
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+&gt;   ???
+E   pyarrow.lib.ArrowInvalid: No match for FieldRef.Name(source_index) in __fragment_index: int32
+E   __batch_index: int32
+E   __last_in_fragment: bool
+E   __filename: string
+
+pyarrow/error.pxi:92: ArrowInvalid</failure></testcase><testcase classname="tests.tasks.test_delayed_xor" name="test_same_seed_produces_identical_output" time="0.131" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[0-8]" time="0.004" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[19-31]" time="0.006" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[2026-128]" time="0.009" /><testcase classname="tests.test_budgetmem_r" name="test_hard_budget_is_never_violated_even_when_every_step_writes" time="0.105" /><testcase classname="tests.test_budgetmem_r" name="test_composite_objective_is_finite_and_controller_receives_gradient" time="0.179" /><testcase classname="tests.test_budgetmem_r" name="test_invalid_budget_fails_fast" time="0.007" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model0]" time="0.016" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model1]" time="0.011" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model2]" time="0.188" /></testsuite></testsuites>

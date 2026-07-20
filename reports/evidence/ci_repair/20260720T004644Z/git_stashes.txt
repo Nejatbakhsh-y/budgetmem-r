@@ -1,0 +1,2 @@
+stash@{0}: On main: secondary safety stash before syncing main 20260720-003514
+stash@{1}: On fix/section15-budgetmem-write-controller: post-merge local recovery 20260720T002920Z

@@ -1,0 +1,6 @@
+{
+  "gradient_flow_test_rc": 0,
+  "controller_calibration_test_rc": 0,
+  "profiler_rc": null,
+  "note": "Recovery gate evaluated current pilot_results.csv only; no stale profile was reused."
+}

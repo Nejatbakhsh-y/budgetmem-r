@@ -1,0 +1,18 @@
+Section 14.11 Final GO Decision
+===============================
+
+Gradient stability: PASS
+Memory-budget enforcement: PASS
+Same-budget comparison: PASS
+Deterministic policies outperformed: at least 2
+Final decision: GO
+Section 14.11: COMPLETE
+
+Decision basis
+--------------
+The final decision is GO because the independently checked source
+evidence confirms gradient stability, strict memory-budget enforcement,
+a same-budget comparison, and superiority over at least two deterministic
+memory policies.
+
+Source diagnostic: reports/evidence/section14_11_8_diagnostic.txt

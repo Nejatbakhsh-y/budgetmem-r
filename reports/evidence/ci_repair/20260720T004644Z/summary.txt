@@ -1,0 +1,17 @@
+Failed CI Diagnostic Summary
+============================
+
+Generated UTC: 20260720T004644Z
+Branch: recovery/restored-project-work-20260720-004252
+Pytest exit code: 0
+Ruff exit code: 1
+
+Pytest failure markers:
+No standard pytest failure markers found.
+
+GitHub failed-log files:
+github_run_29621509504_failed.log
+github_run_29621526619_failed.log
+github_run_29709396486_failed.log
+github_run_29709398125_failed.log
+github_run_29709514807_failed.log

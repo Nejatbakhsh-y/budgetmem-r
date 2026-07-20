@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "generated_utc": "20260720T091415Z",
+  "section": "14",
+  "gate_type": "authoritative_pretraining",
+  "selected_targets": [
+    "tests/test_budgetmem_r.py",
+    "tests/test_section14_authoritative.py"
+  ],
+  "cached_state_graph_policy": {
+    "method": "Inspect cached-content autograd connectivity directly; do not infer content detachment from write-decision controller gradients.",
+    "evidence": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_cached_state_graph_policy_20260720T091415Z.json"
+  },
+  "category_status": {
+    "Budget correctness": "PASS",
+    "Causality": "PASS",
+    "Determinism": "PASS",
+    "Synthetic seed isolation": "PASS",
+    "HDFS block isolation": "PASS",
+    "IMDb official-test isolation": "PASS",
+    "Gradient flow": "PASS",
+    "Cached-state graph policy": "PASS",
+    "Memory reset": "PASS"
+  },
+  "production_tests": "PASS",
+  "pytest_exit_code": 0,
+  "decision": "GO",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "evidence": {
+    "junit": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/junit/section14_graph_policy_20260720T091415Z.xml",
+    "log": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/logs/section14_graph_policy_20260720T091415Z.log",
+    "results_csv": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/tables/section14_unit_test_results.csv",
+    "report": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_unit_tests_report.txt"
+  }
+}

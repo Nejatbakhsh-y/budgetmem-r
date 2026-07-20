@@ -1,0 +1,5 @@
+Section 17 Syntax Repair
+File: 17_section15_final_go_decision.sh
+Repairs: 1
+Repaired broken line 1297 by continuing line 1296.
+Content: && git remote get-url origin >/dev/null 2>&1

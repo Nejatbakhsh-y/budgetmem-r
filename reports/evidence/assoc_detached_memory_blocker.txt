@@ -1,0 +1,53 @@
+====================================================================================================
+DETACHED-MEMORY TARGETED BLOCKER
+====================================================================================================
+
+Recorded decision: TARGETED_NO_GO
+Qualified deterministic policies: 2/2
+
+====================================================================================================
+AUXILIARY CRITERIA
+====================================================================================================
+stability_pass                 FAIL  value=False
+budget_pass                    PASS  value=True
+resource_pass                  PASS  value=True
+write_frequency_pass           PASS  value=True
+outperforms_both_policies      PASS  value=True
+
+====================================================================================================
+BUDGETMEM-R TRAINING RECORD
+====================================================================================================
+task                           associative_recall
+model                          budgetmem_r
+first_loss                     5.448570301135381
+final_loss                     4.603477030992508
+maximum_gradient_norm          181.8977813720703
+finite_losses                  True
+stability_pass                 False
+checkpoint_path                outputs/assoc_detached_memory/checkpoints/associative_recall/budgetmem_r/last.pt
+
+====================================================================================================
+BUDGETMEM-R EVALUATION ROWS
+====================================================================================================
+              task  sequence_length  memory_budget  memory_recall  token_accuracy  write_frequency  stability_pass  budget_pass  resource_measurement_pass
+associative_recall             1024             16       0.197917        0.010417         0.277659           False         True                       True
+associative_recall             1024             32       0.437500        0.031250         0.252665           False         True                       True
+
+====================================================================================================
+POLICY COMPARISONS
+====================================================================================================
+             policy  matched_budgets  mean_gain  minimum_gain  clear_win_rate  qualifies
+gru_reservoir_cache                2   0.260417      0.145833             1.0       True
+  gru_uniform_cache                2   0.317708      0.197917             1.0       True
+
+====================================================================================================
+EXACT BLOCKERS
+====================================================================================================
+- stability_pass
+
+====================================================================================================
+REQUIRED NEXT ACTION
+====================================================================================================
+The recall, budget, resource, and write-frequency requirements passed.
+Only the gradient-stability criterion remains.
+Do not rerun the complete pilot. Inspect whether the reported maximum gradient is measured before or after gradient clipping.

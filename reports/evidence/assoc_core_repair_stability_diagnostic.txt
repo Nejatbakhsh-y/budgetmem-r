@@ -1,0 +1,77 @@
+====================================================================================================
+ASSOCIATIVE-RECALL STABILITY DIAGNOSTIC
+====================================================================================================
+
+Performance status:
+- Policies clearly outperformed: 2/2
+- Performance requirement: PASS
+
+====================================================================================================
+BUDGETMEM-R TRAINING RECORD
+====================================================================================================
+Task:                         associative_recall
+Model:                        budgetmem_r
+Epochs configured:            12
+Learning rate:                0.00050000
+Gradient clipping norm:       1.000000
+First epoch loss:              5.3650813699
+Final epoch loss:              4.3910607745
+Allowed final-loss maximum:   10.7301627398
+Final/first loss ratio:        0.818452
+Maximum pre-clip gradient:     140.0399322510
+Allowed gradient maximum:     100.0000000000
+Finite losses recorded:       True
+Recorded stability pass:      False
+Recomputed stability pass:    False
+
+====================================================================================================
+CHECKPOINT HISTORY
+====================================================================================================
+Checkpoint:                    outputs/assoc_core_repair_screen/checkpoints/associative_recall/budgetmem_r/last.pt
+Checkpoint exists:             True
+Checkpoint epoch:              11
+History entries:               12
+All history values finite:     True
+Minimum epoch loss:            4.3910607745
+Maximum epoch loss:            5.3650813699
+Best epoch:                    12
+
+Epoch loss history:
+- epoch 01: 5.3650813699
+- epoch 02: 5.1634335419
+- epoch 03: 5.0174882114
+- epoch 04: 4.9702361822
+- epoch 05: 4.9272418121
+- epoch 06: 4.8825066288
+- epoch 07: 4.8531042735
+- epoch 08: 4.7988332907
+- epoch 09: 4.7200736503
+- epoch 10: 4.6733960311
+- epoch 11: 4.5236910979
+- epoch 12: 4.3910607745  <-- best
+
+====================================================================================================
+STABILITY CONDITIONS
+====================================================================================================
+Finite-loss condition:        PASS
+Gradient-norm condition:      FAIL
+Loss-growth condition:        PASS
+
+====================================================================================================
+FINAL DIAGNOSIS
+====================================================================================================
+Diagnosis: GRADIENT_NORM_FAILURE
+
+Failed condition identifiers:
+- EXCESSIVE_PRECLIP_GRADIENT_NORM
+
+Required next action:
+- Stabilize the optimizer or model initialization.
+- Do not raise the acceptable-gradient threshold.
+- Rerun only the targeted associative-recall screen.
+
+====================================================================================================
+FILES WRITTEN
+====================================================================================================
+reports/evidence/assoc_core_repair_stability_diagnostic.txt
+reports/evidence/assoc_core_repair_stability_diagnostic.json

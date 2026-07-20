@@ -1,0 +1,71 @@
+{
+  "decision": "TARGETED_NO_GO",
+  "target_task": "associative_recall",
+  "target_sequence_length": 1024,
+  "target_budgets": [
+    16,
+    32
+  ],
+  "minimum_required_gain": 0.02,
+  "qualified_policy_count": 2,
+  "criteria": {
+    "stability_pass": false,
+    "budget_pass": true,
+    "resource_pass": true,
+    "write_frequency_pass": true,
+    "write_frequency": 0.2651621500651042,
+    "outperforms_both_policies": true
+  },
+  "policy_summary": [
+    {
+      "policy": "gru_reservoir_cache",
+      "matched_budgets": 2,
+      "mean_gain": 0.26041666666666663,
+      "minimum_gain": 0.14583333333333331,
+      "clear_win_rate": 1.0,
+      "qualifies": true
+    },
+    {
+      "policy": "gru_uniform_cache",
+      "matched_budgets": 2,
+      "mean_gain": 0.3177083333333333,
+      "minimum_gain": 0.19791666666666666,
+      "clear_win_rate": 1.0,
+      "qualifies": true
+    }
+  ],
+  "matched_comparisons": [
+    {
+      "policy": "gru_uniform_cache",
+      "budget": 16,
+      "budgetmem_memory_recall": 0.19791666666666666,
+      "policy_memory_recall": 0.0,
+      "absolute_gain": 0.19791666666666666,
+      "clear_win": true
+    },
+    {
+      "policy": "gru_uniform_cache",
+      "budget": 32,
+      "budgetmem_memory_recall": 0.4375,
+      "policy_memory_recall": 0.0,
+      "absolute_gain": 0.4375,
+      "clear_win": true
+    },
+    {
+      "policy": "gru_reservoir_cache",
+      "budget": 16,
+      "budgetmem_memory_recall": 0.19791666666666666,
+      "policy_memory_recall": 0.052083333333333336,
+      "absolute_gain": 0.14583333333333331,
+      "clear_win": true
+    },
+    {
+      "policy": "gru_reservoir_cache",
+      "budget": 32,
+      "budgetmem_memory_recall": 0.4375,
+      "policy_memory_recall": 0.0625,
+      "absolute_gain": 0.375,
+      "clear_win": true
+    }
+  ]
+}

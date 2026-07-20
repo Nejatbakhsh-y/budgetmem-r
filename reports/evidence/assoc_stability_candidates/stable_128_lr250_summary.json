@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "config_path": "configs/experiments/pilot_assoc_core_repair_screen.yaml",
+  "effective_config_path": "outputs/assoc_core_repair_screen/effective_screen_config.yaml",
+  "config_sha256": "705188ba8642940b8fa15cafff2211ea2c6d9750c28d0592731b6521987b5c4d",
+  "training_records": [
+    {
+      "task": "associative_recall",
+      "model": "gru_uniform_cache",
+      "model_source": "pilot_uniform_checkpoint_cache",
+      "checkpoint_path": "outputs/assoc_stability_candidates/stable_128_lr250/checkpoints/associative_recall/gru_uniform_cache/last.pt",
+      "config_sha256": "705188ba8642940b8fa15cafff2211ea2c6d9750c28d0592731b6521987b5c4d",
+      "first_loss": 5.2573362191518145,
+      "final_loss": 4.825933754444122,
+      "maximum_gradient_norm": 2.3601105213165283,
+      "finite_losses": true,
+      "stability_pass": true,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 15,
+      "train_wall_seconds": 121.89602878699952,
+      "train_peak_rss_mb": 681.58984375,
+      "parameter_count": 182976
+    },
+    {
+      "task": "associative_recall",
+      "model": "gru_reservoir_cache",
+      "model_source": "pilot_reservoir_cache",
+      "checkpoint_path": "outputs/assoc_stability_candidates/stable_128_lr250/checkpoints/associative_recall/gru_reservoir_cache/last.pt",
+      "config_sha256": "705188ba8642940b8fa15cafff2211ea2c6d9750c28d0592731b6521987b5c4d",
+      "first_loss": 5.249336818854014,
+      "final_loss": 4.7950246930122375,
+      "maximum_gradient_norm": 2.724433660507202,
+      "finite_losses": true,
+      "stability_pass": true,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 15,
+      "train_wall_seconds": 222.69203702299274,
+      "train_peak_rss_mb": 686.51953125,
+      "parameter_count": 182976
+    },
+    {
+      "task": "associative_recall",
+      "model": "budgetmem_r",
+      "model_source": "src/budgetmem/models/budgetmem_r.py",
+      "checkpoint_path": "outputs/assoc_stability_candidates/stable_128_lr250/checkpoints/associative_recall/budgetmem_r/last.pt",
+      "config_sha256": "705188ba8642940b8fa15cafff2211ea2c6d9750c28d0592731b6521987b5c4d",
+      "first_loss": 5.3675714035828905,
+      "final_loss": 4.483306139707565,
+      "maximum_gradient_norm": 532.009521484375,
+      "finite_losses": true,
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 15,
+      "train_wall_seconds": 943.7783182260027,
+      "train_peak_rss_mb": 849.48046875,
+      "parameter_count": 224283
+    }
+  ],
+  "result_count": 6,
+  "results_csv": "reports/tables/assoc_core_repair_screen_results.csv"
+}

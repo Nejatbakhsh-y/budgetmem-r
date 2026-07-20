@@ -1,0 +1,17 @@
+ERROR: not found: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/tests/pilot/__pycache__/__init__.cpython-312.pyc
+(no match in any of [<Dir __pycache__>])
+
+ERROR: not found: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/tests/pilot/__pycache__/test_controller_calibration.cpython-312-pytest-9.1.1.pyc
+(no match in any of [<Dir __pycache__>])
+
+ERROR: not found: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/tests/pilot/__pycache__/test_controller_calibration.cpython-312.pyc
+(no match in any of [<Dir __pycache__>])
+
+ERROR: not found: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/tests/pilot/__pycache__/test_pilot.cpython-312-pytest-9.1.1.pyc
+(no match in any of [<Dir __pycache__>])
+
+ERROR: not found: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/tests/pilot/__pycache__/test_pilot.cpython-312.pyc
+(no match in any of [<Dir __pycache__>])
+
+
+no tests ran in 0.35s

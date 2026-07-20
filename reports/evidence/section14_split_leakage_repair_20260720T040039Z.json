@@ -1,0 +1,56 @@
+{
+  "generated_utc": "20260720T040039Z",
+  "datasets": {
+    "hdfs": {
+      "overlap_before": {
+        "train_validation": 0,
+        "train_test": 0,
+        "validation_test": 1076
+      },
+      "rows_removed": 1076,
+      "overlap_after": {
+        "train_validation": 0,
+        "train_test": 0,
+        "validation_test": 0
+      }
+    },
+    "imdb": {
+      "overlap_before": {
+        "train_validation": 19,
+        "train_test": 111,
+        "validation_test": 12
+      },
+      "rows_removed": 123,
+      "overlap_after": {
+        "train_validation": 19,
+        "train_test": 0,
+        "validation_test": 0
+      }
+    }
+  },
+  "modified_files": [
+    {
+      "path": "data/processed/hdfs/development_subset/test/data.parquet",
+      "rows_before": 1076,
+      "rows_removed": 1076,
+      "rows_after": 0
+    },
+    {
+      "path": "data/processed/imdb/train/data.parquet",
+      "rows_before": 22500,
+      "rows_removed": 111,
+      "rows_after": 22389
+    },
+    {
+      "path": "data/processed/imdb/validation/data.parquet",
+      "rows_before": 2500,
+      "rows_removed": 12,
+      "rows_after": 2488
+    }
+  ],
+  "skipped_large_or_unreadable_files": [
+    "data/manifests/hdfs_manifest.json",
+    "data/manifests/imdb_manifest.json",
+    "data/manifests/imdb_split_indices.json"
+  ]
+}

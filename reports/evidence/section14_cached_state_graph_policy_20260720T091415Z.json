@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "20260720T091415Z",
+  "detached_cached_values": {
+    "detach_memory_writes": true,
+    "requires_grad": false,
+    "grad_fn": null
+  },
+  "trainable_cached_values": {
+    "detach_memory_writes": false,
+    "requires_grad": true,
+    "grad_fn": "AddBackward0",
+    "value_projection_gradient_norms": {
+      "weight": 7.635149955749512
+    }
+  }
+}

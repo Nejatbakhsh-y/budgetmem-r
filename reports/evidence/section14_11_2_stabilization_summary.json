@@ -1,0 +1,13 @@
+{
+  "section": "14.11.2",
+  "generated_at_utc": "2026-07-19T00:55:18.860763+00:00",
+  "gradient_stability": "FAIL",
+  "attempts_used": 3,
+  "maximum_observed_gradient_norm": null,
+  "raw_gradient_limit": 100.0,
+  "gradient_clip_norm": 1.0,
+  "pilot_runner": "18_run_tuned_pilot_and_final_gate.sh",
+  "patch_history": "reports/evidence/section14_11_2_lr_patch_history.jsonl",
+  "main_log": "reports/evidence/logs/section14_11_2_stabilize_20260718T184502Z.log",
+  "threshold_was_changed": false
+}

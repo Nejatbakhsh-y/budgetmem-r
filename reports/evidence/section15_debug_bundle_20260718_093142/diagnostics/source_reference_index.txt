@@ -1,0 +1,613 @@
+ASSOCIATIVE-RECALL SOURCE REFERENCES
+====================================
+
+src/budgetmem/experiments/pilot.py:44:    query_positions: list[list[int]]
+src/budgetmem/experiments/pilot.py:143:def stable_int(value: str) -> int:
+src/budgetmem/experiments/pilot.py:144:    digest = hashlib.sha256(value.encode("utf-8")).digest()
+src/budgetmem/experiments/pilot.py:212:                    f"Generator {task} returned {len(generated)} values, expected 5"
+src/budgetmem/experiments/pilot.py:214:            input_ids, target_ids, relevant, query, _metadata = generated
+src/budgetmem/experiments/pilot.py:240:                    "query_positions": list(map(int, query)),
+src/budgetmem/experiments/pilot.py:257:        query_positions=[row["query_positions"] for row in rows],
+src/budgetmem/experiments/pilot.py:318:        value = (
+src/budgetmem/experiments/pilot.py:323:        return int(value % (step + 1))
+src/budgetmem/experiments/pilot.py:475:        self.key_dim = int(model_cfg["key_dim"])
+src/budgetmem/experiments/pilot.py:476:        self.retrieval_k = int(model_cfg["retrieval_k"])
+src/budgetmem/experiments/pilot.py:491:        values: dict[str, Any] = {
+src/budgetmem/experiments/pilot.py:506:            "key_dim": self.key_dim,
+src/budgetmem/experiments/pilot.py:507:            "value_dim": self.hidden_dim,
+src/budgetmem/experiments/pilot.py:511:            "retrieval_k": min(self.retrieval_k, self.max_budget),
+src/budgetmem/experiments/pilot.py:512:            "top_k": min(self.retrieval_k, self.max_budget),
+src/budgetmem/experiments/pilot.py:513:            "read_k": min(self.retrieval_k, self.max_budget),
+src/budgetmem/experiments/pilot.py:530:            if name in values:
+src/budgetmem/experiments/pilot.py:531:                kwargs[name] = values[name]
+src/budgetmem/experiments/pilot.py:700:        per_sample_write_rate = straight_through.mean(dim=1)
+src/budgetmem/experiments/pilot.py:701:        target_rate = float(training_cfg["write_rate_target"])
+src/budgetmem/experiments/pilot.py:704:            + float(training_cfg["write_rate_penalty"])
+src/budgetmem/experiments/pilot.py:705:            * (per_sample_write_rate - target_rate).square().mean()
+src/budgetmem/experiments/pilot.py:754:        query_positions=batch.query_positions,
+src/budgetmem/experiments/pilot.py:977:def _safe_mean(values: Iterable[float]) -> float:
+src/budgetmem/experiments/pilot.py:978:    data = list(values)
+src/budgetmem/experiments/pilot.py:1020:    successful_long_range_retrievals = 0
+src/budgetmem/experiments/pilot.py:1081:                        query_positions = batch.query_positions[row]
+src/budgetmem/experiments/pilot.py:1084:                            and query_positions
+src/budgetmem/experiments/pilot.py:1085:                            and min(query_positions) - min(relevant)
+src/budgetmem/experiments/pilot.py:1089:                            successful_long_range_retrievals += 1
+src/budgetmem/experiments/pilot.py:1124:        "memory_recall": _safe_mean(relevant_retention),
+src/budgetmem/experiments/pilot.py:1126:        "successful_long_range_retrievals": successful_long_range_retrievals,
+src/budgetmem/experiments/pilot.py:1129:            round(sum(max(0.0, 1.0 - value) for value in relevant_retention))
+src/budgetmem/experiments/pilot.py:1219:        status = "GO" if all(criteria.values()) else "NO_GO"
+src/budgetmem/experiments/pilot.py:1251:    fieldnames = list(rows[0].keys())
+src/budgetmem/experiments/pilot.py:1277:    for criterion, value in gate["criteria"].items():
+src/budgetmem/experiments/pilot.py:1278:        lines.append(f"| {criterion} | {'PASS' if value else 'FAIL'} |")
+src/budgetmem/experiments/pilot.py:1288:    for model, value in gate["long_range_token_accuracy"].items():
+src/budgetmem/experiments/pilot.py:1289:        lines.append(f"| {model} | {float(value):.6f} |")
+src/budgetmem/experiments/pilot.py:1318:            f"{float(row['memory_recall']):.6f} | "
+src/budgetmem/experiments/pilot.py:1348:        "associative_recall",
+src/budgetmem/experiments/pilot.py:1404:        yaml.safe_dump(cfg, sort_keys=False),
+src/budgetmem/experiments/pilot.py:1431:    records_by_key = {
+src/budgetmem/experiments/pilot.py:1437:            record = records_by_key[(str(task), str(model_name))]
+src/budgetmem/memory/budget_state.py:21:    keys: Tensor
+src/budgetmem/memory/budget_state.py:22:    values: Tensor
+src/budgetmem/memory/budget_state.py:36:        key_dim: int,
+src/budgetmem/memory/budget_state.py:37:        value_dim: int,
+src/budgetmem/memory/budget_state.py:50:            keys=torch.zeros(
+src/budgetmem/memory/budget_state.py:51:                batch_size, max_budget, key_dim, device=device, dtype=dtype
+src/budgetmem/memory/budget_state.py:53:            values=torch.zeros(
+src/budgetmem/memory/budget_state.py:56:                value_dim,
+src/budgetmem/memory/budget_state.py:71:                fill_value=-1,
+src/budgetmem/memory/budget_state.py:80:        return int(self.keys.shape[0])
+src/budgetmem/memory/budget_state.py:84:        return int(self.keys.shape[1])
+src/budgetmem/memory/budget_state.py:92:        slot_ids = torch.arange(self.max_budget, device=self.keys.device)
+src/budgetmem/models/budgetmem_r.py:102:        key_dim: int,
+src/budgetmem/models/budgetmem_r.py:103:        value_dim: int,
+src/budgetmem/models/budgetmem_r.py:108:        feature_dim = key_dim + value_dim + hidden_dim + budget_embedding_dim + 2
+src/budgetmem/models/budgetmem_r.py:130:                memory.keys,
+src/budgetmem/models/budgetmem_r.py:131:                memory.values,
+src/budgetmem/models/budgetmem_r.py:149:        value_dim: int,
+src/budgetmem/models/budgetmem_r.py:154:        self.memory_projection = nn.Linear(value_dim, hidden_dim)
+src/budgetmem/models/budgetmem_r.py:192:        key_dim: int | None = None,
+src/budgetmem/models/budgetmem_r.py:193:        value_dim: int | None = None,
+src/budgetmem/models/budgetmem_r.py:195:        retrieval_k: int = 4,
+src/budgetmem/models/budgetmem_r.py:207:        if retrieval_k < 1:
+src/budgetmem/models/budgetmem_r.py:208:            raise ValueError("retrieval_k must be positive")
+src/budgetmem/models/budgetmem_r.py:213:        normalized_budgets = tuple(sorted({int(value) for value in allowed_budgets}))
+src/budgetmem/models/budgetmem_r.py:224:        self.key_dim = key_dim or hidden_dim
+src/budgetmem/models/budgetmem_r.py:225:        self.value_dim = value_dim or hidden_dim
+src/budgetmem/models/budgetmem_r.py:226:        self.retrieval_k = min(retrieval_k, max_budget)
+src/budgetmem/models/budgetmem_r.py:241:        self.key_projection = nn.Linear(hidden_dim, self.key_dim)
+src/budgetmem/models/budgetmem_r.py:242:        self.value_projection = nn.Linear(hidden_dim, self.value_dim)
+src/budgetmem/models/budgetmem_r.py:243:        self.query_projection = nn.Linear(hidden_dim, self.key_dim)
+src/budgetmem/models/budgetmem_r.py:247:            key_dim=self.key_dim,
+src/budgetmem/models/budgetmem_r.py:248:            value_dim=self.value_dim,
+src/budgetmem/models/budgetmem_r.py:254:            value_dim=self.value_dim,
+src/budgetmem/models/budgetmem_r.py:281:                    fill_value=self.allowed_budgets[-1],
+src/budgetmem/models/budgetmem_r.py:288:                fill_value=budget,
+src/budgetmem/models/budgetmem_r.py:323:        query = self.query_projection(hidden)
+src/budgetmem/models/budgetmem_r.py:324:        scores = torch.einsum("bd,bsd->bs", query, memory.keys)
+src/budgetmem/models/budgetmem_r.py:325:        scores = scores / math.sqrt(float(self.key_dim))
+src/budgetmem/models/budgetmem_r.py:328:        top_scores, top_indices = torch.topk(scores, k=self.retrieval_k, dim=1)
+src/budgetmem/models/budgetmem_r.py:336:        gather_index = top_indices.unsqueeze(-1).expand(-1, -1, self.value_dim)
+src/budgetmem/models/budgetmem_r.py:337:        top_values = torch.gather(memory.values, dim=1, index=gather_index)
+src/budgetmem/models/budgetmem_r.py:338:        retrieved = (weights.unsqueeze(-1) * top_values).sum(dim=1)
+src/budgetmem/models/budgetmem_r.py:345:    def _novelty(self, key: Tensor, memory: ExternalMemoryState) -> Tensor:
+src/budgetmem/models/budgetmem_r.py:346:        normalized_key = F.normalize(key, p=2, dim=-1, eps=1.0e-8)
+src/budgetmem/models/budgetmem_r.py:347:        normalized_memory = F.normalize(memory.keys, p=2, dim=-1, eps=1.0e-8)
+src/budgetmem/models/budgetmem_r.py:348:        similarities = torch.einsum("bd,bsd->bs", normalized_key, normalized_memory)
+src/budgetmem/models/budgetmem_r.py:350:        maximum_similarity = similarities.max(dim=1).values
+src/budgetmem/models/budgetmem_r.py:360:    def _write_gate(self, logits: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+src/budgetmem/models/budgetmem_r.py:362:        # The relaxed value is retained only as the straight-through gradient path.
+src/budgetmem/models/budgetmem_r.py:413:        no_write_value = torch.full_like(selected, -1)
+src/budgetmem/models/budgetmem_r.py:417:            no_write_value,
+src/budgetmem/models/budgetmem_r.py:428:        candidate_key: Tensor,
+src/budgetmem/models/budgetmem_r.py:429:        candidate_value: Tensor,
+src/budgetmem/models/budgetmem_r.py:441:        ).to(dtype=memory.keys.dtype)
+src/budgetmem/models/budgetmem_r.py:448:        source_key = (
+src/budgetmem/models/budgetmem_r.py:449:            candidate_key.detach() if self.detach_memory_writes else candidate_key
+src/budgetmem/models/budgetmem_r.py:451:        source_value = (
+src/budgetmem/models/budgetmem_r.py:452:            candidate_value.detach() if self.detach_memory_writes else candidate_value
+src/budgetmem/models/budgetmem_r.py:454:        memory.keys = memory.keys * (1.0 - gate_3d) + source_key.unsqueeze(1) * gate_3d
+src/budgetmem/models/budgetmem_r.py:455:        memory.values = (
+src/budgetmem/models/budgetmem_r.py:456:            memory.values * (1.0 - gate_3d) + source_value.unsqueeze(1) * gate_3d
+src/budgetmem/models/budgetmem_r.py:499:            key_dim=self.key_dim,
+src/budgetmem/models/budgetmem_r.py:500:            value_dim=self.value_dim,
+src/budgetmem/models/budgetmem_r.py:534:            key = self.key_projection(hidden)
+src/budgetmem/models/budgetmem_r.py:535:            value = self.value_projection(hidden)
+src/budgetmem/models/budgetmem_r.py:550:            novelty = self._novelty(key, memory)
+src/budgetmem/models/budgetmem_r.py:567:            write_probability, hard_write, straight_through_gate = self._write_gate(
+src/budgetmem/models/budgetmem_r.py:584:                candidate_key=key,
+src/budgetmem/models/budgetmem_r.py:585:                candidate_value=value,
+src/budgetmem/tasks/associative_recall.py:15:def generate_associative_recall(
+src/budgetmem/tasks/associative_recall.py:23:    Column 0 contains token values.
+src/budgetmem/tasks/associative_recall.py:28:    - 1: association key
+src/budgetmem/tasks/associative_recall.py:29:    - 2: association value
+src/budgetmem/tasks/associative_recall.py:30:    - 3: final query key
+src/budgetmem/tasks/associative_recall.py:32:    Each key is immediately followed by its associated value. The final
+src/budgetmem/tasks/associative_recall.py:33:    position repeats one earlier key as a query. The target contains the
+src/budgetmem/tasks/associative_recall.py:34:    value associated with that key.
+src/budgetmem/tasks/associative_recall.py:38:        sequence_length: Total sequence length, including the final query.
+src/budgetmem/tasks/associative_recall.py:55:    query_position = sequence_length - 1
+src/budgetmem/tasks/associative_recall.py:56:    pre_query_length = query_position
+src/budgetmem/tasks/associative_recall.py:58:    # Create between two and five key-value associations.
+src/budgetmem/tasks/associative_recall.py:61:        min(5, pre_query_length // 3),
+src/budgetmem/tasks/associative_recall.py:64:    filler_count = pre_query_length - (2 * num_pairs)
+src/budgetmem/tasks/associative_recall.py:67:    # and after the key-value pairs.
+src/budgetmem/tasks/associative_recall.py:76:    # Keys and values use separate token ranges.
+src/budgetmem/tasks/associative_recall.py:77:    keys = rng.choice(
+src/budgetmem/tasks/associative_recall.py:87:    values = rng.choice(
+src/budgetmem/tasks/associative_recall.py:127:        key_position = cursor
+src/budgetmem/tasks/associative_recall.py:128:        value_position = cursor + 1
+src/budgetmem/tasks/associative_recall.py:130:        input_array[key_position] = (
+src/budgetmem/tasks/associative_recall.py:131:            keys[pair_index],
+src/budgetmem/tasks/associative_recall.py:135:        input_array[value_position] = (
+src/budgetmem/tasks/associative_recall.py:136:            values[pair_index],
+src/budgetmem/tasks/associative_recall.py:142:                "key_position": key_position,
+src/budgetmem/tasks/associative_recall.py:143:                "value_position": value_position,
+src/budgetmem/tasks/associative_recall.py:169:    if cursor != query_position:
+src/budgetmem/tasks/associative_recall.py:172:    # Select one earlier association for the final query.
+src/budgetmem/tasks/associative_recall.py:180:    queried_key = int(keys[queried_pair_index])
+src/budgetmem/tasks/associative_recall.py:181:    target_value = int(values[queried_pair_index])
+src/budgetmem/tasks/associative_recall.py:183:    input_array[query_position] = (
+src/budgetmem/tasks/associative_recall.py:184:        queried_key,
+src/budgetmem/tasks/associative_recall.py:191:        selected_pair["key_position"],
+src/budgetmem/tasks/associative_recall.py:192:        selected_pair["value_position"],
+src/budgetmem/tasks/associative_recall.py:199:        for position in range(query_position)
+src/budgetmem/tasks/associative_recall.py:204:        [target_value],
+src/budgetmem/tasks/associative_recall.py:210:        "query_positions": [query_position],
+src/budgetmem/tasks/associative_recall.py:215:        "queried_key": queried_key,
+src/budgetmem/tasks/associative_recall.py:216:        "target_values": target.tolist(),
+src/budgetmem/tasks/delayed_xor.py:4:A query token appears at the final sequence position. The target is the XOR
+src/budgetmem/tasks/delayed_xor.py:11:    input[position] = [token_value, role_marker]
+src/budgetmem/tasks/delayed_xor.py:18:    3 = query
+src/budgetmem/tasks/delayed_xor.py:21:nonquery positions are distractors.
+src/budgetmem/tasks/delayed_xor.py:70:        for the query.
+src/budgetmem/tasks/delayed_xor.py:80:        - ``distractor_positions``: nonoperand and nonquery positions
+src/budgetmem/tasks/delayed_xor.py:88:    query_position = sequence_length - 1
+src/budgetmem/tasks/delayed_xor.py:97:    # Force the second operand into the latter half, before the query.
+src/budgetmem/tasks/delayed_xor.py:100:        query_position,
+src/budgetmem/tasks/delayed_xor.py:111:    # Distractor tokens are also binary so that token value alone does not
+src/budgetmem/tasks/delayed_xor.py:113:    token_values = rng.integers(
+src/budgetmem/tasks/delayed_xor.py:122:        fill_value=DISTRACTOR_MARKER,
+src/budgetmem/tasks/delayed_xor.py:126:    token_values[first_operand_position] = first_operand_bit
+src/budgetmem/tasks/delayed_xor.py:129:    token_values[second_operand_position] = second_operand_bit
+src/budgetmem/tasks/delayed_xor.py:132:    # The query carries no operand value. Its role marker identifies it.
+src/budgetmem/tasks/delayed_xor.py:133:    token_values[query_position] = 0
+src/budgetmem/tasks/delayed_xor.py:134:    role_markers[query_position] = QUERY_MARKER
+src/budgetmem/tasks/delayed_xor.py:137:        (token_values, role_markers)
+src/budgetmem/tasks/delayed_xor.py:153:        query_position,
+src/budgetmem/tasks/delayed_xor.py:168:        "query_positions": [query_position],
+src/budgetmem/tasks/delayed_xor.py:181:        "target_values": [xor_result],
+src/budgetmem/tasks/distractor_retrieval.py:7:3. One retrieval query at the final sequence position.
+src/budgetmem/tasks/distractor_retrieval.py:32:def _validate_integer(name: str, value: object) -> int:
+src/budgetmem/tasks/distractor_retrieval.py:34:    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
+src/budgetmem/tasks/distractor_retrieval.py:37:    return int(value)
+src/budgetmem/tasks/distractor_retrieval.py:59:          Column 0 contains token values and column 1 contains role markers.
+src/budgetmem/tasks/distractor_retrieval.py:62:        - ``relevant_positions``: target and query positions.
+src/budgetmem/tasks/distractor_retrieval.py:72:    - 2: retrieval query
+src/budgetmem/tasks/distractor_retrieval.py:88:    query_position = sequence_length - 1
+src/budgetmem/tasks/distractor_retrieval.py:91:    # query requires long-range retention through many distractors.
+src/budgetmem/tasks/distractor_retrieval.py:95:    target_value = int(
+src/budgetmem/tasks/distractor_retrieval.py:102:    # Generate distractors while excluding the target value. This prevents
+src/budgetmem/tasks/distractor_retrieval.py:104:    token_values = rng.integers(
+src/budgetmem/tasks/distractor_retrieval.py:111:    collision_mask = token_values == target_value
+src/budgetmem/tasks/distractor_retrieval.py:114:        token_values[collision_mask] = rng.integers(
+src/budgetmem/tasks/distractor_retrieval.py:120:        collision_mask = token_values == target_value
+src/budgetmem/tasks/distractor_retrieval.py:127:    input_array[:, 0] = token_values
+src/budgetmem/tasks/distractor_retrieval.py:130:    input_array[target_position, 0] = target_value
+src/budgetmem/tasks/distractor_retrieval.py:133:    input_array[query_position, 0] = QUERY_TOKEN
+src/budgetmem/tasks/distractor_retrieval.py:134:    input_array[query_position, 1] = QUERY_MARKER
+src/budgetmem/tasks/distractor_retrieval.py:137:        [target_value],
+src/budgetmem/tasks/distractor_retrieval.py:143:        query_position,
+src/budgetmem/tasks/distractor_retrieval.py:159:        "query_position": query_position,
+src/budgetmem/tasks/distractor_retrieval.py:162:        "target_value": target_value,
+src/budgetmem/tasks/distractor_retrieval.py:163:        "target_values": target.tolist(),
+src/budgetmem/tasks/distractor_retrieval.py:164:        "retrieval_delay": query_position - target_position,
+src/budgetmem/tasks/distractor_retrieval.py:169:            "query": QUERY_MARKER,
+src/budgetmem/tasks/multi_key_retrieval.py:1:"""Deterministic multi-key retrieval synthetic task generator."""
+src/budgetmem/tasks/multi_key_retrieval.py:24:    """Choose non-overlapping starts for adjacent key-value rows."""
+src/budgetmem/tasks/multi_key_retrieval.py:34:def generate_multi_key_retrieval(
+src/budgetmem/tasks/multi_key_retrieval.py:38:    """Generate one deterministic multi-key retrieval example.
+src/budgetmem/tasks/multi_key_retrieval.py:40:    The source region contains six key-value records. Four distinct keys are
+src/budgetmem/tasks/multi_key_retrieval.py:42:    values in query order.
+src/budgetmem/tasks/multi_key_retrieval.py:65:            f"{_MINIMUM_SEQUENCE_LENGTH} for multi-key retrieval"
+src/budgetmem/tasks/multi_key_retrieval.py:73:    keys = rng.choice(
+src/budgetmem/tasks/multi_key_retrieval.py:79:    values = rng.choice(
+src/budgetmem/tasks/multi_key_retrieval.py:100:        key_position = start
+src/budgetmem/tasks/multi_key_retrieval.py:101:        value_position = start + 1
+src/budgetmem/tasks/multi_key_retrieval.py:103:        input_array[key_position] = [
+src/budgetmem/tasks/multi_key_retrieval.py:105:            int(keys[pair_index]),
+src/budgetmem/tasks/multi_key_retrieval.py:108:        input_array[value_position] = [
+src/budgetmem/tasks/multi_key_retrieval.py:110:            int(values[pair_index]),
+src/budgetmem/tasks/multi_key_retrieval.py:114:            key_position,
+src/budgetmem/tasks/multi_key_retrieval.py:115:            value_position,
+src/budgetmem/tasks/multi_key_retrieval.py:128:    query_positions = list(range(source_length, sequence_length))
+src/budgetmem/tasks/multi_key_retrieval.py:130:    queried_keys: list[int] = []
+src/budgetmem/tasks/multi_key_retrieval.py:131:    target_values: list[int] = []
+src/budgetmem/tasks/multi_key_retrieval.py:135:    for query_position, pair_index in zip(
+src/budgetmem/tasks/multi_key_retrieval.py:136:        query_positions,
+src/budgetmem/tasks/multi_key_retrieval.py:140:        key = int(keys[pair_index])
+src/budgetmem/tasks/multi_key_retrieval.py:141:        value = int(values[pair_index])
+src/budgetmem/tasks/multi_key_retrieval.py:143:        key_position, value_position = pair_positions[pair_index]
+src/budgetmem/tasks/multi_key_retrieval.py:145:        input_array[query_position] = [
+src/budgetmem/tasks/multi_key_retrieval.py:147:            key,
+src/budgetmem/tasks/multi_key_retrieval.py:150:        queried_keys.append(key)
+src/budgetmem/tasks/multi_key_retrieval.py:151:        target_values.append(value)
+src/budgetmem/tasks/multi_key_retrieval.py:152:        answer_positions.append(value_position)
+src/budgetmem/tasks/multi_key_retrieval.py:156:                key_position,
+src/budgetmem/tasks/multi_key_retrieval.py:157:                value_position,
+src/budgetmem/tasks/multi_key_retrieval.py:163:    reserved_positions = set(required_positions) | set(query_positions)
+src/budgetmem/tasks/multi_key_retrieval.py:173:        "query_positions": query_positions,
+src/budgetmem/tasks/multi_key_retrieval.py:178:        "queried_keys": queried_keys,
+src/budgetmem/tasks/multi_key_retrieval.py:179:        "target_values": target_values,
+src/budgetmem/tasks/multi_key_retrieval.py:185:        "target": target_values,
+src/budgetmem/tasks/rare_event_recall.py:51:    positions query two of those events by chronological event index. The
+src/budgetmem/tasks/rare_event_recall.py:52:    target contains the requested event values in query order.
+src/budgetmem/tasks/rare_event_recall.py:71:    token_values = rng.integers(
+src/budgetmem/tasks/rare_event_recall.py:86:    query_positions = list(range(source_length, sequence_length))
+src/budgetmem/tasks/rare_event_recall.py:87:    token_values[query_positions] = queried_event_indices
+src/budgetmem/tasks/rare_event_recall.py:88:    role_markers[query_positions] = QUERY_MARKER
+src/budgetmem/tasks/rare_event_recall.py:95:    target = token_values[relevant_positions].copy()
+src/budgetmem/tasks/rare_event_recall.py:98:        (token_values, role_markers)
+src/budgetmem/tasks/rare_event_recall.py:104:    excluded_positions = set(relevant_positions) | set(query_positions)
+src/budgetmem/tasks/rare_event_recall.py:126:        "query_positions": list(query_positions),
+src/budgetmem/tasks/rare_event_recall.py:131:        "rare_event_values": token_values[rare_event_positions].tolist(),
+src/budgetmem/tasks/rare_event_recall.py:137:        "retrieval_order": "query_order",
+src/budgetmem/tasks/rare_event_recall.py:138:        "target_values": target.tolist(),
+src/budgetmem/tasks/selective_copy.py:23:    Column 0 contains token values.
+src/budgetmem/tasks/selective_copy.py:25:    Column 1 contains marker values:
+src/budgetmem/tasks/selective_copy.py:29:    - 2: query token requesting the copied values
+src/budgetmem/tasks/selective_copy.py:31:    The final sequence position is always the query position.
+src/budgetmem/tasks/selective_copy.py:34:    token values in chronological order.
+src/budgetmem/tasks/selective_copy.py:39:            the final query position.
+src/budgetmem/tasks/selective_copy.py:58:    query_position = sequence_length - 1
+src/budgetmem/tasks/selective_copy.py:61:        query_position,
+src/budgetmem/tasks/selective_copy.py:65:    # Select between one and four relevant values, depending on length.
+src/budgetmem/tasks/selective_copy.py:68:        min(4, query_position // 4),
+src/budgetmem/tasks/selective_copy.py:83:    # Value 0 is reserved for the final query token.
+src/budgetmem/tasks/selective_copy.py:84:    token_values = rng.integers(
+src/budgetmem/tasks/selective_copy.py:91:    token_values[query_position] = 0
+src/budgetmem/tasks/selective_copy.py:100:    markers[query_position] = QUERY_MARKER
+src/budgetmem/tasks/selective_copy.py:104:            token_values,
+src/budgetmem/tasks/selective_copy.py:112:    # The target contains the relevant values in chronological order.
+src/budgetmem/tasks/selective_copy.py:113:    target = token_values[relevant_positions_array].copy()
+src/budgetmem/tasks/selective_copy.py:117:        for position in range(query_position)
+src/budgetmem/tasks/selective_copy.py:123:        "query_positions": [query_position],
+src/budgetmem/tasks/selective_copy.py:127:        "target_values": target.tolist(),
+src/budgetmem/tasks/__init__.py:3:from budgetmem.tasks.associative_recall import (
+src/budgetmem/tasks/__init__.py:4:    generate_associative_recall,
+src/budgetmem/tasks/__init__.py:6:from budgetmem.tasks.multi_key_retrieval import (
+src/budgetmem/tasks/__init__.py:7:    generate_multi_key_retrieval,
+src/budgetmem/tasks/__init__.py:12:    "generate_associative_recall",
+src/budgetmem/tasks/__init__.py:13:    "generate_multi_key_retrieval",
+src/budgetmem/training/budgetmem_loss.py:74:    values = output.final_memory.values
+src/budgetmem/training/budgetmem_loss.py:76:    normalized = F.normalize(values, p=2, dim=-1, eps=1.0e-8)
+src/budgetmem/training/budgetmem_loss.py:80:        values.shape[1],
+src/budgetmem/training/budgetmem_loss.py:81:        device=values.device,
+src/budgetmem/training/budgetmem_loss.py:87:        return values.new_zeros(())
+src/budgetmem/training/budgetmem_loss.py:121:    write_rate = output.write_probabilities.mean(dim=1)
+src/budgetmem/training/budgetmem_loss.py:122:    write = torch.relu(write_rate - max_write_fraction).pow(2).mean()
+tests/models/test_budgetmem_r.py:21:        "key_dim": 8,
+tests/models/test_budgetmem_r.py:22:        "value_dim": 10,
+tests/models/test_budgetmem_r.py:23:        "retrieval_k": 2,
+tests/models/test_budgetmem_r.py:87:def test_budget_sampler_uses_only_allowed_values() -> None:
+tests/pilot/test_controller_calibration.py:22:    _, training_hard, _ = model._write_gate(logits)
+tests/pilot/test_controller_calibration.py:24:    _, evaluation_hard, _ = model._write_gate(logits)
+tests/pilot/test_controller_calibration.py:28:def test_write_rate_loss_pushes_collapsed_probabilities_upward() -> None:
+tests/pilot/test_controller_calibration.py:36:            "write_rate_target": 0.15,
+tests/pilot/test_controller_calibration.py:37:            "write_rate_penalty": 5.0,
+tests/pretraining/conftest.py:59:    value = getattr(model, "input_dim", None)
+tests/pretraining/conftest.py:60:    if isinstance(value, int):
+tests/pretraining/conftest.py:61:        return value
+tests/pretraining/conftest.py:76:    values = getattr(model, "allowed_budgets", None)
+tests/pretraining/conftest.py:77:    if values is None:
+tests/pretraining/conftest.py:81:    budgets = tuple(sorted({int(value) for value in values}))
+tests/pretraining/test_determinism.py:48:        "number_keys": 2,
+tests/pretraining/test_determinism.py:76:    assert first_state.keys() == second_state.keys()
+tests/pretraining/test_determinism.py:114:    return [int(value) for batch in loader for value in batch[0].tolist()]
+tests/pretraining/test_gradient_and_reset.py:82:    assert memory_output.final_memory.keys.requires_grad
+tests/pretraining/test_gradient_and_reset.py:83:    assert memory_output.final_memory.values.requires_grad
+tests/pretraining/test_gradient_and_reset.py:134:        "keys",
+tests/pretraining/test_gradient_and_reset.py:135:        "values",
+tests/pretraining/test_split_leakage.py:26:        str(name): int(value) for name, value in config["split_seeds"].items()
+tests/pretraining/test_split_leakage.py:28:    assert len(split_seeds) == len(set(split_seeds.values()))
+tests/pretraining/test_split_leakage.py:31:        name: values
+tests/pretraining/test_split_leakage.py:32:        for name, values in config["tasks"].items()
+tests/pretraining/test_split_leakage.py:33:        if bool(values.get("enabled", False))
+tests/pretraining/test_split_leakage.py:36:        name: int(values["random_seed"]) for name, values in enabled_tasks.items()
+tests/pretraining/test_split_leakage.py:38:    assert len(task_seeds) == len(set(task_seeds.values()))
+tests/pretraining/test_split_leakage.py:45:    assert len(combined) == len(set(combined.values()))
+tests/pretraining/test_split_leakage.py:53:        for name, values in config["tasks"].items()
+tests/pretraining/test_split_leakage.py:54:        if bool(values.get("enabled", False))
+tests/pretraining/test_split_leakage.py:84:    if not all(path.exists() for path in paths.values()):
+tests/pretraining/test_split_leakage.py:115:    required = [*paths.values(), manifest_path, indices_path]
+tests/tasks/test_associative_recall.py:7:from budgetmem.tasks.associative_recall import (
+tests/tasks/test_associative_recall.py:11:    generate_associative_recall,
+tests/tasks/test_associative_recall.py:17:    first = generate_associative_recall(
+tests/tasks/test_associative_recall.py:22:    second = generate_associative_recall(
+tests/tasks/test_associative_recall.py:46:    first = generate_associative_recall(
+tests/tasks/test_associative_recall.py:51:    second = generate_associative_recall(
+tests/tasks/test_associative_recall.py:66:    sample = generate_associative_recall(
+tests/tasks/test_associative_recall.py:75:    """Every relevant position must be a valid pre-query index."""
+tests/tasks/test_associative_recall.py:78:    sample = generate_associative_recall(
+tests/tasks/test_associative_recall.py:91:    """Every distractor position must be a valid pre-query index."""
+tests/tasks/test_associative_recall.py:94:    sample = generate_associative_recall(
+tests/tasks/test_associative_recall.py:106:    """Relevant, distractor, and query positions must partition input."""
+tests/tasks/test_associative_recall.py:109:    sample = generate_associative_recall(
+tests/tasks/test_associative_recall.py:116:    query_positions = set(sample["oracle"]["query_positions"])
+tests/tasks/test_associative_recall.py:119:    assert relevant.isdisjoint(query_positions)
+tests/tasks/test_associative_recall.py:120:    assert distractors.isdisjoint(query_positions)
+tests/tasks/test_associative_recall.py:122:    assert relevant | distractors | query_positions == set(range(sequence_length))
+tests/tasks/test_associative_recall.py:126:    """The queried key and associated value must define the target."""
+tests/tasks/test_associative_recall.py:127:    sample = generate_associative_recall(
+tests/tasks/test_associative_recall.py:132:    key_position, value_position = sample["oracle"]["required_positions"]
+tests/tasks/test_associative_recall.py:134:    query_position = sample["oracle"]["query_positions"][0]
+tests/tasks/test_associative_recall.py:137:        key_position,
+tests/tasks/test_associative_recall.py:138:        value_position,
+tests/tasks/test_associative_recall.py:141:    assert sample["input"][key_position, 1] == KEY_MARKER
+tests/tasks/test_associative_recall.py:143:    assert sample["input"][value_position, 1] == VALUE_MARKER
+tests/tasks/test_associative_recall.py:145:    assert value_position == key_position + 1
+tests/tasks/test_associative_recall.py:147:    assert sample["input"][query_position, 1] == QUERY_MARKER
+tests/tasks/test_associative_recall.py:149:    assert sample["input"][query_position, 0] == sample["input"][key_position, 0]
+tests/tasks/test_associative_recall.py:154:            value_position : value_position + 1,
+tests/tasks/test_associative_recall.py:159:    assert sample["oracle"]["target_values"] == sample["target"].tolist()
+tests/tasks/test_associative_recall.py:166:    sample = generate_associative_recall(
+tests/tasks/test_delayed_xor.py:30:        assert left.keys() == right.keys()
+tests/tasks/test_delayed_xor.py:32:        for key in left:
+tests/tasks/test_delayed_xor.py:33:            _assert_nested_equal(left[key], right[key])
+tests/tasks/test_delayed_xor.py:115:def test_operand_positions_are_delayed_and_query_is_last() -> None:
+tests/tasks/test_delayed_xor.py:116:    """Operands must be separated and the query must be at the end."""
+tests/tasks/test_delayed_xor.py:128:    query_position = oracle["query_positions"][0]
+tests/tasks/test_delayed_xor.py:133:    assert query_position == sequence_length - 1
+tests/tasks/test_delayed_xor.py:136:def test_relevant_distractor_and_query_positions_are_valid() -> None:
+tests/tasks/test_delayed_xor.py:147:    queries = set(sample["oracle"]["query_positions"])
+tests/tasks/test_delayed_xor.py:164:    """Role markers must identify operands, distractors, and query."""
+tests/tasks/test_delayed_xor.py:176:    query_position = oracle["query_positions"][0]
+tests/tasks/test_delayed_xor.py:180:    assert int(input_sequence[query_position, 1]) == QUERY_MARKER
+tests/tasks/test_delayed_xor.py:208:    assert expected_target == oracle["target_values"][0]
+tests/tasks/test_delayed_xor.py:272:    assert sample["oracle"]["query_positions"] == [MINIMUM_SEQUENCE_LENGTH - 1]
+tests/tasks/test_distractor_retrieval.py:150:def test_target_query_distractors_and_oracle_are_correct(
+tests/tasks/test_distractor_retrieval.py:154:    """Markers, target value, distractors, delay, and oracle must agree."""
+tests/tasks/test_distractor_retrieval.py:167:    query_position = relevant_positions[1]
+tests/tasks/test_distractor_retrieval.py:168:    target_value = int(target[0])
+tests/tasks/test_distractor_retrieval.py:170:    assert query_position == sequence_length - 1
+tests/tasks/test_distractor_retrieval.py:172:    assert input_array[target_position, 0] == target_value
+tests/tasks/test_distractor_retrieval.py:175:    assert input_array[query_position, 0] == QUERY_TOKEN
+tests/tasks/test_distractor_retrieval.py:176:    assert input_array[query_position, 1] == QUERY_MARKER
+tests/tasks/test_distractor_retrieval.py:180:    # The target value must not appear at an irrelevant position.
+tests/tasks/test_distractor_retrieval.py:181:    assert np.all(input_array[distractor_positions, 0] != target_value)
+tests/tasks/test_distractor_retrieval.py:186:    # The query must occur after a substantial distractor interval.
+tests/tasks/test_distractor_retrieval.py:187:    assert query_position > target_position
+tests/tasks/test_distractor_retrieval.py:188:    assert query_position - target_position > sequence_length // 2
+tests/tasks/test_distractor_retrieval.py:195:        "query_position",
+tests/tasks/test_distractor_retrieval.py:198:        "target_value",
+tests/tasks/test_distractor_retrieval.py:199:        "target_values",
+tests/tasks/test_distractor_retrieval.py:209:    assert oracle["query_position"] == query_position
+tests/tasks/test_distractor_retrieval.py:212:    assert oracle["target_value"] == target_value
+tests/tasks/test_distractor_retrieval.py:213:    assert oracle["target_values"] == target.tolist()
+tests/tasks/test_distractor_retrieval.py:215:    assert oracle["retrieval_delay"] == (query_position - target_position)
+tests/tasks/test_distractor_retrieval.py:220:        "query": QUERY_MARKER,
+tests/tasks/test_distractor_retrieval.py:270:def test_negative_seed_raises_value_error() -> None:
+tests/tasks/test_distractor_retrieval.py:290:def test_short_sequence_length_raises_value_error(
+tests/tasks/test_multi_key_retrieval.py:1:"""Tests for the deterministic multi-key retrieval generator."""
+tests/tasks/test_multi_key_retrieval.py:3:from budgetmem.tasks.multi_key_retrieval import (
+tests/tasks/test_multi_key_retrieval.py:7:    generate_multi_key_retrieval,
+tests/tasks/test_multi_key_retrieval.py:12:    first = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:17:    second = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:26:    first = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:31:    second = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:40:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:49:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:56:    assert len(oracle["query_positions"]) == 4
+tests/tasks/test_multi_key_retrieval.py:57:    assert len(oracle["queried_keys"]) == 4
+tests/tasks/test_multi_key_retrieval.py:64:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:79:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:94:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:101:    queries = set(example["oracle"]["query_positions"])
+tests/tasks/test_multi_key_retrieval.py:111:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:124:    assert oracle["target_values"] == target
+tests/tasks/test_multi_key_retrieval.py:127:        query_position = oracle["query_positions"][output_index]
+tests/tasks/test_multi_key_retrieval.py:129:        key_position, value_position = oracle["pair_positions"][pair_index]
+tests/tasks/test_multi_key_retrieval.py:131:        queried_key = oracle["queried_keys"][output_index]
+tests/tasks/test_multi_key_retrieval.py:132:        target_value = target[output_index]
+tests/tasks/test_multi_key_retrieval.py:134:        assert input_sequence[query_position] == [
+tests/tasks/test_multi_key_retrieval.py:136:            queried_key,
+tests/tasks/test_multi_key_retrieval.py:139:        assert input_sequence[key_position] == [
+tests/tasks/test_multi_key_retrieval.py:141:            queried_key,
+tests/tasks/test_multi_key_retrieval.py:144:        assert input_sequence[value_position] == [
+tests/tasks/test_multi_key_retrieval.py:146:            target_value,
+tests/tasks/test_multi_key_retrieval.py:149:        assert key_position in oracle["required_positions"]
+tests/tasks/test_multi_key_retrieval.py:150:        assert value_position in oracle["required_positions"]
+tests/tasks/test_multi_key_retrieval.py:152:        assert value_position == oracle["answer_positions"][output_index]
+tests/tasks/test_multi_key_retrieval.py:156:    example = generate_multi_key_retrieval(
+tests/tasks/test_multi_key_retrieval.py:166:    assert all(isinstance(value, int) for value in example["target"])
+tests/tasks/test_rare_event_recall.py:107:    queries = set(sample["oracle"]["query_positions"])
+tests/tasks/test_rare_event_recall.py:125:    query_positions = sample["oracle"]["query_positions"]
+tests/tasks/test_rare_event_recall.py:130:        - set(query_positions)
+tests/tasks/test_rare_event_recall.py:138:        markers[query_positions] == QUERY_MARKER
+tests/tasks/test_rare_event_recall.py:146:def test_query_tokens_select_the_target_events() -> None:
+tests/tasks/test_rare_event_recall.py:154:    query_tokens = sample["input"][
+tests/tasks/test_rare_event_recall.py:155:        oracle["query_positions"],
+tests/tasks/test_rare_event_recall.py:160:        query_tokens,
+tests/tasks/test_rare_event_recall.py:180:    required_values = sample["input"][
+tests/tasks/test_rare_event_recall.py:186:        required_values,
+tests/tasks/test_rare_event_recall.py:191:        sample["oracle"]["target_values"]
+tests/tasks/test_rare_event_recall.py:195:    assert sample["oracle"]["retrieval_order"] == "query_order"
+tests/tasks/test_selective_copy.py:76:    """Every relevant position must be a valid pre-query index."""
+tests/tasks/test_selective_copy.py:93:    """Every distractor position must be a valid pre-query index."""
+tests/tasks/test_selective_copy.py:108:    """Relevant, distractor, and query positions must be disjoint."""
+tests/tasks/test_selective_copy.py:118:    query_positions = set(
+tests/tasks/test_selective_copy.py:119:        sample["oracle"]["query_positions"]
+tests/tasks/test_selective_copy.py:123:    assert relevant.isdisjoint(query_positions)
+tests/tasks/test_selective_copy.py:124:    assert distractors.isdisjoint(query_positions)
+tests/tasks/test_selective_copy.py:128:        relevant | distractors | query_positions
+tests/tasks/test_selective_copy.py:134:    """Oracle-required positions must contain the target values."""
+tests/tasks/test_selective_copy.py:150:        sample["oracle"]["target_values"]
+scripts/data/generate_synthetic.py:20:    "number_keys",
+scripts/data/generate_synthetic.py:41:    if cfg["vocabulary_size"] <= DATA_START + cfg["number_keys"] + 4:
+scripts/data/generate_synthetic.py:72:def key_value_space(cfg: dict[str, Any], rng: np.random.Generator) -> tuple[list[int], list[int]]:
+scripts/data/generate_synthetic.py:73:    n_keys = int(cfg["number_keys"])
+scripts/data/generate_synthetic.py:74:    keys = list(range(DATA_START, DATA_START + n_keys))
+scripts/data/generate_synthetic.py:75:    values = rng.integers(DATA_START + n_keys, int(cfg["vocabulary_size"]), size=n_keys).astype(int).tolist()
+scripts/data/generate_synthetic.py:76:    return keys, values
+scripts/data/generate_synthetic.py:81:    values = random_data(rng, int(cfg["vocabulary_size"]), n)
+scripts/data/generate_synthetic.py:84:    for value in values:
+scripts/data/generate_synthetic.py:86:        prefix.extend([MARK, value])
+scripts/data/generate_synthetic.py:90:    query_positions = [len(sequence) - 2]
+scripts/data/generate_synthetic.py:91:    return sequence, values, relevant_positions, query_positions, {}
+scripts/data/generate_synthetic.py:94:def associative_recall(cfg: dict[str, Any], rng: np.random.Generator) -> tuple[list[int], list[int], list[int], list[int], dict[str, Any]]:
+scripts/data/generate_synthetic.py:95:    keys, values = key_value_space(cfg, rng)
+scripts/data/generate_synthetic.py:98:    for key, value in zip(keys, values):
+scripts/data/generate_synthetic.py:99:        prefix.extend([key, value, SEP])
+scripts/data/generate_synthetic.py:101:    qn = min(int(cfg["number_queries"]), len(keys))
+scripts/data/generate_synthetic.py:102:    selected = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+scripts/data/generate_synthetic.py:103:    suffix = [QUERY] + [keys[i] for i in selected] + [EOS]
+scripts/data/generate_synthetic.py:105:    query_positions = list(range(len(sequence) - qn - 1, len(sequence) - 1))
+scripts/data/generate_synthetic.py:106:    return sequence, [values[i] for i in selected], relevant_positions, query_positions, {"queried_keys": [keys[i] for i in selected]}
+scripts/data/generate_synthetic.py:109:def multiple_key_retrieval(cfg: dict[str, Any], rng: np.random.Generator) -> tuple[list[int], list[int], list[int], list[int], dict[str, Any]]:
+scripts/data/generate_synthetic.py:110:    keys, values = key_value_space(cfg, rng)
+scripts/data/generate_synthetic.py:114:    order = rng.permutation(len(keys)).astype(int).tolist()
+scripts/data/generate_synthetic.py:117:        prefix.extend([MARK, keys[idx], values[idx]])
+scripts/data/generate_synthetic.py:119:    qn = min(int(cfg["number_queries"]), len(keys))
+scripts/data/generate_synthetic.py:120:    selected = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+scripts/data/generate_synthetic.py:121:    suffix = [SEP, QUERY] + [keys[i] for i in selected] + [EOS]
+scripts/data/generate_synthetic.py:123:    query_positions = list(range(len(sequence) - qn - 1, len(sequence) - 1))
+scripts/data/generate_synthetic.py:124:    return sequence, [values[i] for i in selected], relevant_positions, query_positions, {"queried_keys": [keys[i] for i in selected]}
+scripts/data/generate_synthetic.py:140:    return sequence, [bit1 ^ bit2], [p1, p2], [length - 2], {"bit_values": [bit1, bit2]}
+scripts/data/generate_synthetic.py:151:    values = random_data(rng, int(cfg["vocabulary_size"]), n)
+scripts/data/generate_synthetic.py:152:    for pos, value in zip(positions, values):
+scripts/data/generate_synthetic.py:154:        sequence[pos + 1] = value
+scripts/data/generate_synthetic.py:155:    target = values[-qn:]
+scripts/data/generate_synthetic.py:161:    keys, values = key_value_space(cfg, rng)
+scripts/data/generate_synthetic.py:163:    qn = min(int(cfg["number_queries"]), len(keys))
+scripts/data/generate_synthetic.py:167:    selected_slots = choose_nonadjacent(rng, 2, length - suffix_length - 1, len(keys))
+scripts/data/generate_synthetic.py:169:    for pos, key, value in zip(selected_slots, keys, values):
+scripts/data/generate_synthetic.py:170:        sequence[pos] = key
+scripts/data/generate_synthetic.py:171:        sequence[pos + 1] = value
+scripts/data/generate_synthetic.py:173:    queried = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+scripts/data/generate_synthetic.py:174:    suffix = [QUERY] + [keys[i] for i in queried] + [EOS]
+scripts/data/generate_synthetic.py:176:    query_positions = list(range(length - qn - 1, length - 1))
+scripts/data/generate_synthetic.py:177:    return sequence, [values[i] for i in queried], relevant_positions, query_positions, {"queried_keys": [keys[i] for i in queried]}
+scripts/data/generate_synthetic.py:182:    values = random_data(rng, int(cfg["vocabulary_size"]), n)
+scripts/data/generate_synthetic.py:183:    prefix = [BOS] + values
+scripts/data/generate_synthetic.py:186:    return sequence, list(reversed(values)), list(range(1, n + 1)), [len(sequence) - 2], {}
+scripts/data/generate_synthetic.py:209:    "associative_recall": associative_recall,
+scripts/data/generate_synthetic.py:210:    "multiple_key_retrieval": multiple_key_retrieval,
+scripts/data/generate_synthetic.py:232:        "associative_recall",
+scripts/data/generate_synthetic.py:233:        "multiple_key_retrieval",
+scripts/data/generate_synthetic.py:256:                input_ids, target_ids, relevant_positions, query_positions, metadata = GENERATORS[task_name](task_cfg, rng)
+scripts/data/generate_synthetic.py:264:                        "query_positions": query_positions,
+scripts/data/generate_synthetic.py:267:                        "metadata_json": json.dumps(metadata, sort_keys=True),
+scripts/data/generate_synthetic.py:282:                yaml.safe_dump(generation_cfg, sort_keys=False), encoding="utf-8"
+scripts/data/prepare_hdfs.py:69:    value = int(hashlib.sha256(token).hexdigest()[:16], 16) / float(16**16)
+scripts/data/prepare_hdfs.py:72:    if value < train_p:
+scripts/data/prepare_hdfs.py:74:    if value < train_p + val_p:
+scripts/data/validate_datasets.py:12:    "associative_recall",
+scripts/data/validate_datasets.py:13:    "multiple_key_retrieval",
+scripts/data/validate_datasets.py:24:    seeds = list(cfg["split_seeds"].values())
+scripts/tune_budgetmem_performance.py:37:    "associative_recall",
+scripts/tune_budgetmem_performance.py:53:            "write_rate_target": 0.10,
+scripts/tune_budgetmem_performance.py:54:            "write_rate_penalty": 1.0,
+scripts/tune_budgetmem_performance.py:60:            "key_dim": 32,
+scripts/tune_budgetmem_performance.py:61:            "retrieval_k": 4,
+scripts/tune_budgetmem_performance.py:72:            "write_rate_target": 0.10,
+scripts/tune_budgetmem_performance.py:73:            "write_rate_penalty": 0.5,
+scripts/tune_budgetmem_performance.py:79:            "key_dim": 32,
+scripts/tune_budgetmem_performance.py:80:            "retrieval_k": 4,
+scripts/tune_budgetmem_performance.py:91:            "write_rate_target": 0.10,
+scripts/tune_budgetmem_performance.py:92:            "write_rate_penalty": 0.75,
+scripts/tune_budgetmem_performance.py:98:            "key_dim": 48,
+scripts/tune_budgetmem_performance.py:99:            "retrieval_k": 8,
+scripts/tune_budgetmem_performance.py:106:    for key, value in updates.items():
+scripts/tune_budgetmem_performance.py:107:        if isinstance(value, dict) and isinstance(target.get(key), dict):
+scripts/tune_budgetmem_performance.py:108:            deep_update(target[key], value)
+scripts/tune_budgetmem_performance.py:110:            target[key] = value
+scripts/tune_budgetmem_performance.py:113:def safe_mean(values: list[float]) -> float:
+scripts/tune_budgetmem_performance.py:114:    finite = [float(v) for v in values if math.isfinite(float(v))]
+scripts/tune_budgetmem_performance.py:169:    config_path.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+scripts/tune_budgetmem_performance.py:215:                f"recall={float(row['memory_recall']):.6f} "
+scripts/tune_budgetmem_performance.py:246:    recall = safe_mean([float(row["memory_recall"]) for row in rows])
+scripts/tune_budgetmem_performance.py:263:    minimum_policy_gain = min(gains.values())
+scripts/tune_budgetmem_performance.py:277:        "mean_memory_recall": recall,
+scripts/tune_budgetmem_performance.py:298:        key=lambda item: (
+scripts/tune_budgetmem_performance.py:302:            float(item["mean_memory_recall"]),
+scripts/tune_budgetmem_performance.py:313:        "mean_memory_recall",
+scripts/tune_budgetmem_performance.py:331:                    "mean_memory_recall": item["mean_memory_recall"],
+scripts/tune_budgetmem_performance.py:373:    path.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+scripts/tune_budgetmem_performance.py:402:        key=lambda item: (
+scripts/tune_budgetmem_performance.py:406:            float(item["mean_memory_recall"]),
+scripts/validate_budgetmem_r.py:20:        key_dim=24,
+scripts/validate_budgetmem_r.py:21:        value_dim=32,
+scripts/validate_budgetmem_r.py:22:        retrieval_k=4,
+scripts/validate_pretraining_gates.py:30:            for name, values in config.get("tasks", {}).items()
+scripts/validate_pretraining_gates.py:31:            if bool(values.get("enabled", False))
+configs/data/synthetic.yaml:17:    number_keys: 8
+configs/data/synthetic.yaml:24:  associative_recall:
+configs/data/synthetic.yaml:28:    number_keys: 12
+configs/data/synthetic.yaml:35:  multiple_key_retrieval:
+configs/data/synthetic.yaml:39:    number_keys: 16
+configs/data/synthetic.yaml:50:    number_keys: 2
+configs/data/synthetic.yaml:61:    number_keys: 8
+configs/data/synthetic.yaml:72:    number_keys: 12
+configs/data/synthetic.yaml:83:    number_keys: 8
+configs/data/synthetic.yaml:94:    number_keys: 2
+configs/experiments/pilot.yaml:11:  - associative_recall
+configs/experiments/pilot.yaml:30:  key_dim: 32
+configs/experiments/pilot.yaml:31:  retrieval_k: 4
+configs/experiments/pilot.yaml:44:  write_rate_target: 0.15
+configs/experiments/pilot.yaml:45:  write_rate_penalty: 5.0
+configs/experiments/pilot_controller_calibration.yaml:22:  key_dim: 32
+configs/experiments/pilot_controller_calibration.yaml:23:  retrieval_k: 4
+configs/experiments/pilot_controller_calibration.yaml:36:  write_rate_target: 0.15
+configs/experiments/pilot_controller_calibration.yaml:37:  write_rate_penalty: 5.0
+configs/experiments/pilot_tuned.yaml:11:  - associative_recall
+configs/experiments/pilot_tuned.yaml:30:  key_dim: 32
+configs/experiments/pilot_tuned.yaml:31:  retrieval_k: 4
+configs/experiments/pilot_tuned.yaml:44:  write_rate_target: 0.1
+configs/experiments/pilot_tuned.yaml:45:  write_rate_penalty: 0.5
+configs/experiments/pilot_tuning_candidates/capacity_10e.yaml:11:  - associative_recall
+configs/experiments/pilot_tuning_candidates/capacity_10e.yaml:25:  key_dim: 48
+configs/experiments/pilot_tuning_candidates/capacity_10e.yaml:26:  retrieval_k: 8
+configs/experiments/pilot_tuning_candidates/capacity_10e.yaml:39:  write_rate_target: 0.1
+configs/experiments/pilot_tuning_candidates/capacity_10e.yaml:40:  write_rate_penalty: 0.75
+configs/experiments/pilot_tuning_candidates/optimization_12e.yaml:11:  - associative_recall
+configs/experiments/pilot_tuning_candidates/optimization_12e.yaml:25:  key_dim: 32
+configs/experiments/pilot_tuning_candidates/optimization_12e.yaml:26:  retrieval_k: 4
+configs/experiments/pilot_tuning_candidates/optimization_12e.yaml:39:  write_rate_target: 0.1
+configs/experiments/pilot_tuning_candidates/optimization_12e.yaml:40:  write_rate_penalty: 0.5
+configs/experiments/pilot_tuning_candidates/optimization_8e.yaml:11:  - associative_recall
+configs/experiments/pilot_tuning_candidates/optimization_8e.yaml:25:  key_dim: 32
+configs/experiments/pilot_tuning_candidates/optimization_8e.yaml:26:  retrieval_k: 4
+configs/experiments/pilot_tuning_candidates/optimization_8e.yaml:39:  write_rate_target: 0.1
+configs/experiments/pilot_tuning_candidates/optimization_8e.yaml:40:  write_rate_penalty: 1.0
+configs/experiments/targeted_associative_recall/assoc_repair_24e_focused.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_24e_focused.yaml:30:  key_dim: 48
+configs/experiments/targeted_associative_recall/assoc_repair_24e_focused.yaml:31:  retrieval_k: 8
+configs/experiments/targeted_associative_recall/assoc_repair_24e_focused.yaml:44:  write_rate_target: 0.15
+configs/experiments/targeted_associative_recall/assoc_repair_24e_focused.yaml:45:  write_rate_penalty: 0.25
+configs/experiments/targeted_associative_recall/assoc_repair_24e_full.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_24e_full.yaml:30:  key_dim: 48
+configs/experiments/targeted_associative_recall/assoc_repair_24e_full.yaml:31:  retrieval_k: 8
+configs/experiments/targeted_associative_recall/assoc_repair_24e_full.yaml:44:  write_rate_target: 0.15
+configs/experiments/targeted_associative_recall/assoc_repair_24e_full.yaml:45:  write_rate_penalty: 0.25
+configs/experiments/targeted_associative_recall/assoc_repair_32e_focused.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_32e_focused.yaml:30:  key_dim: 64
+configs/experiments/targeted_associative_recall/assoc_repair_32e_focused.yaml:31:  retrieval_k: 8
+configs/experiments/targeted_associative_recall/assoc_repair_32e_focused.yaml:44:  write_rate_target: 0.2
+configs/experiments/targeted_associative_recall/assoc_repair_32e_focused.yaml:45:  write_rate_penalty: 0.15
+configs/experiments/targeted_associative_recall/assoc_repair_32e_full.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_32e_full.yaml:30:  key_dim: 64
+configs/experiments/targeted_associative_recall/assoc_repair_32e_full.yaml:31:  retrieval_k: 8
+configs/experiments/targeted_associative_recall/assoc_repair_32e_full.yaml:44:  write_rate_target: 0.2
+configs/experiments/targeted_associative_recall/assoc_repair_32e_full.yaml:45:  write_rate_penalty: 0.15
+configs/experiments/targeted_associative_recall/assoc_repair_40e_focused.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_40e_focused.yaml:30:  key_dim: 64
+configs/experiments/targeted_associative_recall/assoc_repair_40e_focused.yaml:31:  retrieval_k: 12
+configs/experiments/targeted_associative_recall/assoc_repair_40e_focused.yaml:44:  write_rate_target: 0.25
+configs/experiments/targeted_associative_recall/assoc_repair_40e_focused.yaml:45:  write_rate_penalty: 0.1
+configs/experiments/targeted_associative_recall/assoc_repair_40e_full.yaml:11:  - associative_recall
+configs/experiments/targeted_associative_recall/assoc_repair_40e_full.yaml:30:  key_dim: 64
+configs/experiments/targeted_associative_recall/assoc_repair_40e_full.yaml:31:  retrieval_k: 12
+configs/experiments/targeted_associative_recall/assoc_repair_40e_full.yaml:44:  write_rate_target: 0.25
+configs/experiments/targeted_associative_recall/assoc_repair_40e_full.yaml:45:  write_rate_penalty: 0.1
+configs/models/budgetmem_r.yaml:9:key_dim: 64
+configs/models/budgetmem_r.yaml:10:value_dim: 128
+configs/models/budgetmem_r.yaml:12:retrieval_k: 4

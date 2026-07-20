@@ -1,0 +1,11 @@
+{
+  "raw_gradient_limit": 100.0,
+  "measurement_count": 88,
+  "maximum": {
+    "source": "reports/evidence/assoc_gradient_training_trace.json",
+    "location": "$.component_profile[0].raw_gradient_norm",
+    "value": 123.32007695818419,
+    "context": null
+  },
+  "currently_passes": false
+}

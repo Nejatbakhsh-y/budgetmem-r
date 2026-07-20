@@ -1,0 +1,1224 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="38" time="100.943" timestamp="2026-07-20T00:04:53.124795-04:00" hostname="DESKTOP-N66626H"><testcase classname="tests.test_section14_required" name="test_14_01_budget_correctness_every_forward_step" time="30.326"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 12, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(12, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(2, 12, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(12, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(2, 12, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64&#10;shape=(12, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64">def test_14_01_budget_correctness_every_forward_step() -&gt; None:
+        budget = 4
+        model = build_model(seed=2026, budget=budget)
+        model.eval()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=12)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 12
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        attempted: set[tuple[tuple[int, ...], torch.dtype]] = set()
+        inferred_dimensions: list[int] = []
+    
+        def try_input(x: Tensor) -&gt; Tensor | None:
+            key = (tuple(x.shape), x.dtype)
+            if key in attempted:
+                return None
+            attempted.add(key)
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                message = f"{type(exc).__name__}: {exc}"
+                failures.append(
+                    f"shape={tuple(x.shape)}, dtype={x.dtype}: {message}"
+                )
+                patterns = (
+                    r"Expected input_dim[=:]\s*(\d+)",
+                    r"expected input[_ ]dim[=:]\s*(\d+)",
+                    r"input_dim\s+must\s+be\s+(\d+)",
+                    r"input_size\s+must\s+be\s+(\d+)",
+                )
+                for pattern in patterns:
+                    match = re.search(pattern, message, flags=re.IGNORECASE)
+                    if match:
+                        inferred_dimensions.append(int(match.group(1)))
+                return None
+    
+        for candidate in _candidate_inputs(model, seq_len=seq_len):
+            accepted = try_input(candidate)
+            if accepted is not None:
+                return accepted
+    
+        dimensions = list(dict.fromkeys([*inferred_dimensions, 8, 16, 32, 64]))
+        for feature_dim in dimensions:
+            for candidate in (
+                torch.randn(2, seq_len, feature_dim),
+                torch.randn(seq_len, 2, feature_dim),
+            ):
+                accepted = try_input(candidate)
+                if accepted is not None:
+                    return accepted
+    
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 12), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 12, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(12, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(12, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 12, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(12, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(2, 12, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(12, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(2, 12, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+E       shape=(12, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+
+tests/section14_runtime.py:475: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_02_causality_future_tokens_do_not_change_earlier_steps" time="0.816"><failure message="AssertionError: Causality could not be evaluated because neither sequence-aligned model outputs nor sequence-aligned controller decisions were exposed.&#10;assert False">def test_14_02_causality_future_tokens_do_not_change_earlier_steps() -&gt; None:
+        seed = 2026
+        model_a = build_model(seed=seed, budget=4)
+        model_b = build_model(seed=seed, budget=4)
+        assert state_dict_equal(model_a, model_b), "Models are not identically initialized."
+    
+        model_a.eval()
+        model_b.eval()
+        x = compatible_input(model_a, seq_len=12)
+        seq_len = _sequence_length(x)
+        prefix_len = max(2, seq_len // 2)
+        changed = mutate_suffix(x, prefix_len)
+    
+        reset_memory(model_a, require=False)
+        output_a, decisions_a = capture_controller_outputs(model_a, x)
+        reset_memory(model_b, require=False)
+        output_b, decisions_b = capture_controller_outputs(model_b, changed)
+    
+        tensor_a = extract_tensor(output_a)
+        tensor_b = extract_tensor(output_b)
+        compared = False
+    
+        if tensor_a is not None and tensor_b is not None:
+            prefix_a = sequence_prefix(tensor_a, seq_len, prefix_len)
+            prefix_b = sequence_prefix(tensor_b, seq_len, prefix_len)
+            if prefix_a is not None and prefix_b is not None:
+                assert torch.equal(prefix_a.cpu(), prefix_b.cpu()), (
+                    "Changing future tokens changed model outputs at earlier time steps."
+                )
+                compared = True
+    
+        for left, right in zip(decisions_a, decisions_b, strict=False):
+            axis_left = infer_sequence_axis(left, seq_len)
+            axis_right = infer_sequence_axis(right, seq_len)
+            if axis_left is None or axis_right is None:
+                continue
+            prefix_left = sequence_prefix(left, seq_len, prefix_len)
+            prefix_right = sequence_prefix(right, seq_len, prefix_len)
+            if prefix_left is not None and prefix_right is not None:
+                assert torch.equal(prefix_left, prefix_right), (
+                    "Changing future tokens changed controller decisions at earlier steps."
+                )
+                compared = True
+    
+&gt;       assert compared, (
+            "Causality could not be evaluated because neither sequence-aligned model outputs "
+            "nor sequence-aligned controller decisions were exposed."
+        )
+E       AssertionError: Causality could not be evaluated because neither sequence-aligned model outputs nor sequence-aligned controller decisions were exposed.
+E       assert False
+
+tests/test_section14_required.py:137: AssertionError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_03_deterministic_dataset_generation" time="0.467"><failure message="KeyError: 0">def test_14_03_deterministic_dataset_generation() -&gt; None:
+        try:
+            first = build_synthetic_dataset(seed=2026, split="train")
+            second = build_synthetic_dataset(seed=2026, split="train")
+        except Section14DiscoveryError:
+            assert existing_test_has(
+                ("synthetic", "dataset"),
+                ("determin", "same seed", "reproduc"),
+            ), (
+                "Synthetic dataset factory was not discovered and no existing deterministic "
+                "synthetic-dataset test was found."
+            )
+            return
+    
+&gt;       assert dataset_fingerprint(first) == dataset_fingerprint(second), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "The same synthetic seed and configuration produced different datasets."
+        )
+
+tests/test_section14_required.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+dataset = {'input': array([[294,   0],
+       [612,   0],
+       [ 69,   1],
+       [128,   2],
+       [715,   0],
+       [860, ...,   3]]), 'target': array([191]), 'relevant_positions': [14, 15], 'distractor_positions': [0, 1, 2, 3, 4, 5, ...], ...}
+limit = 16
+
+    def dataset_fingerprint(dataset: Any, limit: int = 16) -&gt; str:
+        digest = hashlib.sha256()
+        if hasattr(dataset, "__len__") and hasattr(dataset, "__getitem__"):
+            count = min(int(len(dataset)), limit)
+            for index in range(count):
+&gt;               digest.update(_stable_serialize(dataset[index]))
+                                                ^^^^^^^^^^^^^^
+E               KeyError: 0
+
+tests/section14_runtime.py:886: KeyError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_04_deterministic_initialization" time="0.600" /><testcase classname="tests.test_section14_required" name="test_14_05_deterministic_training_order" time="0.175" /><testcase classname="tests.test_section14_required" name="test_14_06_deterministic_evaluation_output" time="0.650" /><testcase classname="tests.test_section14_required" name="test_14_07_synthetic_seeds_do_not_overlap" time="0.539" /><testcase classname="tests.test_section14_required" name="test_14_08_hdfs_block_ids_do_not_overlap" time="44.649" /><testcase classname="tests.test_section14_required" name="test_14_09_imdb_test_examples_not_in_train_or_validation" time="5.926" /><testcase classname="tests.test_section14_required" name="test_14_10_memory_controller_parameters_receive_gradients" time="0.381"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 10, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(10, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(2, 10, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(10, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(2, 10, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64&#10;shape=(10, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64">def test_14_10_memory_controller_parameters_receive_gradients() -&gt; None:
+        model = build_model(seed=2026, budget=4, force_detach=False)
+        model.train()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=10)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 10
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        attempted: set[tuple[tuple[int, ...], torch.dtype]] = set()
+        inferred_dimensions: list[int] = []
+    
+        def try_input(x: Tensor) -&gt; Tensor | None:
+            key = (tuple(x.shape), x.dtype)
+            if key in attempted:
+                return None
+            attempted.add(key)
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                message = f"{type(exc).__name__}: {exc}"
+                failures.append(
+                    f"shape={tuple(x.shape)}, dtype={x.dtype}: {message}"
+                )
+                patterns = (
+                    r"Expected input_dim[=:]\s*(\d+)",
+                    r"expected input[_ ]dim[=:]\s*(\d+)",
+                    r"input_dim\s+must\s+be\s+(\d+)",
+                    r"input_size\s+must\s+be\s+(\d+)",
+                )
+                for pattern in patterns:
+                    match = re.search(pattern, message, flags=re.IGNORECASE)
+                    if match:
+                        inferred_dimensions.append(int(match.group(1)))
+                return None
+    
+        for candidate in _candidate_inputs(model, seq_len=seq_len):
+            accepted = try_input(candidate)
+            if accepted is not None:
+                return accepted
+    
+        dimensions = list(dict.fromkeys([*inferred_dimensions, 8, 16, 32, 64]))
+        for feature_dim in dimensions:
+            for candidate in (
+                torch.randn(2, seq_len, feature_dim),
+                torch.randn(seq_len, 2, feature_dim),
+            ):
+                accepted = try_input(candidate)
+                if accepted is not None:
+                    return accepted
+    
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 10, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(10, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(2, 10, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(10, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(2, 10, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+E       shape=(10, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+
+tests/section14_runtime.py:475: Section14DiscoveryError</failure></testcase><testcase classname="tests.test_section14_required" name="test_14_11_detached_cached_states_are_intentionally_detached" time="0.863" /><testcase classname="tests.test_section14_required" name="test_14_12_trainable_cached_states_remain_connected" time="1.000" /><testcase classname="tests.test_section14_required" name="test_14_13_memory_reset_between_unrelated_sequences" time="0.373"><failure message="section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:&#10;shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]&#10;shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16&#10;shape=(2, 10, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(10, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one&#10;shape=(2, 10, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(10, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32&#10;shape=(2, 10, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64&#10;shape=(10, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64">def test_14_13_memory_reset_between_unrelated_sequences() -&gt; None:
+        model = build_model(seed=2026, budget=4)
+        model.eval()
+        encourage_writes(model)
+&gt;       x = compatible_input(model, seq_len=10)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_section14_required.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = BudgetMemR(
+  (recurrent_cell): GRUCell(8, 16)
+  (key_projection): Linear(in_features=16, out_features=8, bias=False)
+...ures=64, bias=True)
+    (1): SiLU()
+    (2): Linear(in_features=64, out_features=1, bias=True)
+    (3): Sigmoid()
+  )
+)
+seq_len = 10
+
+    def compatible_input(model: nn.Module, seq_len: int = 12) -&gt; Tensor:
+        failures: list[str] = []
+        attempted: set[tuple[tuple[int, ...], torch.dtype]] = set()
+        inferred_dimensions: list[int] = []
+    
+        def try_input(x: Tensor) -&gt; Tensor | None:
+            key = (tuple(x.shape), x.dtype)
+            if key in attempted:
+                return None
+            attempted.add(key)
+            try:
+                reset_memory(model, require=False)
+                with torch.no_grad():
+                    invoke(model, x, reset=True)
+                return x
+            except Exception as exc:
+                message = f"{type(exc).__name__}: {exc}"
+                failures.append(
+                    f"shape={tuple(x.shape)}, dtype={x.dtype}: {message}"
+                )
+                patterns = (
+                    r"Expected input_dim[=:]\s*(\d+)",
+                    r"expected input[_ ]dim[=:]\s*(\d+)",
+                    r"input_dim\s+must\s+be\s+(\d+)",
+                    r"input_size\s+must\s+be\s+(\d+)",
+                )
+                for pattern in patterns:
+                    match = re.search(pattern, message, flags=re.IGNORECASE)
+                    if match:
+                        inferred_dimensions.append(int(match.group(1)))
+                return None
+    
+        for candidate in _candidate_inputs(model, seq_len=seq_len):
+            accepted = try_input(candidate)
+            if accepted is not None:
+                return accepted
+    
+        dimensions = list(dict.fromkeys([*inferred_dimensions, 8, 16, 32, 64]))
+        for feature_dim in dimensions:
+            for candidate in (
+                torch.randn(2, seq_len, feature_dim),
+                torch.randn(seq_len, 2, feature_dim),
+            ):
+                accepted = try_input(candidate)
+                if accepted is not None:
+                    return accepted
+    
+&gt;       raise Section14DiscoveryError(
+            "No compatible synthetic input was found for the discovered model. Attempts:\n"
+            + "\n".join(failures)
+        )
+E       section14_runtime.Section14DiscoveryError: No compatible synthetic input was found for the discovered model. Attempts:
+E       shape=(2, 10), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(2, 10, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(10, 2), dtype=torch.int64: ValueError: inputs must have shape [batch, sequence, input_dim]
+E       shape=(10, 2, 16), dtype=torch.float32: ValueError: Expected input_dim=8, received 16
+E       shape=(2, 10, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(10, 2, 8), dtype=torch.float32: ValueError: threshold must be strictly between zero and one
+E       shape=(2, 10, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(10, 2, 32), dtype=torch.float32: ValueError: Expected input_dim=8, received 32
+E       shape=(2, 10, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+E       shape=(10, 2, 64), dtype=torch.float32: ValueError: Expected input_dim=8, received 64
+
+tests/section14_runtime.py:475: Section14DiscoveryError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_strict_budget_is_never_violated" time="0.120"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">def test_strict_budget_is_never_violated() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model().eval()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90af24d2b0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_eval_is_deterministic" time="0.100"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">def test_eval_is_deterministic() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model(write_threshold=0.5).eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae786cc0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_training_loss_backpropagates_to_write_controller" time="0.095"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">def test_training_loss_backpropagates_to_write_controller() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model(write_threshold=0.0).train()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/models/test_budgetmem_r.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90c05883b0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_budget_sampler_uses_only_allowed_values" time="0.102"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">def test_budget_sampler_uses_only_allowed_values() -&gt; None:
+        torch.manual_seed(2026)
+&gt;       model = _model().train()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90c0588ad0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.models.test_budgetmem_r" name="test_invalid_budget_is_rejected" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">def test_invalid_budget_is_rejected() -&gt; None:
+&gt;       model = _model().eval()
+                ^^^^^^^^
+
+tests/models/test_budgetmem_r.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae76a990&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_budget_and_causality" name="test_memory_never_exceeds_configured_budget_at_any_forward_step" time="0.039"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae6ffc80&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_never_exceeds_configured_budget_at_any_forward_step() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_budget_and_causality.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae7a1910&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_budget_and_causality" name="test_future_tokens_do_not_change_earlier_memory_decisions" time="0.002"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae7a2930&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_future_tokens_do_not_change_earlier_memory_decisions() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_budget_and_causality.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae7a22d0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_and_configuration_produce_identical_synthetic_example" time="0.021" /><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_model_initialization_and_evaluation" time="0.107"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90c0588d40&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_same_seed_produces_identical_model_initialization_and_evaluation() -&gt; None:
+        seed_everything(2026)
+&gt;       first_model = build_budgetmem_model().eval()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_determinism.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae786f90&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_determinism" name="test_same_seed_produces_identical_training_order" time="0.009" /><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_controllers_receive_gradients_and_graph_policy_is_explicit" time="0.087"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90c0589490&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_controllers_receive_gradients_and_graph_policy_is_explicit() -&gt; None:
+        # Test the write controller under its normal, nonsaturated initialization.
+        torch.manual_seed(12000)
+&gt;       write_model = build_budgetmem_model().train()
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_gradient_and_reset.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae7a3290&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_gradient_and_reset" name="test_memory_is_reset_between_unrelated_forward_calls" time="0.001"><failure message="TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'">overrides = {}
+
+    def build_budgetmem_model(**overrides: object) -&gt; nn.Module:
+        """Build the exact small BudgetMem-R model used by Section 13 tests."""
+        module = _load_section13_test_module()
+        factory = getattr(module, "_model", None)
+        if factory is None:
+            raise AttributeError(
+                "tests/models/test_budgetmem_r.py must expose the Section 13 "
+                "_model test factory"
+            )
+    
+        try:
+&gt;           model = factory(**overrides)
+                    ^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/conftest.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae5ca8d0&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_memory_is_reset_between_unrelated_forward_calls() -&gt; None:
+&gt;       model = build_budgetmem_model().eval()
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/pretraining/test_gradient_and_reset.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/pretraining/conftest.py:51: in build_budgetmem_model
+    model = factory()
+            ^^^^^^^^^
+tests/models/test_budgetmem_r.py:27: in _model
+    return BudgetMemR(**config)
+           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;[AttributeError("'BudgetMemR' object has no attribute '_modules'") raised in repr()] BudgetMemR object at 0x7a90ae5cb920&gt;
+__original_init = &lt;function BudgetMemR.__init__ at 0x7a90c8977a60&gt;
+__parameters = mappingproxy(OrderedDict({'self': &lt;Parameter "self"&gt;, 'input_dim': &lt;Parameter "input_dim: 'int'"&gt;, 'hidden_dim': &lt;Para...: &lt;Parameter "write_threshold: 'float' = 0.5"&gt;, 'write_temperature': &lt;Parameter "write_temperature: 'float' = 0.67"&gt;}))
+args = ()
+kwargs = {'input_dim': 6, 'hidden_dim': 12, 'output_dim': 3, 'max_budget': 5, ...}
+
+    @_section14_functools.wraps(original_init)
+    def compatible_init(
+        self,
+        *args,
+        __original_init=original_init,
+        __parameters=init_parameters,
+        **kwargs,
+    ):
+        allowed = kwargs.pop("allowed_budgets", None)
+        if allowed is not None:
+            allowed_values = tuple(int(value) for value in allowed)
+            mapped = False
+    
+            for parameter_name in candidate_budget_parameters:
+                if parameter_name in __parameters and parameter_name not in kwargs:
+                    kwargs[parameter_name] = list(allowed_values)
+                    mapped = True
+                    break
+    
+            if not mapped and "max_budget" in __parameters and "max_budget" not in kwargs:
+                kwargs["max_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "memory_budget" in __parameters and "memory_budget" not in kwargs:
+                kwargs["memory_budget"] = max(allowed_values)
+                mapped = True
+    
+            if not mapped and "budget" in __parameters and "budget" not in kwargs:
+                kwargs["budget"] = max(allowed_values)
+    
+&gt;       __original_init(self, *args, **kwargs)
+E       TypeError: BudgetMemR.__init__() got an unexpected keyword argument 'retrieval_k'
+
+tests/conftest.py:76: TypeError</failure></testcase><testcase classname="tests.pretraining.test_split_leakage" name="test_synthetic_split_and_task_seeds_do_not_overlap" time="0.024" /><testcase classname="tests.pretraining.test_split_leakage" name="test_hdfs_block_ids_do_not_cross_splits" time="1.146" /><testcase classname="tests.pretraining.test_split_leakage" name="test_imdb_official_test_examples_are_not_in_train_or_validation" time="2.483"><failure message="assert 22389 == 22500&#10; +  where 22389 = len(       source_index\n0                 1\n1                 2\n2                 3\n3                 4\n4                 ...        24994\n22385         24995\n22386         24997\n22387         24998\n22388         24999\n\n[22389 rows x 1 columns])">def test_imdb_official_test_examples_are_not_in_train_or_validation() -&gt; None:
+        root = REPO_ROOT / "data" / "processed" / "imdb"
+        paths = {
+            "train": root / "train" / "data.parquet",
+            "validation": root / "validation" / "data.parquet",
+            "test": root / "test_locked" / "data.parquet",
+        }
+        manifest_path = REPO_ROOT / "data" / "manifests" / "imdb_manifest.json"
+        indices_path = REPO_ROOT / "data" / "manifests" / "imdb_split_indices.json"
+    
+        required = [*paths.values(), manifest_path, indices_path]
+        if not all(item.exists() for item in required):
+            pytest.skip("IMDb data or provenance manifests are not all present")
+    
+        train = pd.read_parquet(paths["train"], columns=["source_index"])
+        validation = pd.read_parquet(
+            paths["validation"],
+            columns=["source_index"],
+        )
+        test = pd.read_parquet(paths["test"], columns=["source_index"])
+    
+        manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        indices = yaml.safe_load(indices_path.read_text(encoding="utf-8"))
+    
+&gt;       assert len(train) == 22500
+E       assert 22389 == 22500
+E        +  where 22389 = len(       source_index\n0                 1\n1                 2\n2                 3\n3                 4\n4                 ...        24994\n22385         24995\n22386         24997\n22387         24998\n22388         24999\n\n[22389 rows x 1 columns])
+
+tests/pretraining/test_split_leakage.py:129: AssertionError</failure></testcase><testcase classname="tests.tasks.test_delayed_xor" name="test_same_seed_produces_identical_output" time="0.119" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[0-8]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[19-31]" time="0.003" /><testcase classname="tests.tasks.test_distractor_retrieval" name="test_same_configuration_is_deterministic[2026-128]" time="0.006" /><testcase classname="tests.test_budgetmem_r" name="test_hard_budget_is_never_violated_even_when_every_step_writes" time="0.100" /><testcase classname="tests.test_budgetmem_r" name="test_composite_objective_is_finite_and_controller_receives_gradient" time="0.266" /><testcase classname="tests.test_budgetmem_r" name="test_invalid_budget_fails_fast" time="0.010" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model0]" time="0.017" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model1]" time="0.011" /><testcase classname="tests.test_section12_baselines" name="test_recurrent_baselines_shape_and_gradient[model2]" time="0.207" /></testsuite></testsuites>

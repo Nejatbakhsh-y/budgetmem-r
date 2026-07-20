@@ -62,23 +62,44 @@ class WriteController(nn.Module):
         threshold: float,
         temperature: float,
     ) -> Tensor:
-        """Use a straight-through relaxed Bernoulli gate during training."""
-
-        if not 0.0 < threshold < 1.0:
-            raise ValueError("threshold must be strictly between zero and one")
+        # Boundary values are valid controlled modes:
+        # 0.0 means always write; 1.0 means write only at probability one.
+        if not 0.0 <= threshold <= 1.0:
+            raise ValueError("threshold must be within [0, 1]")
         if temperature <= 0.0:
             raise ValueError("temperature must be positive")
+
+        if threshold <= 0.0:
+            hard = torch.ones_like(probability)
+            return (
+                hard + probability - probability.detach()
+                if training
+                else hard
+            )
+
+        if threshold >= 1.0:
+            hard = (probability >= 1.0).to(probability.dtype)
+            return (
+                hard + probability - probability.detach()
+                if training
+                else hard
+            )
+
         if not training:
             return (probability >= threshold).to(probability.dtype)
 
         eps = torch.finfo(probability.dtype).eps
         clipped = probability.clamp(min=eps, max=1.0 - eps)
         logistic = torch.log(clipped) - torch.log1p(-clipped)
-        uniform = torch.rand_like(clipped).clamp(min=eps, max=1.0 - eps)
+        uniform = torch.rand_like(clipped).clamp(
+            min=eps,
+            max=1.0 - eps,
+        )
         noise = torch.log(uniform) - torch.log1p(-uniform)
         relaxed = torch.sigmoid((logistic + noise) / temperature)
         hard = (relaxed >= threshold).to(relaxed.dtype)
         return hard + relaxed - relaxed.detach()
+
 
 
 class EvictionController(nn.Module):

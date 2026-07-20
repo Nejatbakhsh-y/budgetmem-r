@@ -1,0 +1,78 @@
+{
+  "candidate": {
+    "name": "capacity_10e",
+    "training": {
+      "train_samples": 384,
+      "validation_samples": 96,
+      "epochs": 10,
+      "learning_rate": 0.0005,
+      "weight_decay": 0.0001,
+      "write_rate_target": 0.1,
+      "write_rate_penalty": 0.75,
+      "write_binarization_penalty": 0.01
+    },
+    "model": {
+      "embedding_dim": 48,
+      "hidden_dim": 96,
+      "key_dim": 48,
+      "retrieval_k": 8
+    }
+  },
+  "training_records": [
+    {
+      "task": "selective_copy",
+      "model": "budgetmem_r",
+      "model_source": "src/budgetmem/models/budgetmem_r.py",
+      "checkpoint_path": "outputs/pilot_performance_tuning/capacity_10e/checkpoints/selective_copy/budgetmem_r/last.pt",
+      "config_sha256": "1a03dba7ecaa73c9c6b773b8b8c45cf565791e9d25b223fce20193240c2c0402",
+      "first_loss": 5.404412180185318,
+      "final_loss": 4.780056715011597,
+      "maximum_gradient_norm": 140.92784118652344,
+      "finite_losses": true,
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 9,
+      "train_wall_seconds": 1420.020384217998,
+      "train_peak_rss_mb": 1150.24609375,
+      "parameter_count": 384379,
+      "candidate": "capacity_10e"
+    },
+    {
+      "task": "associative_recall",
+      "model": "budgetmem_r",
+      "model_source": "src/budgetmem/models/budgetmem_r.py",
+      "checkpoint_path": "outputs/pilot_performance_tuning/capacity_10e/checkpoints/associative_recall/budgetmem_r/last.pt",
+      "config_sha256": "1a03dba7ecaa73c9c6b773b8b8c45cf565791e9d25b223fce20193240c2c0402",
+      "first_loss": 5.386992484331131,
+      "final_loss": 4.368067761262258,
+      "maximum_gradient_norm": 111.61031341552734,
+      "finite_losses": true,
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 9,
+      "train_wall_seconds": 1410.4172072099973,
+      "train_peak_rss_mb": 1228.68359375,
+      "parameter_count": 384379,
+      "candidate": "capacity_10e"
+    },
+    {
+      "task": "distractor_heavy_retrieval",
+      "model": "budgetmem_r",
+      "model_source": "src/budgetmem/models/budgetmem_r.py",
+      "checkpoint_path": "outputs/pilot_performance_tuning/capacity_10e/checkpoints/distractor_heavy_retrieval/budgetmem_r/last.pt",
+      "config_sha256": "1a03dba7ecaa73c9c6b773b8b8c45cf565791e9d25b223fce20193240c2c0402",
+      "first_loss": 5.3981476326783495,
+      "final_loss": 4.501694371302922,
+      "maximum_gradient_norm": 2125.291748046875,
+      "finite_losses": true,
+      "stability_pass": false,
+      "checkpoint_resume_pass": true,
+      "checkpoint_epoch": 9,
+      "train_wall_seconds": 1412.8776657799972,
+      "train_peak_rss_mb": 1247.53515625,
+      "parameter_count": 384379,
+      "candidate": "capacity_10e"
+    }
+  ],
+  "results_csv": "reports/tables/pilot_tuning/capacity_10e_results.csv"
+}

@@ -1,0 +1,73 @@
+task,model,sequence_length,memory_budget,seed,tested_successfully,record_count,source_files
+selective_copy,GRU,256,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU,256,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU,512,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU,512,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + uniform cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,GRU + reservoir cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,BudgetMem-R,256,16,2026,YES,3,reports/evidence/pilot_controller_calibration_summary.json; reports/tables/pilot_controller_calibration_results.csv; reports/tables/pilot_results.csv
+selective_copy,BudgetMem-R,256,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,BudgetMem-R,512,16,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,BudgetMem-R,512,32,2026,YES,1,reports/tables/pilot_results.csv
+selective_copy,BudgetMem-R,1024,16,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv
+selective_copy,BudgetMem-R,1024,32,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv
+associative_recall,GRU,256,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU,256,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU,512,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU,512,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + uniform cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,GRU + reservoir cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,BudgetMem-R,256,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,BudgetMem-R,256,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,BudgetMem-R,512,16,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,BudgetMem-R,512,32,2026,YES,1,reports/tables/pilot_results.csv
+associative_recall,BudgetMem-R,1024,16,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv
+associative_recall,BudgetMem-R,1024,32,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv
+distractor_retrieval,GRU,256,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU,256,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU,512,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU,512,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + uniform cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,256,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,256,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,512,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,512,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,1024,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,GRU + reservoir cache,1024,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,BudgetMem-R,256,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,BudgetMem-R,256,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,BudgetMem-R,512,16,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,BudgetMem-R,512,32,2026,YES,1,reports/tables/pilot_results.csv
+distractor_retrieval,BudgetMem-R,1024,16,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv
+distractor_retrieval,BudgetMem-R,1024,32,2026,YES,7,reports/tables/pilot_results.csv; reports/tables/pilot_tuning/all_candidate_results.csv; reports/tables/pilot_tuning/capacity_10e_results.csv; reports/tables/pilot_tuning/optimization_12e_results.csv; reports/tables/pilot_tuning/optimization_8e_results.csv

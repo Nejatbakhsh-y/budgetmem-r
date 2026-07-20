@@ -1,0 +1,32 @@
+SECTION 15 ASSOCIATIVE-RECALL STABILITY SWEEP
+=============================================
+
+The maximum acceptable gradient threshold was not changed.
+
+
+stable_128_lr250_decision
+  decision: TARGETED_NO_GO
+  qualified_policies: 2/2
+  stability_pass: False
+  budget_pass: True
+  resource_pass: True
+  write_frequency_pass: True
+  write_frequency: 0.24714152018229169
+
+stable_128_lr125_decision
+  decision: TARGETED_NO_GO
+  qualified_policies: 2/2
+  stability_pass: False
+  budget_pass: True
+  resource_pass: True
+  write_frequency_pass: True
+  write_frequency: 0.132110595703125
+
+stable_96_lr100_decision
+  decision: TARGETED_NO_GO
+  qualified_policies: 2/2
+  stability_pass: False
+  budget_pass: True
+  resource_pass: True
+  write_frequency_pass: True
+  write_frequency: 0.08851114908854166

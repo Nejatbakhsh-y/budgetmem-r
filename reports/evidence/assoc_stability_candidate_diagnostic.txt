@@ -1,0 +1,20 @@
+========================================================================================================================
+SECTION 15 STABILITY-CANDIDATE DIAGNOSTIC
+========================================================================================================================
+
+       candidate       decision  stability_pass  budget_pass  resource_pass  write_frequency_pass  qualified_policies  minimum_policy_gain  maximum_gradient_norm  first_loss  final_loss  recorded_stability
+stable_128_lr125 TARGETED_NO_GO           False         True           True                  True                   2             0.135417             144.602722    5.440822    4.602305               False
+stable_128_lr250 TARGETED_NO_GO           False         True           True                  True                   2             0.156250             532.009521    5.367571    4.483306               False
+ stable_96_lr100 TARGETED_NO_GO           False         True           True                  True                   2             0.187500             115.390511    5.455450    4.618740               False
+
+========================================================================================================================
+FAILURE CLASSIFICATION
+========================================================================================================================
+stable_128_lr125: stability
+stable_128_lr250: stability
+stable_96_lr100: stability
+
+========================================================================================================================
+NEXT DECISION
+========================================================================================================================
+All useful recall candidates remain unstable. The next repair must address the gradient computation or optimizer path, not the recall objective.

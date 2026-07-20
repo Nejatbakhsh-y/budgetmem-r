@@ -100,6 +100,14 @@ def associative_recall(cfg: dict[str, Any], rng: np.random.Generator) -> tuple[l
         relevant_positions.append(len(prefix) - 2)
     qn = min(int(cfg["number_queries"]), len(keys))
     selected = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+
+    # SECTION15_ORACLE_REPAIR: retain only queried values.
+    # The answer depends only on values belonging to the queried keys.
+    relevant_positions = [
+        relevant_positions[index]
+        for index in selected
+    ]
+
     suffix = [QUERY] + [keys[i] for i in selected] + [EOS]
     sequence = fit(prefix, suffix, int(cfg["sequence_length"]), rng, int(cfg["vocabulary_size"]))
     query_positions = list(range(len(sequence) - qn - 1, len(sequence) - 1))
@@ -118,6 +126,13 @@ def multiple_key_retrieval(cfg: dict[str, Any], rng: np.random.Generator) -> tup
         relevant_positions.append(len(prefix) - 1)
     qn = min(int(cfg["number_queries"]), len(keys))
     selected = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+
+    # SECTION15_MULTIKEY_ORACLE_REPAIR: retain only queried values.
+    relevant_positions = [
+        relevant_positions[index]
+        for index in selected
+    ]
+
     suffix = [SEP, QUERY] + [keys[i] for i in selected] + [EOS]
     sequence = fit(prefix, suffix, int(cfg["sequence_length"]), rng, int(cfg["vocabulary_size"]))
     query_positions = list(range(len(sequence) - qn - 1, len(sequence) - 1))
@@ -171,6 +186,13 @@ def distractor_heavy_retrieval(cfg: dict[str, Any], rng: np.random.Generator) ->
         sequence[pos + 1] = value
         relevant_positions.append(pos + 1)
     queried = rng.choice(len(keys), size=qn, replace=False).astype(int).tolist()
+
+    # SECTION15_DISTRACTOR_ORACLE_REPAIR: retain only queried values.
+    relevant_positions = [
+        relevant_positions[index]
+        for index in queried
+    ]
+
     suffix = [QUERY] + [keys[i] for i in queried] + [EOS]
     sequence[-len(suffix):] = suffix
     query_positions = list(range(length - qn - 1, length - 1))

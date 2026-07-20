@@ -1,0 +1,39 @@
+{
+  "decision": "NO-GO",
+  "criteria": {
+    "long_sequence_minimum": 1024,
+    "minimum_absolute_recall_gain": 0.02,
+    "minimum_policy_clear_win_rate": 0.67,
+    "minimum_matched_cells_per_policy": 4,
+    "required_outperformed_policies": 2
+  },
+  "qualified_policy_count": 0,
+  "qualified_policies": [],
+  "comparisons": [
+    {
+      "policy": "uniform_cache",
+      "matched_same_budget_cells": 6,
+      "budgetmem_mean_recall": 0.3665364583333333,
+      "policy_mean_recall": 0.011357060185185166,
+      "mean_absolute_gain": 0.35517939814814814,
+      "minimum_absolute_gain": -0.0208333333333333,
+      "clear_wins": 4,
+      "clear_win_rate": 0.6666666666666666,
+      "qualifies_as_outperformed": false
+    },
+    {
+      "policy": "reservoir_cache",
+      "matched_same_budget_cells": 6,
+      "budgetmem_mean_recall": 0.3665364583333333,
+      "policy_mean_recall": 0.05461516203703698,
+      "mean_absolute_gain": 0.31192129629629634,
+      "minimum_absolute_gain": -0.010416666666666595,
+      "clear_wins": 4,
+      "clear_win_rate": 0.6666666666666666,
+      "qualifies_as_outperformed": false
+    }
+  ],
+  "source_files": [
+    "reports/tables/pilot_tuned_results.csv"
+  ]
+}

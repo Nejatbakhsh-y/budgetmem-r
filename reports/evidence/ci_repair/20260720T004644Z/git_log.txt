@@ -1,0 +1,17 @@
+44cfbef (HEAD -> recovery/restored-project-work-20260720-004252, origin/main, main) Confirm Section 14.11 BudgetMem-R performance gate (#1)
+128478f Add pretraining unit tests and validation gates
+17ed919 Implement recurrent baselines and BudgetMem-R
+ef84ddd Implement distractor retrieval synthetic task
+ffe9213 Implement deterministic rare event recall task generator
+0c0d6b6 Fix CI dependency and package imports
+7e67658 Implement deterministic delayed XOR task
+7e48b30 Implement deterministic multi-key retrieval task generator
+e193a6c Implement deterministic associative recall task generator
+5cdfa8b Implement deterministic selective copy task generator
+2d23520 Complete Step 11 novelty review and novelty gate
+a47868d Mark Step 9 setup script as executable
+4007fca Implement reproducible dataset pipelines for Step 9
+d26ee9a Add VS Code project configuration
+751b761 Create initial BudgetMem-R repository structure
+8a62a1a Create initial BudgetMem-R repository structure
+34d954a Initialize project and add gitignore

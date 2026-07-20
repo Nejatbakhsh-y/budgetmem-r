@@ -1,0 +1,1202 @@
+from __future__ import annotations
+
+import dataclasses
+import hashlib
+import importlib
+import inspect
+import json
+import os
+import pkgutil
+import random
+import re
+import sys
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import torch
+from torch import Tensor, nn
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+STRICT = os.getenv("SECTION14_STRICT", "1") == "1"
+
+MODEL_EXACT_NAMES = (
+    "BudgetMemR",
+    "BudgetMemRModel",
+    "BudgetMemoryRNN",
+    "BudgetedMemoryRNN",
+)
+MODEL_MODULE_HINTS = (
+    "budgetmem.models.budgetmem_r",
+    "budgetmem.models.budgetmem",
+    "budgetmem.models.memory_rnn",
+    "budgetmem.model",
+)
+SYNTHETIC_TASK_HINTS = (
+    "selective_copy",
+    "associative_recall",
+    "distractor_retrieval",
+)
+CONTROLLER_WORDS = (
+    "controller",
+    "write",
+    "retain",
+    "retention",
+    "utility",
+    "policy",
+    "selector",
+    "evict",
+)
+MEMORY_WORDS = (
+    "memory",
+    "cache",
+    "slot",
+    "external",
+    "bank",
+)
+
+
+class Section14DiscoveryError(RuntimeError):
+    pass
+
+
+def set_all_seeds(seed: int) -> None:
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.set_num_threads(max(1, int(os.getenv("SECTION14_TORCH_THREADS", "1"))))
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    try:
+        torch.use_deterministic_algorithms(True, warn_only=True)
+    except TypeError:
+        torch.use_deterministic_algorithms(True)
+    if hasattr(torch.backends, "cudnn"):
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
+
+def _iter_budgetmem_module_names() -> list[str]:
+    names = list(MODEL_MODULE_HINTS)
+    package_root = SRC / "budgetmem"
+    if package_root.exists():
+        for path in package_root.rglob("*.py"):
+            if path.name == "__init__.py":
+                module = ".".join(path.parent.relative_to(SRC).parts)
+            else:
+                module = ".".join(path.with_suffix("").relative_to(SRC).parts)
+            if module not in names:
+                names.append(module)
+    return names
+
+
+def _safe_import(module_name: str) -> Any | None:
+    try:
+        return importlib.import_module(module_name)
+    except Exception:
+        return None
+
+
+def _resolve_override(value: str) -> Any:
+    if ":" not in value:
+        raise Section14DiscoveryError(
+            f"Override must use module:object syntax, received {value!r}."
+        )
+    module_name, object_name = value.split(":", 1)
+    module = importlib.import_module(module_name)
+    return getattr(module, object_name)
+
+
+def discover_model_class() -> type[nn.Module]:
+    override = os.getenv("BUDGETMEM_MODEL_IMPORT")
+    if override:
+        candidate = _resolve_override(override)
+        if not inspect.isclass(candidate) or not issubclass(candidate, nn.Module):
+            raise Section14DiscoveryError(
+                f"BUDGETMEM_MODEL_IMPORT={override!r} does not resolve to torch.nn.Module."
+            )
+        return candidate
+
+    candidates: list[tuple[int, type[nn.Module]]] = []
+    for module_name in _iter_budgetmem_module_names():
+        module = _safe_import(module_name)
+        if module is None:
+            continue
+        for name, obj in vars(module).items():
+            if not inspect.isclass(obj) or not issubclass(obj, nn.Module):
+                continue
+            if obj is nn.Module or obj.__module__ != module.__name__:
+                continue
+            lowered = name.lower()
+            module_lowered = module_name.lower()
+            score = 0
+            if name in MODEL_EXACT_NAMES:
+                score += 100
+            if "budget" in lowered and "mem" in lowered:
+                score += 60
+            if "budgetmem" in module_lowered:
+                score += 35
+            if any(word in lowered for word in ("gru", "lstm", "rnn")):
+                score += 5
+            if any(word in lowered for word in ("controller", "memory", "cache")):
+                score -= 25
+            if score > 0:
+                candidates.append((score, obj))
+
+    if not candidates:
+        raise Section14DiscoveryError(
+            "BudgetMem-R model class was not discovered. Set "
+            "BUDGETMEM_MODEL_IMPORT='module.path:ClassName'."
+        )
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    return candidates[0][1]
+
+
+def _annotation_class(annotation: Any) -> type[Any] | None:
+    if inspect.isclass(annotation):
+        return annotation
+    return None
+
+
+def _default_value(name: str, *, budget: int, force_detach: bool | None) -> Any:
+    key = name.lower()
+    if key in {
+        "allowed_budgets",
+        "training_budgets",
+        "train_budgets",
+        "memory_budgets",
+        "budget_values",
+        "budget_choices",
+        "budgets",
+    }:
+        return (budget,)
+    if key == "max_budget":
+        return max(4, budget)
+    if key in {
+        "top_k",
+        "retrieval_k",
+        "retrieval_top_k",
+        "read_top_k",
+    }:
+        return 1
+    if key in {"budget", "memory_budget", "max_memory", "max_memory_size", "capacity", "num_slots", "memory_size"}:
+        return budget
+    if key in {"input_size", "input_dim", "feature_dim", "embedding_dim", "embed_dim", "d_input"}:
+        return 8
+    if key in {"hidden_size", "hidden_dim", "d_model", "model_dim", "controller_hidden_size"}:
+        return 16
+    if key in {"output_size", "output_dim", "num_classes", "n_classes", "vocab_size", "num_embeddings"}:
+        return 32
+    if key in {"key_dim", "memory_key_dim"}:
+        return 8
+    if key in {"value_dim", "memory_value_dim"}:
+        return 16
+    if key in {"num_layers", "n_layers", "layers", "heads", "num_heads"}:
+        return 1
+    if key in {"dropout", "dropout_rate"}:
+        return 0.0
+    if key in {"batch_first"}:
+        return True
+    if key in {"device"}:
+        return "cpu"
+    if key in {"dtype"}:
+        return torch.float32
+    if key in {"task", "task_name"}:
+        return "selective_copy"
+    if key in {"seed", "random_seed"}:
+        return 2026
+    if any(token in key for token in ("detach", "truncate_graph", "stop_gradient")):
+        return True if force_detach is None else force_detach
+    if key in {"trainable_memory", "trainable_cache", "retain_graph_memory"}:
+        return False if force_detach is None else not force_detach
+    return _MISSING
+
+
+class _Missing:
+    pass
+
+
+_MISSING = _Missing()
+
+
+def _build_dataclass_config(
+    config_cls: type[Any], *, budget: int, force_detach: bool | None
+) -> Any:
+    kwargs: dict[str, Any] = {}
+    for field in dataclasses.fields(config_cls):
+        if field.default is not dataclasses.MISSING:
+            continue
+        if field.default_factory is not dataclasses.MISSING:  # type: ignore[comparison-overlap]
+            continue
+        value = _default_value(field.name, budget=budget, force_detach=force_detach)
+        if value is _MISSING:
+            raise Section14DiscoveryError(
+                f"Cannot infer required config field {config_cls.__name__}.{field.name}."
+            )
+        kwargs[field.name] = value
+    config = config_cls(**kwargs)
+    for field in dataclasses.fields(config):
+        value = _default_value(field.name, budget=budget, force_detach=force_detach)
+        if value is not _MISSING:
+            try:
+                setattr(config, field.name, value)
+            except Exception:
+                pass
+    return config
+
+
+def _find_config_class(model_cls: type[nn.Module]) -> type[Any] | None:
+    module = importlib.import_module(model_cls.__module__)
+    for name, obj in vars(module).items():
+        if not inspect.isclass(obj):
+            continue
+        if "config" not in name.lower():
+            continue
+        if dataclasses.is_dataclass(obj):
+            return obj
+    return None
+
+
+def build_model(
+    *,
+    seed: int = 2026,
+    budget: int = 4,
+    force_detach: bool | None = None,
+) -> nn.Module:
+    set_all_seeds(seed)
+    model_cls = discover_model_class()
+    signature = inspect.signature(model_cls)
+    kwargs: dict[str, Any] = {}
+
+    for name, parameter in signature.parameters.items():
+        if name in {"self", "args", "kwargs"}:
+            continue
+        if parameter.kind in {
+            inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.VAR_KEYWORD,
+        }:
+            continue
+
+        value = _default_value(name, budget=budget, force_detach=force_detach)
+        if value is not _MISSING:
+            kwargs[name] = value
+            continue
+
+        if name.lower() in {"config", "cfg"}:
+            config_cls = _annotation_class(parameter.annotation) or _find_config_class(model_cls)
+            if config_cls is not None and dataclasses.is_dataclass(config_cls):
+                kwargs[name] = _build_dataclass_config(
+                    config_cls,
+                    budget=budget,
+                    force_detach=force_detach,
+                )
+                continue
+
+        if parameter.default is not inspect.Parameter.empty:
+            continue
+
+        raise Section14DiscoveryError(
+            f"Cannot instantiate {model_cls.__module__}:{model_cls.__name__}; "
+            f"required constructor parameter {name!r} is unknown. "
+            "Set BUDGETMEM_MODEL_IMPORT or extend the generated adapter."
+        )
+
+    model = model_cls(**kwargs)
+    model.to("cpu")
+
+    for object_ in _walk_named_objects(model):
+        for attr in (
+            "budget",
+            "memory_budget",
+            "max_memory",
+            "max_memory_size",
+            "capacity",
+            "num_slots",
+        ):
+            if hasattr(object_, attr):
+                try:
+                    current = getattr(object_, attr)
+                    if isinstance(current, (int, float)):
+                        setattr(object_, attr, budget)
+                except Exception:
+                    pass
+
+        if force_detach is not None:
+            for attr in (
+                "detach_cached_states",
+                "detach_cache",
+                "detach_memory",
+                "truncate_memory_graph",
+            ):
+                if hasattr(object_, attr):
+                    try:
+                        setattr(object_, attr, force_detach)
+                    except Exception:
+                        pass
+            for attr in ("trainable_memory", "trainable_cache"):
+                if hasattr(object_, attr):
+                    try:
+                        setattr(object_, attr, not force_detach)
+                    except Exception:
+                        pass
+
+    return model
+
+
+def _walk_named_objects(model: nn.Module) -> Iterable[Any]:
+    yielded: set[int] = set()
+    for object_ in [model, *list(model.modules())]:
+        if id(object_) not in yielded:
+            yielded.add(id(object_))
+            yield object_
+        for name in MEMORY_WORDS:
+            if hasattr(object_, name):
+                child = getattr(object_, name)
+                if child is not None and id(child) not in yielded:
+                    yielded.add(id(child))
+                    yield child
+
+
+def _forward_parameters(model: nn.Module) -> list[inspect.Parameter]:
+    return [
+        parameter
+        for name, parameter in inspect.signature(model.forward).parameters.items()
+        if name != "self"
+    ]
+
+
+def _candidate_inputs(model: nn.Module, seq_len: int = 12) -> list[Tensor]:
+    batch = 2
+    vocab = 32
+    features = 8
+    for object_ in _walk_named_objects(model):
+        for attr in ("vocab_size", "num_embeddings", "input_vocab_size"):
+            value = getattr(object_, attr, None)
+            if isinstance(value, int) and value > 2:
+                vocab = value
+        for attr in ("input_size", "input_dim", "feature_dim", "embedding_dim"):
+            value = getattr(object_, attr, None)
+            if isinstance(value, int) and value > 0:
+                features = value
+
+    integer_batch_first = torch.randint(0, max(vocab, 3), (batch, seq_len), dtype=torch.long)
+    integer_time_first = integer_batch_first.transpose(0, 1).contiguous()
+    float_batch_first = torch.randn(batch, seq_len, features)
+    float_time_first = float_batch_first.transpose(0, 1).contiguous()
+    one_hot = torch.nn.functional.one_hot(
+        integer_batch_first % features, num_classes=features
+    ).float()
+
+    return [
+        integer_batch_first,
+        float_batch_first,
+        one_hot,
+        integer_time_first,
+        float_time_first,
+    ]
+
+
+def _forward_kwargs(model: nn.Module, x: Tensor, *, reset: bool | None) -> dict[str, Any]:
+    parameters = _forward_parameters(model)
+    kwargs: dict[str, Any] = {}
+    for parameter in parameters[1:]:
+        name = parameter.name
+        key = name.lower()
+        if key in {"budget", "memory_budget"}:
+            kwargs[name] = 4
+        elif key in {"reset", "reset_memory", "clear_memory"} and reset is not None:
+            kwargs[name] = reset
+        elif key in {"return_diagnostics", "return_memory", "return_state", "return_details"}:
+            kwargs[name] = True
+        elif key in {"lengths", "sequence_lengths"}:
+            seq_len = x.shape[1] if x.ndim >= 2 else x.shape[0]
+            batch = x.shape[0] if x.ndim >= 2 else 1
+            kwargs[name] = torch.full((batch,), seq_len, dtype=torch.long)
+        elif key in {"mask", "attention_mask", "padding_mask"}:
+            kwargs[name] = torch.ones(x.shape[:2], dtype=torch.bool)
+        elif key in {"hidden", "hidden_state", "hx", "state"}:
+            kwargs[name] = None
+        elif key in {"targets", "target", "labels", "y"}:
+            kwargs[name] = x.clone()
+        elif parameter.default is inspect.Parameter.empty:
+            raise Section14DiscoveryError(
+                f"Cannot infer required forward parameter {name!r} for "
+                f"{type(model).__module__}:{type(model).__name__}."
+            )
+    return kwargs
+
+
+def invoke(model: nn.Module, x: Tensor, *, reset: bool | None = None) -> Any:
+    parameters = _forward_parameters(model)
+    if not parameters:
+        raise Section14DiscoveryError("Model.forward has no input parameter.")
+    kwargs = _forward_kwargs(model, x, reset=reset)
+    return model(x, **kwargs)
+
+
+def compatible_input(model: nn.Module, seq_len: int = 12) -> Tensor:
+    failures: list[str] = []
+    attempted: set[tuple[tuple[int, ...], torch.dtype]] = set()
+    inferred_dimensions: list[int] = []
+
+    def try_input(x: Tensor) -> Tensor | None:
+        key = (tuple(x.shape), x.dtype)
+        if key in attempted:
+            return None
+        attempted.add(key)
+        try:
+            reset_memory(model, require=False)
+            with torch.no_grad():
+                invoke(model, x, reset=True)
+            return x
+        except Exception as exc:
+            message = f"{type(exc).__name__}: {exc}"
+            failures.append(
+                f"shape={tuple(x.shape)}, dtype={x.dtype}: {message}"
+            )
+            patterns = (
+                r"Expected input_dim[=:]\s*(\d+)",
+                r"expected input[_ ]dim[=:]\s*(\d+)",
+                r"input_dim\s+must\s+be\s+(\d+)",
+                r"input_size\s+must\s+be\s+(\d+)",
+            )
+            for pattern in patterns:
+                match = re.search(pattern, message, flags=re.IGNORECASE)
+                if match:
+                    inferred_dimensions.append(int(match.group(1)))
+            return None
+
+    for candidate in _candidate_inputs(model, seq_len=seq_len):
+        accepted = try_input(candidate)
+        if accepted is not None:
+            return accepted
+
+    dimensions = list(dict.fromkeys([*inferred_dimensions, 8, 16, 32, 64]))
+    for feature_dim in dimensions:
+        for candidate in (
+            torch.randn(2, seq_len, feature_dim),
+            torch.randn(seq_len, 2, feature_dim),
+        ):
+            accepted = try_input(candidate)
+            if accepted is not None:
+                return accepted
+
+    raise Section14DiscoveryError(
+        "No compatible synthetic input was found for the discovered model. Attempts:\n"
+        + "\n".join(failures)
+    )
+
+def extract_tensor(value: Any) -> Tensor | None:
+    if isinstance(value, Tensor):
+        return value
+    if dataclasses.is_dataclass(value):
+        for field in dataclasses.fields(value):
+            tensor = extract_tensor(getattr(value, field.name))
+            if tensor is not None:
+                return tensor
+    if isinstance(value, Mapping):
+        preferred = ("logits", "output", "outputs", "prediction", "predictions", "hidden")
+        for key in preferred:
+            if key in value:
+                tensor = extract_tensor(value[key])
+                if tensor is not None:
+                    return tensor
+        for item in value.values():
+            tensor = extract_tensor(item)
+            if tensor is not None:
+                return tensor
+    if isinstance(value, (tuple, list)):
+        for item in value:
+            tensor = extract_tensor(item)
+            if tensor is not None:
+                return tensor
+    return None
+
+
+
+def extract_named_tensor(value: Any, names: Sequence[str]) -> Tensor | None:
+    requested = {name.lower() for name in names}
+
+    if dataclasses.is_dataclass(value):
+        for field in dataclasses.fields(value):
+            if field.name.lower() in requested:
+                candidate = getattr(value, field.name)
+                if isinstance(candidate, Tensor):
+                    return candidate
+        for field in dataclasses.fields(value):
+            candidate = extract_named_tensor(getattr(value, field.name), names)
+            if candidate is not None:
+                return candidate
+
+    if isinstance(value, Mapping):
+        for key, candidate in value.items():
+            if str(key).lower() in requested and isinstance(candidate, Tensor):
+                return candidate
+        for candidate in value.values():
+            nested = extract_named_tensor(candidate, names)
+            if nested is not None:
+                return nested
+
+    if isinstance(value, (tuple, list)):
+        for candidate in value:
+            nested = extract_named_tensor(candidate, names)
+            if nested is not None:
+                return nested
+
+    for name in names:
+        candidate = getattr(value, name, None)
+        if isinstance(candidate, Tensor):
+            return candidate
+
+    return None
+
+def infer_sequence_axis(tensor: Tensor, seq_len: int) -> int | None:
+    matching = [index for index, size in enumerate(tensor.shape) if size == seq_len]
+    if not matching:
+        return None
+    if tensor.ndim >= 3 and 1 in matching:
+        return 1
+    return matching[0]
+
+
+def sequence_prefix(tensor: Tensor, seq_len: int, prefix_len: int) -> Tensor | None:
+    axis = infer_sequence_axis(tensor, seq_len)
+    if axis is None:
+        return None
+    slices = [slice(None)] * tensor.ndim
+    slices[axis] = slice(0, prefix_len)
+    return tensor[tuple(slices)]
+
+
+def input_sequence_axis(x: Tensor) -> int:
+    if x.ndim == 1:
+        return 0
+    if x.ndim == 2:
+        return 1 if x.shape[0] <= x.shape[1] else 0
+    if x.ndim >= 3:
+        return 1 if x.shape[0] <= x.shape[1] else 0
+    raise Section14DiscoveryError(f"Unsupported input rank: {x.ndim}")
+
+
+def slice_step(x: Tensor, step: int) -> Tensor:
+    axis = input_sequence_axis(x)
+    slices = [slice(None)] * x.ndim
+    slices[axis] = slice(step, step + 1)
+    return x[tuple(slices)]
+
+
+def mutate_suffix(x: Tensor, prefix_len: int) -> Tensor:
+    changed = x.clone()
+    axis = input_sequence_axis(changed)
+    slices = [slice(None)] * changed.ndim
+    slices[axis] = slice(prefix_len, None)
+    suffix = changed[tuple(slices)]
+    if changed.dtype.is_floating_point:
+        changed[tuple(slices)] = suffix + 7.0
+    else:
+        max_value = 31
+        changed[tuple(slices)] = (suffix + 11) % max_value
+    return changed
+
+
+def reset_memory(model: nn.Module, *, require: bool = True) -> bool:
+    method_names = (
+        "reset_memory",
+        "clear_memory",
+        "reset_state",
+        "clear_state",
+        "reset",
+    )
+    for object_ in _walk_named_objects(model):
+        for name in method_names:
+            method = getattr(object_, name, None)
+            if callable(method):
+                try:
+                    signature = inspect.signature(method)
+                    required = [
+                        p
+                        for p in signature.parameters.values()
+                        if p.default is inspect.Parameter.empty
+                        and p.kind
+                        not in {
+                            inspect.Parameter.VAR_POSITIONAL,
+                            inspect.Parameter.VAR_KEYWORD,
+                        }
+                    ]
+                    if not required:
+                        method()
+                        return True
+                except (TypeError, ValueError):
+                    try:
+                        method()
+                        return True
+                    except Exception:
+                        pass
+    if require:
+        raise Section14DiscoveryError(
+            "No zero-argument memory reset method was discovered. "
+            "Provide reset_memory(), clear_memory(), reset_state(), or clear_state()."
+        )
+    return False
+
+
+def encourage_writes(model: nn.Module) -> None:
+    for object_ in _walk_named_objects(model):
+        for attr in (
+            "write_threshold",
+            "retention_threshold",
+            "admission_threshold",
+            "store_threshold",
+        ):
+            if hasattr(object_, attr):
+                try:
+                    setattr(object_, attr, 0.01)
+                except Exception:
+                    pass
+        for attr in ("force_write", "always_write"):
+            if hasattr(object_, attr):
+                try:
+                    setattr(object_, attr, True)
+                except Exception:
+                    pass
+
+
+def _numeric_size(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, Tensor) and value.numel() == 1:
+        return int(value.detach().cpu().item())
+    return None
+
+
+def memory_size(model: nn.Module) -> int | None:
+    sizes: list[int] = []
+    for object_ in _walk_named_objects(model):
+        for attr in (
+            "memory_size",
+            "current_size",
+            "num_entries",
+            "num_slots_used",
+            "n_items",
+            "size",
+        ):
+            if not hasattr(object_, attr):
+                continue
+            try:
+                value = getattr(object_, attr)
+                if callable(value):
+                    value = value()
+                number = _numeric_size(value)
+                if number is not None and number >= 0:
+                    sizes.append(number)
+            except Exception:
+                pass
+
+        for attr in ("slots", "entries", "items", "memory", "cache"):
+            if not hasattr(object_, attr):
+                continue
+            try:
+                value = getattr(object_, attr)
+                if isinstance(value, (list, tuple, dict)):
+                    sizes.append(len(value))
+            except Exception:
+                pass
+
+        tensor_candidates: list[Tensor] = []
+        for attr in ("keys", "values", "memory_keys", "memory_values", "valid_mask", "occupied"):
+            value = getattr(object_, attr, None)
+            if isinstance(value, Tensor) and value.ndim > 0:
+                tensor_candidates.append(value)
+        for tensor in tensor_candidates:
+            if tensor.dtype == torch.bool:
+                sizes.append(int(tensor.detach().sum().cpu().item()))
+            elif tensor.ndim == 1:
+                sizes.append(int(tensor.shape[0]))
+            elif tensor.ndim >= 2:
+                dimensions = [dim for dim in tensor.shape if 0 <= dim <= 4096]
+                if dimensions:
+                    sizes.append(int(min(dimensions)))
+
+    sensible = [size for size in sizes if 0 <= size <= 1_000_000]
+    return max(sensible) if sensible else None
+
+
+def memory_tensors(model: nn.Module) -> list[Tensor]:
+    tensors: list[Tensor] = []
+    seen: set[int] = set()
+    for object_ in _walk_named_objects(model):
+        if isinstance(object_, Tensor) and id(object_) not in seen:
+            seen.add(id(object_))
+            tensors.append(object_)
+        if hasattr(object_, "__dict__"):
+            for name, value in vars(object_).items():
+                tensor_terms = MEMORY_WORDS + CONTROLLER_WORDS + (
+                    "key",
+                    "value",
+                    "state",
+                    "entry",
+                    "item",
+                    "hidden",
+                )
+                if not any(word in name.lower() for word in tensor_terms):
+                    continue
+                if isinstance(value, Tensor) and id(value) not in seen:
+                    seen.add(id(value))
+                    tensors.append(value)
+                elif isinstance(value, (list, tuple)):
+                    for item in value:
+                        if isinstance(item, Tensor) and id(item) not in seen:
+                            seen.add(id(item))
+                            tensors.append(item)
+    return tensors
+
+
+def controller_parameters(model: nn.Module) -> list[tuple[str, nn.Parameter]]:
+    selected = [
+        (name, parameter)
+        for name, parameter in model.named_parameters()
+        if any(word in name.lower() for word in CONTROLLER_WORDS)
+    ]
+    if selected:
+        return selected
+
+    selected_modules = [
+        (name, module)
+        for name, module in model.named_modules()
+        if any(word in name.lower() for word in CONTROLLER_WORDS)
+    ]
+    for module_name, module in selected_modules:
+        for name, parameter in module.named_parameters(recurse=True):
+            selected.append((f"{module_name}.{name}".strip("."), parameter))
+    return selected
+
+
+def capture_controller_outputs(model: nn.Module, x: Tensor) -> tuple[Any, list[Tensor]]:
+    captured: list[Tensor] = []
+    handles: list[Any] = []
+
+    def hook(_module: nn.Module, _inputs: tuple[Any, ...], output: Any) -> None:
+        tensor = extract_tensor(output)
+        if tensor is not None:
+            captured.append(tensor.detach().cpu().clone())
+
+    for name, module in model.named_modules():
+        if name and any(word in name.lower() for word in CONTROLLER_WORDS):
+            handles.append(module.register_forward_hook(hook))
+
+    try:
+        result = invoke(model, x, reset=True)
+    finally:
+        for handle in handles:
+            handle.remove()
+    return result, captured
+
+
+def state_dict_equal(left: nn.Module, right: nn.Module) -> bool:
+    left_state = left.state_dict()
+    right_state = right.state_dict()
+    if left_state.keys() != right_state.keys():
+        return False
+    return all(
+        torch.equal(left_state[key].detach().cpu(), right_state[key].detach().cpu())
+        for key in left_state
+    )
+
+
+def output_equal(left: Any, right: Any) -> bool:
+    left_tensor = extract_tensor(left)
+    right_tensor = extract_tensor(right)
+    if left_tensor is None or right_tensor is None:
+        return repr(left) == repr(right)
+    return torch.equal(left_tensor.detach().cpu(), right_tensor.detach().cpu())
+
+
+def _callable_required_kwargs(
+    callable_: Callable[..., Any],
+    *,
+    seed: int,
+    split: str = "train",
+) -> dict[str, Any]:
+    signature = inspect.signature(callable_)
+    kwargs: dict[str, Any] = {}
+    for name, parameter in signature.parameters.items():
+        if name in {"self", "cls", "args", "kwargs"}:
+            continue
+        key = name.lower()
+        value: Any = _MISSING
+        if key in {"seed", "random_seed", "rng_seed"}:
+            value = seed
+        elif key in {"split", "partition"}:
+            value = split
+        elif key in {"num_samples", "n_samples", "size", "dataset_size", "examples"}:
+            value = 16
+        elif key in {"sequence_length", "seq_len", "length", "max_length"}:
+            value = 32
+        elif key in {"vocab_size", "num_tokens", "alphabet_size"}:
+            value = 16
+        elif key in {"memory_budget", "budget"}:
+            value = 4
+        elif key in {"root", "data_dir", "cache_dir", "path"}:
+            value = str(ROOT / "data")
+        elif key in {"download"}:
+            value = False
+        if value is not _MISSING:
+            kwargs[name] = value
+        elif parameter.default is inspect.Parameter.empty:
+            raise Section14DiscoveryError(
+                f"Cannot infer required dataset-factory parameter {name!r} "
+                f"for {callable_!r}."
+            )
+    return kwargs
+
+
+def discover_synthetic_factory() -> Callable[..., Any]:
+    override = os.getenv("BUDGETMEM_SYNTHETIC_FACTORY")
+    if override:
+        candidate = _resolve_override(override)
+        if not callable(candidate):
+            raise Section14DiscoveryError(
+                f"BUDGETMEM_SYNTHETIC_FACTORY={override!r} is not callable."
+            )
+        return candidate
+
+    candidates: list[tuple[int, Callable[..., Any]]] = []
+    for module_name in _iter_budgetmem_module_names():
+        if not any(hint in module_name.lower() for hint in SYNTHETIC_TASK_HINTS + ("data", "task", "dataset")):
+            continue
+        module = _safe_import(module_name)
+        if module is None:
+            continue
+        for name, obj in vars(module).items():
+            if not callable(obj):
+                continue
+            lowered = name.lower()
+            score = 0
+            if any(hint in lowered for hint in SYNTHETIC_TASK_HINTS):
+                score += 50
+            if any(word in lowered for word in ("dataset", "generate", "build", "create", "make")):
+                score += 25
+            if inspect.isclass(obj):
+                try:
+                    if issubclass(obj, torch.utils.data.Dataset):
+                        score += 40
+                except TypeError:
+                    pass
+            if score > 0:
+                candidates.append((score, obj))
+
+    if not candidates:
+        raise Section14DiscoveryError(
+            "Synthetic task factory was not discovered. Set "
+            "BUDGETMEM_SYNTHETIC_FACTORY='module.path:factory'."
+        )
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    return candidates[0][1]
+
+
+def build_synthetic_dataset(seed: int, split: str = "train") -> Any:
+    factory = discover_synthetic_factory()
+    kwargs = _callable_required_kwargs(factory, seed=seed, split=split)
+    return factory(**kwargs)
+
+
+def _stable_serialize(value: Any) -> bytes:
+    if isinstance(value, Tensor):
+        array = value.detach().cpu().contiguous().numpy()
+        return b"TENSOR|" + str(array.dtype).encode() + b"|" + str(array.shape).encode() + b"|" + array.tobytes()
+    if isinstance(value, np.ndarray):
+        array = np.ascontiguousarray(value)
+        return b"NDARRAY|" + str(array.dtype).encode() + b"|" + str(array.shape).encode() + b"|" + array.tobytes()
+    if dataclasses.is_dataclass(value):
+        return _stable_serialize(dataclasses.asdict(value))
+    if isinstance(value, Mapping):
+        chunks = []
+        for key in sorted(value, key=lambda item: str(item)):
+            chunks.append(_stable_serialize(key))
+            chunks.append(_stable_serialize(value[key]))
+        return b"MAP|" + b"|".join(chunks)
+    if isinstance(value, (list, tuple)):
+        return b"SEQ|" + b"|".join(_stable_serialize(item) for item in value)
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return repr(value).encode("utf-8")
+    return repr(value).encode("utf-8")
+
+
+def dataset_fingerprint(dataset: Any, limit: int = 16) -> str:
+    digest = hashlib.sha256()
+
+    if dataset is None:
+        digest.update(b"NONE")
+        return digest.hexdigest()
+
+    to_dict = getattr(dataset, "to_dict", None)
+    if callable(to_dict):
+        try:
+            digest.update(_stable_serialize(to_dict()))
+            return digest.hexdigest()
+        except Exception:
+            pass
+
+    keys_method = getattr(dataset, "keys", None)
+    if callable(keys_method):
+        try:
+            keys = sorted(str(key) for key in keys_method())
+            for key in keys:
+                digest.update(key.encode("utf-8"))
+                try:
+                    child = dataset[key]
+                except Exception:
+                    child = getattr(dataset, key, None)
+                digest.update(
+                    dataset_fingerprint(child, limit=limit).encode("utf-8")
+                )
+            return digest.hexdigest()
+        except Exception:
+            pass
+
+    if hasattr(dataset, "__len__") and hasattr(dataset, "__getitem__"):
+        count = min(int(len(dataset)), limit)
+        indexed = True
+        for index in range(count):
+            try:
+                item = dataset[index]
+            except (KeyError, TypeError, IndexError):
+                indexed = False
+                break
+            digest.update(_stable_serialize(item))
+        if indexed:
+            return digest.hexdigest()
+
+    try:
+        for index, item in enumerate(dataset):
+            if index >= limit:
+                break
+            digest.update(_stable_serialize(item))
+        return digest.hexdigest()
+    except Exception:
+        digest.update(_stable_serialize(dataset))
+        return digest.hexdigest()
+
+def project_text_files() -> Iterable[Path]:
+    for base in (ROOT / "src", ROOT / "tests", ROOT / "configs", ROOT / "scripts"):
+        if not base.exists():
+            continue
+        for path in base.rglob("*"):
+            if path.is_file() and path.suffix.lower() in {".py", ".yaml", ".yml", ".json", ".toml"}:
+                yield path
+
+
+def existing_test_has(*groups: Sequence[str]) -> bool:
+    for path in (ROOT / "tests").rglob("test*.py"):
+        if path.name == "test_section14_required.py":
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        if all(any(term.lower() in text for term in group) for group in groups):
+            return True
+    return False
+
+
+def source_has_deterministic_loader_controls() -> bool:
+    terms = (
+        "worker_init_fn",
+        "torch.generator",
+        "manual_seed",
+        "use_deterministic_algorithms",
+        "deterministic",
+    )
+    for path in project_text_files():
+        if path.suffix != ".py":
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        if "dataloader" in text and any(term in text for term in terms):
+            return True
+    return existing_test_has(("training", "order"), ("determin", "seed"))
+
+
+def _walk_config(value: Any, path: tuple[str, ...] = ()) -> Iterable[tuple[tuple[str, ...], Any]]:
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            yield from _walk_config(item, (*path, str(key)))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from _walk_config(item, (*path, str(index)))
+    else:
+        yield path, value
+
+
+def explicit_split_seeds() -> dict[str, set[int]]:
+    result: dict[str, set[int]] = {"train": set(), "validation": set(), "test": set()}
+    config_paths = list((ROOT / "configs").rglob("*.yaml")) + list((ROOT / "configs").rglob("*.yml")) + list((ROOT / "configs").rglob("*.json"))
+    for path in config_paths:
+        try:
+            if path.suffix.lower() == ".json":
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            else:
+                import yaml
+
+                payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for key_path, value in _walk_config(payload):
+            lowered = ".".join(key_path).lower()
+            if "seed" not in lowered:
+                continue
+            if not isinstance(value, int):
+                continue
+            if "train" in lowered:
+                result["train"].add(value)
+            if "validation" in lowered or re.search(r"(^|[._-])val([._-]|$)", lowered):
+                result["validation"].add(value)
+            if "test" in lowered:
+                result["test"].add(value)
+    return result
+
+
+def _read_records(path: Path) -> list[dict[str, Any]]:
+    suffix = path.suffix.lower()
+    if path.stat().st_size > 200 * 1024 * 1024:
+        return []
+    try:
+        if suffix == ".jsonl":
+            rows = []
+            for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                line = line.strip()
+                if line:
+                    value = json.loads(line)
+                    if isinstance(value, Mapping):
+                        rows.append(dict(value))
+            return rows
+        if suffix == ".json":
+            value = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+            if isinstance(value, list):
+                return [dict(item) for item in value if isinstance(item, Mapping)]
+            if isinstance(value, Mapping):
+                for key in ("records", "data", "examples", "items"):
+                    rows = value.get(key)
+                    if isinstance(rows, list):
+                        return [dict(item) for item in rows if isinstance(item, Mapping)]
+            return []
+        if suffix in {".csv", ".tsv"}:
+            import csv
+
+            delimiter = "\t" if suffix == ".tsv" else ","
+            with path.open("r", encoding="utf-8", errors="ignore", newline="") as handle:
+                return [dict(row) for row in csv.DictReader(handle, delimiter=delimiter)]
+        if suffix == ".parquet":
+            import pandas as pd
+
+            return pd.read_parquet(path).to_dict(orient="records")
+    except Exception:
+        return []
+    return []
+
+
+def _infer_split(path: Path, row: Mapping[str, Any]) -> str | None:
+    for key in ("split", "partition", "subset", "fold"):
+        value = row.get(key)
+        if value is not None:
+            lowered = str(value).lower()
+            if lowered in {"train", "training"}:
+                return "train"
+            if lowered in {"val", "valid", "validation", "dev"}:
+                return "validation"
+            if lowered in {"test", "testing"}:
+                return "test"
+    lowered_name = str(path).lower()
+    if "train" in lowered_name:
+        return "train"
+    if any(token in lowered_name for token in ("validation", "_val", "-val", "/val", "dev")):
+        return "validation"
+    if "test" in lowered_name:
+        return "test"
+    return None
+
+
+def _record_identity(row: Mapping[str, Any], fields: Sequence[str]) -> str | None:
+    lowered = {str(key).lower(): value for key, value in row.items()}
+    for field in fields:
+        if field in lowered and lowered[field] not in {None, ""}:
+            normalized = re.sub(r"\s+", " ", str(lowered[field]).strip())
+            return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    return None
+
+
+def local_split_identities(kind: str, identity_fields: Sequence[str]) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = {"train": set(), "validation": set(), "test": set()}
+    data_root = ROOT / "data"
+    if not data_root.exists():
+        return result
+    supported = {".csv", ".tsv", ".json", ".jsonl", ".parquet"}
+    for path in data_root.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in supported:
+            continue
+        if kind.lower() not in str(path).lower():
+            continue
+        for row in _read_records(path):
+            split = _infer_split(path, row)
+            identity = _record_identity(row, identity_fields)
+            if split is not None and identity is not None:
+                result[split].add(identity)
+    return result
+
+
+def cache_graph_policy_evidence() -> dict[str, bool]:
+    evidence = {
+        "detach_call": False,
+        "explicit_policy": False,
+        "trainable_path": False,
+    }
+    for path in (ROOT / "src" / "budgetmem").rglob("*.py"):
+        lowered_path = str(path).lower()
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        relevant_terms = MEMORY_WORDS + CONTROLLER_WORDS + ("budgetmem", "cached")
+        if not any(word in lowered_path or word in text for word in relevant_terms):
+            continue
+        if ".detach(" in text or ".detach()" in text:
+            evidence["detach_call"] = True
+        if any(
+            token in text
+            for token in (
+                "detach_cached_states",
+                "detach_cache",
+                "detach_memory",
+                "truncate_memory_graph",
+                "intentional detach",
+                "intentionally detached",
+            )
+        ):
+            evidence["explicit_policy"] = True
+        if any(
+            token in text
+            for token in (
+                "trainable_cached_states",
+                "trainable_cache",
+                "trainable_memory",
+                "retain_graph",
+                "detach_cached_states = false",
+                "detach_cache = false",
+            )
+        ):
+            evidence["trainable_path"] = True
+    return evidence
+
+
+def supports_detach_override(model: nn.Module) -> bool:
+    names: set[str] = set(inspect.signature(type(model)).parameters)
+    for object_ in _walk_named_objects(model):
+        if hasattr(object_, "__dict__"):
+            names.update(vars(object_))
+    lowered = {name.lower() for name in names}
+    return any("detach" in name or "trainable_memory" in name or "trainable_cache" in name for name in lowered)

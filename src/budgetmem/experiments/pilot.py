@@ -263,6 +263,7 @@ class GRUPilotModel(nn.Module):
     def __init__(self, cfg: Mapping[str, Any]) -> None:
         super().__init__()
         model_cfg = cfg["model"]
+        self._model_cfg = model_cfg
         self.vocab_size = int(model_cfg["vocabulary_size"])
         self.max_target_length = int(model_cfg["max_target_length"])
         embedding_dim = int(model_cfg["embedding_dim"])
@@ -465,6 +466,7 @@ class BudgetMemRAdapter(nn.Module):
     def __init__(self, cfg: Mapping[str, Any]) -> None:
         super().__init__()
         model_cfg = cfg["model"]
+        self._model_cfg = model_cfg
         matrix_cfg = cfg["matrix"]
         training_cfg = cfg["training"]
         self.write_threshold = float(training_cfg.get("write_threshold", 0.5))
@@ -487,6 +489,7 @@ class BudgetMemRAdapter(nn.Module):
         self.core = budgetmem_class(**kwargs)
 
     def _constructor_kwargs(self, budgetmem_class: type[nn.Module]) -> dict[str, Any]:
+        model_cfg = self._model_cfg
         signature = inspect.signature(budgetmem_class)
         values: dict[str, Any] = {
             "input_dim": self.embedding_dim,
@@ -520,7 +523,12 @@ class BudgetMemRAdapter(nn.Module):
             "temperature": self.write_temperature,
             "dropout": 0.0,
             "num_layers": 1,
-            "detach_memory": False,
+            "detach_memory": bool(
+                model_cfg.get("detach_memory", False)
+            ),
+            "detach_memory_writes": bool(
+                model_cfg.get("detach_memory_writes", False)
+            ),
         }
         kwargs: dict[str, Any] = {}
         unresolved: list[str] = []

@@ -1,0 +1,46 @@
+========================================================================================================================
+ASSOCIATIVE-RECALL GRADIENT-SOURCE PROFILE
+========================================================================================================================
+
+Model source:                 src/budgetmem/models/budgetmem_r.py
+Checkpoint:                   outputs/assoc_detached_memory/checkpoints/associative_recall/budgetmem_r/last.pt
+Training sequence length:     96
+Gradient clipping norm:       0.250000
+Maximum acceptable raw norm:  100.000000
+Recorded maximum raw norm:   181.8977813720703
+
+========================================================================================================================
+COMPONENT RESULTS
+========================================================================================================================
+
+ budget                  component  loss_value  raw_gradient_norm  exceeds_raw_threshold  applied_norm_after_clipping  write_controller_gradient_norm  utility_controller_gradient_norm  core_gradient_norm
+     32                  task_loss    5.241094          20.543452                  False                     0.250000                        0.264758                      8.055639e-02           20.541715
+     16                  task_loss    5.209359          14.615635                  False                     0.250000                        1.745359                      1.298837e-01           14.614233
+     32        total_training_loss    5.337383          10.410613                  False                     0.250000                        0.190049                      1.248344e-01           10.409312
+     16        total_training_loss    5.492640           8.992094                  False                     0.250000                        0.788698                      1.438573e-01            8.991165
+     32         write_rate_penalty    0.024274           0.143398                  False                     0.143398                        0.098440                      3.339158e-04            0.143394
+     16         write_rate_penalty    0.027651           0.138827                  False                     0.138827                        0.101005                      4.307548e-04            0.138824
+     16 write_binarization_penalty    0.002494           0.000206                  False                     0.000206                        0.000149                      4.249600e-07            0.000206
+     32 write_binarization_penalty    0.002495           0.000192                  False                     0.000192                        0.000135                      1.257709e-07            0.000192
+     16   budget_violation_penalty    0.000000           0.000000                  False                     0.000000                        0.000000                      0.000000e+00            0.000000
+     32   budget_violation_penalty    0.000000           0.000000                  False                     0.000000                        0.000000                      0.000000e+00            0.000000
+
+========================================================================================================================
+DOMINANT GRADIENT SOURCE
+========================================================================================================================
+
+Budget:                       32
+Component:                    task_loss
+Raw gradient norm:            20.543452
+Threshold excess:             -79.456548
+
+Required repair category:
+- The supervised task-loss graph is the dominant source.
+- Stabilize recurrent backpropagation, normalization, or initialization.
+- Do not weaken the memory-recall objective.
+
+========================================================================================================================
+FILES WRITTEN
+========================================================================================================================
+reports/tables/assoc_gradient_source_profile.csv
+reports/evidence/assoc_gradient_source_profile.json

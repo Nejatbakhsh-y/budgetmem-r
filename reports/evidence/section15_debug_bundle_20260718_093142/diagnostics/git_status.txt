@@ -1,0 +1,27 @@
+ M reports/evidence/pilot_tuned_go_no_go.json
+ M reports/evidence/pilot_tuned_summary.json
+ M reports/evidence/pilot_tuning/capacity_10e_summary.json
+ M reports/evidence/pilot_tuning/optimization_12e_summary.json
+ M reports/evidence/pilot_tuning/optimization_8e_summary.json
+ M reports/pilot_tuned_report.md
+ M reports/tables/pilot_tuned_results.csv
+ M reports/tables/pilot_tuning/all_candidate_results.csv
+ M reports/tables/pilot_tuning/capacity_10e_results.csv
+ M reports/tables/pilot_tuning/optimization_12e_results.csv
+ M reports/tables/pilot_tuning/optimization_8e_results.csv
+?? 17_section15_final_go_decision.sh
+?? 18_run_tuned_pilot_and_final_gate.sh
+?? 19_diagnose_section15_no_go.sh
+?? 20_repair_associative_recall_and_rerun.sh
+?? 20_repair_associative_recall_and_rerun.sh.before_fix
+?? 21_inspect_targeted_candidate_outputs.sh
+?? 22_collect_associative_recall_debug_bundle.sh
+?? configs/experiments/targeted_associative_recall/
+?? reports/evidence/section15_debug_bundle_20260718_093142.txt
+?? reports/evidence/section15_debug_bundle_20260718_093142/
+?? reports/evidence/section15_final_go_decision.json
+?? reports/evidence/section15_final_go_decision.txt
+?? reports/evidence/section15_no_go_diagnostic.txt
+?? reports/evidence/targeted_associative_recall_output_inspection.txt
+?? reports/tables/section15_final_go_comparison.csv
+?? reports/tables/section15_final_go_matched_cells.csv

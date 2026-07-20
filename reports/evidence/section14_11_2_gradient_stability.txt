@@ -1,0 +1,38 @@
+Section 14.11.2 Gradient Stability — Recovery Evaluation
+========================================================
+Generated UTC:                           2026-07-19T01:40:10.016719+00:00
+Evaluation mode:                         current_pilot_results_only
+Pilot metric source:                     reports/tables/pilot_results.csv
+Pilot result rows:                       72 / 72
+Gradient column:                         maximum_gradient_norm
+Measurement scope:                       BudgetMem-R rows
+Observed gradient measurements:          18
+Non-finite measurements:                 0
+Maximum observed raw gradient:           0.0
+Raw-gradient acceptance limit:           100.000000
+Gradient clipping norm:                  1.000000
+
+pilot_results_present                       PASS
+pilot_matrix_has_expected_72_rows           PASS
+gradient_column_present                     PASS
+budgetmem_gradient_measurements_present     PASS
+all_gradient_measurements_finite            PASS
+maximum_raw_gradient_within_100             PASS
+gradient_flow_test                          PASS
+controller_calibration_test                 PASS
+gradient_clipping_implemented               PASS
+raw_gradient_limit_configured               PASS
+clip_norm_configured                        PASS
+
+Gradient stability:                      PASS
+
+Maximum-gradient row:
+  CSV row:                               20
+  Model:                                 budgetmem_r
+  Task:                                  selective_copy
+  Sequence length:                       256
+  Budget:                                NOT RECORDED
+  Seed:                                  2026
+
+Evidence JSON: reports/evidence/section14_11_2_gradient_stability.json
+Main log:     reports/evidence/logs/section14_11_2_recovery_20260719T013829Z.log

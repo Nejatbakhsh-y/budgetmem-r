@@ -1,0 +1,258 @@
+CURRENT DECISION EVIDENCE
+=========================
+
+
+------------------------------------------------------------
+FILE: reports/evidence/section15_final_go_decision.txt
+------------------------------------------------------------
+SECTION 15 FINAL GO/NO-GO DECISION
+==================================
+Decision: NO-GO
+
+Operational gate:
+- Long-range sequence length: >= 1024
+- Comparisons matched by task, sequence length, memory budget, and seed
+- Minimum absolute recall gain per clear win: 0.0200
+- Minimum policy-level clear-win rate: 67.00%
+- Minimum matched cells per policy: 4
+- Required outperformed fixed-policy baselines: 2
+- Policies satisfying the gate: 0
+
+Policy comparisons:
+- uniform_cache: BudgetMem-R=0.1568, policy=0.0103, mean gain=+0.1464, clear wins=2/6 (33.3%), qualifies=NO
+- reservoir_cache: BudgetMem-R=0.1568, policy=0.0621, mean gain=+0.0946, clear wins=2/6 (33.3%), qualifies=NO
+
+Qualified policies:
+- None
+
+Interpretation:
+NO-GO: BudgetMem-R did not clearly outperform at least 2 fixed-policy memory baselines. Return to Sections 14.9 and 14.10, tune the model, rerun the pilot, and rerun this gate.
+
+Source result files:
+- reports/tables/pilot_tuned_results.csv
+
+------------------------------------------------------------
+FILE: reports/evidence/section15_no_go_diagnostic.txt
+------------------------------------------------------------
+====================================================================================================
+SECTION 15 NO-GO DIAGNOSTIC
+====================================================================================================
+
+SECTION 15 FINAL GO/NO-GO DECISION
+==================================
+Decision: NO-GO
+
+Operational gate:
+- Long-range sequence length: >= 1024
+- Comparisons matched by task, sequence length, memory budget, and seed
+- Minimum absolute recall gain per clear win: 0.0200
+- Minimum policy-level clear-win rate: 67.00%
+- Minimum matched cells per policy: 4
+- Required outperformed fixed-policy baselines: 2
+- Policies satisfying the gate: 0
+
+Policy comparisons:
+- uniform_cache: BudgetMem-R=0.1568, policy=0.0103, mean gain=+0.1464, clear wins=2/6 (33.3%), qualifies=NO
+- reservoir_cache: BudgetMem-R=0.1568, policy=0.0621, mean gain=+0.0946, clear wins=2/6 (33.3%), qualifies=NO
+
+Qualified policies:
+- None
+
+Interpretation:
+NO-GO: BudgetMem-R did not clearly outperform at least 2 fixed-policy memory baselines. Return to Sections 14.9 and 14.10, tune the model, rerun the pilot, and rerun this gate.
+
+Source result files:
+- reports/tables/pilot_tuned_results.csv
+
+====================================================================================================
+POLICY-LEVEL COMPARISON
+====================================================================================================
+         policy  matched_same_budget_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_wins  clear_win_rate  qualifies_as_outperformed
+  uniform_cache                          6               0.156756            0.010344            0.146412              -0.013021           2        0.333333                      False
+reservoir_cache                          6               0.156756            0.062138            0.094618              -0.104167           2        0.333333                      False
+
+====================================================================================================
+POLICIES THAT FAILED THE GO GATE
+====================================================================================================
+         policy  matched_same_budget_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_wins  clear_win_rate  qualifies_as_outperformed
+reservoir_cache                          6               0.156756            0.062138            0.094618              -0.104167           2        0.333333                      False
+  uniform_cache                          6               0.156756            0.010344            0.146412              -0.013021           2        0.333333                      False
+
+====================================================================================================
+WORST MATCHED TASK/BUDGET CELLS
+====================================================================================================
+         policy                       task  sequence_length  budget  seed  budgetmem_recall  policy_recall  absolute_gain  clear_win
+reservoir_cache         associative_recall             1024      32  2026          0.000000       0.104167      -0.104167      False
+reservoir_cache         associative_recall             1024      16  2026          0.000000       0.062500      -0.062500      False
+reservoir_cache distractor_heavy_retrieval             1024      32  2026          0.019965       0.037326      -0.017361      False
+  uniform_cache distractor_heavy_retrieval             1024      32  2026          0.019965       0.032986      -0.013021      False
+  uniform_cache distractor_heavy_retrieval             1024      16  2026          0.018229       0.019965      -0.001736      False
+  uniform_cache         associative_recall             1024      32  2026          0.000000       0.000000       0.000000      False
+  uniform_cache         associative_recall             1024      16  2026          0.000000       0.000000       0.000000      False
+reservoir_cache distractor_heavy_retrieval             1024      16  2026          0.018229       0.011285       0.006944      False
+reservoir_cache             selective_copy             1024      16  2026          0.398438       0.049479       0.348958       True
+reservoir_cache             selective_copy             1024      32  2026          0.503906       0.108073       0.395833       True
+  uniform_cache             selective_copy             1024      16  2026          0.398438       0.000000       0.398438       True
+  uniform_cache             selective_copy             1024      32  2026          0.503906       0.009115       0.494792       True
+
+====================================================================================================
+TASK-LEVEL SUMMARY
+====================================================================================================
+                      task  matched_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_win_rate
+        associative_recall              4               0.000000            0.041667           -0.041667              -0.104167             0.0
+distractor_heavy_retrieval              4               0.019097            0.025391           -0.006293              -0.017361             0.0
+            selective_copy              4               0.451172            0.041667            0.409505               0.348958             1.0
+
+====================================================================================================
+BUDGET-LEVEL SUMMARY
+====================================================================================================
+ budget  matched_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_win_rate
+     16              6               0.138889            0.023872            0.115017              -0.062500        0.333333
+     32              6               0.174624            0.048611            0.126013              -0.104167        0.333333
+
+====================================================================================================
+REQUIRED NEXT ACTION
+====================================================================================================
+Weakest task: associative_recall (mean gain -0.041667)
+Weakest budget: 16
+
+Do not rerun the unchanged full pilot. Target the weakest task and budget in the next tuning revision.
+
+------------------------------------------------------------
+FILE: reports/evidence/targeted_associative_recall_output_inspection.txt
+------------------------------------------------------------
+====================================================================================================
+TARGETED ASSOCIATIVE-RECALL OUTPUT INSPECTION
+====================================================================================================
+
+CSV files inspected:
+
+- reports/tables/pilot_tuned_results.csv
+  Rows: 4
+  Columns: ['schema_version', 'experiment_name', 'task', 'model', 'model_source', 'sequence_length', 'memory_budget', 'seed', 'config_path', 'config_sha256', 'checkpoint_path', 'checkpoint_resume_pass', 'stability_pass', 'mean_loss', 'token_accuracy', 'exact_match_accuracy', 'relevant_state_retention_rate', 'irrelevant_state_retention_rate', 'memory_precision', 'memory_recall', 'average_retention_duration', 'successful_long_range_retrievals', 'cache_turnover', 'eviction_errors', 'write_frequency', 'recent_state_overlap', 'expected_random_retention', 'max_memory_size', 'budget_pass', 'wall_seconds', 'cpu_user_seconds', 'cpu_system_seconds', 'peak_rss_mb', 'tokens_per_second', 'parameter_count', 'resource_measurement_pass', 'train_first_loss', 'train_final_loss', 'maximum_gradient_norm']
+  Tasks: ['selective_copy']
+  Models: ['budgetmem_r', 'gru', 'gru_reservoir_cache', 'gru_uniform_cache']
+  Sequence lengths: [256]
+  Budgets: [16]
+  Recall column: memory_recall
+
+- reports/tables/pilot_tuning/all_candidate_results.csv
+  Rows: 18
+  Columns: ['schema_version', 'experiment_name', 'task', 'model', 'model_source', 'sequence_length', 'memory_budget', 'seed', 'config_path', 'config_sha256', 'checkpoint_path', 'checkpoint_resume_pass', 'stability_pass', 'mean_loss', 'token_accuracy', 'exact_match_accuracy', 'relevant_state_retention_rate', 'irrelevant_state_retention_rate', 'memory_precision', 'memory_recall', 'average_retention_duration', 'successful_long_range_retrievals', 'cache_turnover', 'eviction_errors', 'write_frequency', 'recent_state_overlap', 'expected_random_retention', 'max_memory_size', 'budget_pass', 'wall_seconds', 'cpu_user_seconds', 'cpu_system_seconds', 'peak_rss_mb', 'tokens_per_second', 'parameter_count', 'resource_measurement_pass', 'train_first_loss', 'train_final_loss', 'maximum_gradient_norm', 'candidate']
+  Tasks: ['associative_recall', 'distractor_heavy_retrieval', 'selective_copy']
+  Models: ['budgetmem_r']
+  Sequence lengths: [1024]
+  Budgets: [16, 32]
+  Recall column: memory_recall
+
+====================================================================================================
+TARGET-CELL RECOVERY
+====================================================================================================
+
+STATUS: TARGET_CELL_NOT_FOUND
+
+No CSV contains associative_recall at sequence length 1024 and budget 16 for all three required models.
+
+====================================================================================================
+RECENT JSON DECISIONS AND SUMMARIES
+====================================================================================================
+
+- reports/evidence/pilot_tuned_go_no_go.json
+  decision: Smoke validation only; do not use this result for the pilot decision.
+  criteria.outperforms_two_memory_policies: False
+  long_range_sequence_length: 1024
+  minimum_clear_accuracy_gain: 0.02
+  budgetmem_mean_write_frequency: 0.10693359375
+
+- reports/evidence/pilot_tuned_summary.json
+
+- reports/evidence/section15_final_go_decision.json
+  decision: NO-GO
+  criteria.minimum_absolute_recall_gain: 0.02
+  criteria.required_outperformed_policies: 2
+  comparisons.0.budgetmem_mean_recall: 0.15675636574074073
+  comparisons.0.policy_mean_recall: 0.010344328703703684
+  comparisons.0.mean_absolute_gain: 0.14641203703703703
+  comparisons.0.minimum_absolute_gain: -0.013020833333333398
+  comparisons.0.qualifies_as_outperformed: False
+  comparisons.1.budgetmem_mean_recall: 0.15675636574074073
+  comparisons.1.policy_mean_recall: 0.06213831018518514
+  comparisons.1.mean_absolute_gain: 0.09461805555555558
+  comparisons.1.minimum_absolute_gain: -0.1041666666666666
+  comparisons.1.qualifies_as_outperformed: False
+
+- reports/evidence/pilot_tuning/performance_tuning_decision.json
+  candidates.0.mean_token_accuracy: 0.004340277777777777
+  candidates.0.mean_memory_recall: 0.1023220486111111
+  candidates.0.mean_write_frequency: 0.045649210611979164
+  candidates.0.minimum_policy_gain: -0.0018807870370370064
+  candidates.0.write_frequency_pass: True
+  candidates.1.mean_token_accuracy: 0.008101851851851851
+  candidates.1.mean_memory_recall: 0.04260706018518518
+  candidates.1.mean_write_frequency: 0.035837809244791664
+  candidates.1.minimum_policy_gain: 0.001880787037037068
+  candidates.1.write_frequency_pass: True
+  candidates.2.mean_token_accuracy: 0.006076388888888888
+  candidates.2.mean_memory_recall: 0.1467013888888889
+  candidates.2.mean_write_frequency: 0.0266265869140625
+  candidates.2.minimum_policy_gain: -0.00014467592592589534
+  candidates.2.write_frequency_pass: True
+  selected_candidate.mean_token_accuracy: 0.008101851851851851
+  selected_candidate.mean_memory_recall: 0.04260706018518518
+  selected_candidate.mean_write_frequency: 0.035837809244791664
+  selected_candidate.minimum_policy_gain: 0.001880787037037068
+  selected_candidate.write_frequency_pass: True
+  screen_minimum_policy_gain_required: 0.01
+  full_pilot_required_clear_gain: 0.02
+
+- reports/evidence/pilot_tuning/capacity_10e_summary.json
+
+- reports/evidence/pilot_tuning/optimization_12e_summary.json
+
+- reports/evidence/pilot_tuning/optimization_8e_summary.json
+
+- reports/evidence/pilot_summary.json
+
+- reports/evidence/section15_controller_fix_summary.json
+  mean_budgetmem_write_frequency: 0.1318359375
+
+- reports/evidence/pilot_controller_calibration_summary.json
+  result.token_accuracy: 0.005208333333333333
+  result.exact_match_accuracy: 0.0
+  result.memory_recall: 0.10416666666666667
+  result.successful_long_range_retrievals: 0
+  result.write_frequency: 0.1318359375
+
+====================================================================================================
+FINAL DIAGNOSIS
+====================================================================================================
+
+Diagnosis: RESULT_SCHEMA_OR_MATRIX_MISMATCH
+
+Sequence length 1024 exists, but the required task, budget, model, or recall combination is missing.
+
+Do not rerun Script 20 unchanged. Its capture condition cannot be satisfied by the generated smoke outputs.
+
+------------------------------------------------------------
+FILE: reports/tables/section15_final_go_comparison.csv
+------------------------------------------------------------
+policy,matched_same_budget_cells,budgetmem_mean_recall,policy_mean_recall,mean_absolute_gain,minimum_absolute_gain,clear_wins,clear_win_rate,qualifies_as_outperformed
+uniform_cache,6,0.15675636574074073,0.010344328703703684,0.14641203703703703,-0.013020833333333398,2,0.3333333333333333,False
+reservoir_cache,6,0.15675636574074073,0.06213831018518514,0.09461805555555558,-0.1041666666666666,2,0.3333333333333333,False
+
+------------------------------------------------------------
+FILE: reports/tables/section15_final_go_matched_cells.csv
+------------------------------------------------------------
+policy,task,sequence_length,budget,seed,budgetmem_recall,policy_recall,absolute_gain,clear_win
+reservoir_cache,associative_recall,1024,16,2026,0.0,0.0625,-0.0625,False
+reservoir_cache,associative_recall,1024,32,2026,0.0,0.1041666666666666,-0.1041666666666666,False
+reservoir_cache,distractor_heavy_retrieval,1024,16,2026,0.0182291666666666,0.0112847222222222,0.006944444444444399,False
+reservoir_cache,distractor_heavy_retrieval,1024,32,2026,0.0199652777777777,0.0373263888888888,-0.017361111111111098,False
+reservoir_cache,selective_copy,1024,16,2026,0.3984375,0.0494791666666666,0.34895833333333337,True
+reservoir_cache,selective_copy,1024,32,2026,0.50390625,0.1080729166666666,0.39583333333333337,True
+uniform_cache,associative_recall,1024,16,2026,0.0,0.0,0.0,False
+uniform_cache,associative_recall,1024,32,2026,0.0,0.0,0.0,False
+uniform_cache,distractor_heavy_retrieval,1024,16,2026,0.0182291666666666,0.0199652777777777,-0.0017361111111111015,False
+uniform_cache,distractor_heavy_retrieval,1024,32,2026,0.0199652777777777,0.0329861111111111,-0.013020833333333398,False
+uniform_cache,selective_copy,1024,16,2026,0.3984375,0.0,0.3984375,True
+uniform_cache,selective_copy,1024,32,2026,0.50390625,0.0091145833333333,0.4947916666666667,True

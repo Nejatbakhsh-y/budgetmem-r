@@ -1,0 +1,31 @@
+SECTION 15 ASSOCIATIVE-RECALL CORE-REPAIR SCREEN
+================================================
+Decision: TARGETED_NO_GO
+
+Task: associative_recall
+Sequence length: 1024
+Budgets: [16, 32]
+Required recall gain over each policy at each budget: 0.0200
+
+Criteria:
+- Stability: False
+- Strict budget: True
+- Resource measurements: True
+- Nontrivial write frequency: True (0.088511)
+- Policies clearly outperformed: 2/2
+
+Matched comparisons:
+             policy  budget  budgetmem_memory_recall  policy_memory_recall  absolute_gain  clear_win
+  gru_uniform_cache      16                 0.239583              0.000000       0.239583       True
+  gru_uniform_cache      32                 0.562500              0.000000       0.562500       True
+gru_reservoir_cache      16                 0.239583              0.052083       0.187500       True
+gru_reservoir_cache      32                 0.562500              0.062500       0.500000       True
+
+Policy summary:
+             policy  matched_budgets  mean_gain  minimum_gain  clear_win_rate  qualifies
+gru_reservoir_cache                2   0.343750      0.187500             1.0       True
+  gru_uniform_cache                2   0.401042      0.239583             1.0       True
+
+Interpretation:
+The implementation repair did not yet satisfy the targeted gate.
+Do not start another complete 72-cell pilot.

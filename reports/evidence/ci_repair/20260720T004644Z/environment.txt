@@ -1,0 +1,5 @@
+Python executable: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/.venv/bin/python
+Python 3.12.3
+
+Pytest:
+pytest 9.1.1

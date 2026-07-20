@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "status": "SMOKE_ONLY",
+  "decision": "Smoke validation only; do not use this result for the pilot decision.",
+  "criteria": {
+    "training_stability": false,
+    "strict_memory_budget": true,
+    "nontrivial_controller_writes": true,
+    "not_recent_state_copying": true,
+    "retention_exceeds_random": false,
+    "resource_measurements_valid": true,
+    "checkpoint_resumption": true,
+    "configuration_provenance": true,
+    "outperforms_two_memory_policies": false
+  },
+  "long_range_sequence_length": 1024,
+  "long_range_token_accuracy": {
+    "budgetmem_r": 0.0,
+    "gru_uniform_cache": 0.0,
+    "gru_reservoir_cache": 0.0
+  },
+  "accuracy_gains": {
+    "gru_uniform_cache": 0.0,
+    "gru_reservoir_cache": 0.0
+  },
+  "minimum_clear_accuracy_gain": 0.02,
+  "policies_clearly_outperformed": [],
+  "budgetmem_mean_write_frequency": 0.10693359375,
+  "budgetmem_mean_recent_state_overlap": 0.0,
+  "budgetmem_mean_retention_advantage_over_random": 0.0
+}

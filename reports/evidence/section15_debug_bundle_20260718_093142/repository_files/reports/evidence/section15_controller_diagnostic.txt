@@ -1,0 +1,909 @@
+SECTION 15 BUDGETMEM-R CONTROLLER DIAGNOSTIC
+
+=== PILOT CONFIGURATION ===
+schema_version: "1.0"
+experiment_name: section15_pilot
+seed: 2026
+device: cpu
+
+pretraining_gate:
+  report: reports/evidence/pretraining_gate_report.json
+  required_status: PASS
+
+matrix:
+  tasks:
+    - selective_copy
+    - associative_recall
+    - distractor_heavy_retrieval
+  train_sequence_length: 256
+  evaluation_sequence_lengths: [256, 512, 1024]
+  memory_budgets: [16, 32]
+  models:
+    - gru
+    - gru_uniform_cache
+    - gru_reservoir_cache
+    - budgetmem_r
+
+model:
+  vocabulary_size: 192
+  embedding_dim: 32
+  hidden_dim: 64
+  key_dim: 32
+  retrieval_k: 4
+  max_target_length: 12
+  dropout: 0.0
+
+training:
+  train_samples: 128
+  validation_samples: 48
+  batch_size: 8
+  epochs: 4
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  gradient_clip_norm: 1.0
+  maximum_acceptable_gradient_norm: 100.0
+  budget_sampling: alternating
+  write_rate_target: 0.15
+  write_rate_penalty: 0.05
+  budget_violation_penalty: 10.0
+  num_workers: 0
+
+evaluation:
+  batch_size: 8
+  deterministic: true
+  recent_overlap_failure_threshold: 0.90
+  nontrivial_write_frequency_min: 0.01
+  nontrivial_write_frequency_max: 0.95
+  random_retention_margin: 0.01
+  minimum_clear_accuracy_gain: 0.02
+  long_range_sequence_length: 1024
+  resource_sample_interval_seconds: 0.01
+
+artifacts:
+  output_root: outputs/pilot
+  results_csv: reports/tables/pilot_results.csv
+  summary_json: reports/evidence/pilot_summary.json
+  gate_json: reports/evidence/pilot_go_no_go.json
+  report_markdown: reports/pilot_report.md
+  checkpoint_root: outputs/pilot/checkpoints
+
+=== BUDGETMEM-R IMPLEMENTATION ===
+     1	"""Budget-conditioned recurrent model with strict external-memory control."""
+     2	
+     3	from __future__ import annotations
+     4	
+     5	import math
+     6	from dataclasses import dataclass
+     7	from typing import Literal, Sequence
+     8	
+     9	import torch
+    10	from torch import Tensor, nn
+    11	from torch.nn import functional as F
+    12	
+    13	from budgetmem.memory.budget_state import ExternalMemoryState
+    14	
+    15	BackboneName = Literal["rnn", "gru", "lstm"]
+    16	FusionName = Literal["concatenation", "residual", "gated", "attention"]
+    17	
+    18	
+    19	@dataclass
+    20	class BudgetMemROutput:
+    21	    """Model outputs and diagnostics required by the benchmark."""
+    22	
+    23	    logits: Tensor
+    24	    sequence_logits: Tensor
+    25	    hidden_states: Tensor
+    26	    write_probabilities: Tensor
+    27	    hard_writes: Tensor
+    28	    write_slots: Tensor
+    29	    eviction_flags: Tensor
+    30	    retrieval_weights: Tensor
+    31	    memory_masks: Tensor
+    32	    memory_sizes: Tensor
+    33	    budgets: Tensor
+    34	    auxiliary_mean: Tensor
+    35	    auxiliary_log_variance: Tensor
+    36	    inputs: Tensor
+    37	    final_memory: ExternalMemoryState
+    38	
+    39	
+    40	class BudgetConditioner(nn.Module):
+    41	    """Encode a normalized requested budget into a dense representation."""
+    42	
+    43	    def __init__(self, embedding_dim: int) -> None:
+    44	        super().__init__()
+    45	        self.network = nn.Sequential(
+    46	            nn.Linear(1, embedding_dim),
+    47	            nn.Tanh(),
+    48	            nn.Linear(embedding_dim, embedding_dim),
+    49	            nn.Tanh(),
+    50	        )
+    51	
+    52	    def forward(self, normalized_budget: Tensor) -> Tensor:
+    53	        return self.network(normalized_budget.unsqueeze(-1))
+    54	
+    55	
+    56	class WriteController(nn.Module):
+    57	    """Estimate whether the current state should be written to memory."""
+    58	
+    59	    def __init__(self, hidden_dim: int, budget_embedding_dim: int) -> None:
+    60	        super().__init__()
+    61	        feature_dim = hidden_dim + budget_embedding_dim + 6
+    62	        self.network = nn.Sequential(
+    63	            nn.Linear(feature_dim, hidden_dim),
+    64	            nn.GELU(),
+    65	            nn.Linear(hidden_dim, 1),
+    66	        )
+    67	
+    68	    def forward(
+    69	        self,
+    70	        *,
+    71	        hidden: Tensor,
+    72	        novelty: Tensor,
+    73	        surprise: Tensor,
+    74	        uncertainty: Tensor,
+    75	        occupancy: Tensor,
+    76	        recency: Tensor,
+    77	        agreement: Tensor,
+    78	        budget_embedding: Tensor,
+    79	    ) -> Tensor:
+    80	        features = torch.cat(
+    81	            [
+    82	                hidden,
+    83	                novelty.unsqueeze(-1),
+    84	                surprise.unsqueeze(-1),
+    85	                uncertainty.unsqueeze(-1),
+    86	                occupancy.unsqueeze(-1),
+    87	                recency.unsqueeze(-1),
+    88	                agreement.unsqueeze(-1),
+    89	                budget_embedding,
+    90	            ],
+    91	            dim=-1,
+    92	        )
+    93	        return self.network(features).squeeze(-1)
+    94	
+    95	
+    96	class UtilityController(nn.Module):
+    97	    """Predict future utility for every occupied memory slot."""
+    98	
+    99	    def __init__(
+   100	        self,
+   101	        *,
+   102	        key_dim: int,
+   103	        value_dim: int,
+   104	        hidden_dim: int,
+   105	        budget_embedding_dim: int,
+   106	    ) -> None:
+   107	        super().__init__()
+   108	        feature_dim = key_dim + value_dim + hidden_dim + budget_embedding_dim + 2
+   109	        self.network = nn.Sequential(
+   110	            nn.Linear(feature_dim, hidden_dim),
+   111	            nn.GELU(),
+   112	            nn.Linear(hidden_dim, 1),
+   113	        )
+   114	
+   115	    def forward(
+   116	        self,
+   117	        *,
+   118	        memory: ExternalMemoryState,
+   119	        hidden: Tensor,
+   120	        budget_embedding: Tensor,
+   121	        sequence_length: int,
+   122	    ) -> Tensor:
+   123	        slots = memory.max_budget
+   124	        hidden_expanded = hidden.unsqueeze(1).expand(-1, slots, -1)
+   125	        budget_expanded = budget_embedding.unsqueeze(1).expand(-1, slots, -1)
+   126	        age = memory.age / max(float(sequence_length), 1.0)
+   127	        retrieval_frequency = memory.retrieval_count / max(float(sequence_length), 1.0)
+   128	        features = torch.cat(
+   129	            [
+   130	                memory.keys,
+   131	                memory.values,
+   132	                hidden_expanded,
+   133	                budget_expanded,
+   134	                age.unsqueeze(-1),
+   135	                retrieval_frequency.unsqueeze(-1),
+   136	            ],
+   137	            dim=-1,
+   138	        )
+   139	        return self.network(features).squeeze(-1)
+   140	
+   141	
+   142	class MemoryFusion(nn.Module):
+   143	    """Fuse retrieved memory with the recurrent state."""
+   144	
+   145	    def __init__(
+   146	        self,
+   147	        *,
+   148	        hidden_dim: int,
+   149	        value_dim: int,
+   150	        mode: FusionName,
+   151	    ) -> None:
+   152	        super().__init__()
+   153	        self.mode = mode
+   154	        self.memory_projection = nn.Linear(value_dim, hidden_dim)
+   155	        self.concatenate = nn.Linear(hidden_dim * 2, hidden_dim)
+   156	        self.gate = nn.Linear(hidden_dim * 2, hidden_dim)
+   157	        self.attention_score = nn.Linear(hidden_dim, 1)
+   158	        self.normalization = nn.LayerNorm(hidden_dim)
+   159	
+   160	    def forward(self, hidden: Tensor, retrieved: Tensor) -> Tensor:
+   161	        projected = self.memory_projection(retrieved)
+   162	        if self.mode == "concatenation":
+   163	            return torch.tanh(self.concatenate(torch.cat([hidden, projected], dim=-1)))
+   164	        if self.mode == "residual":
+   165	            return self.normalization(hidden + projected)
+   166	        if self.mode == "gated":
+   167	            gate = torch.sigmoid(self.gate(torch.cat([hidden, projected], dim=-1)))
+   168	            return self.normalization(gate * projected + (1.0 - gate) * hidden)
+   169	        if self.mode == "attention":
+   170	            candidates = torch.stack([hidden, projected], dim=1)
+   171	            weights = torch.softmax(self.attention_score(candidates).squeeze(-1), dim=1)
+   172	            return self.normalization((weights.unsqueeze(-1) * candidates).sum(dim=1))
+   173	        raise ValueError(f"unsupported fusion mode: {self.mode}")
+   174	
+   175	
+   176	class BudgetMemR(nn.Module):
+   177	    """BudgetMem-R with write, utility-based eviction, retrieval, and fusion.
+   178	
+   179	    The forward method intentionally accepts no final classification or anomaly
+   180	    label. All write-controller signals are computed from the observed input
+   181	    sequence, recurrent state, external memory, and auxiliary next-input model.
+   182	    """
+   183	
+   184	    def __init__(
+   185	        self,
+   186	        *,
+   187	        input_dim: int,
+   188	        hidden_dim: int,
+   189	        output_dim: int,
+   190	        max_budget: int = 128,
+   191	        allowed_budgets: Sequence[int] = (8, 16, 32, 64, 128),
+   192	        key_dim: int | None = None,
+   193	        value_dim: int | None = None,
+   194	        budget_embedding_dim: int = 16,
+   195	        retrieval_k: int = 4,
+   196	        backbone: BackboneName = "gru",
+   197	        fusion: FusionName = "gated",
+   198	        write_threshold: float = 0.5,
+   199	        write_temperature: float = 0.67,
+   200	        detach_memory_writes: bool = False,
+   201	    ) -> None:
+   202	        super().__init__()
+   203	        if input_dim < 1 or hidden_dim < 1 or output_dim < 1:
+   204	            raise ValueError("input_dim, hidden_dim, and output_dim must be positive")
+   205	        if max_budget < 1:
+   206	            raise ValueError("max_budget must be positive")
+   207	        if retrieval_k < 1:
+   208	            raise ValueError("retrieval_k must be positive")
+   209	        if not 0.0 <= write_threshold <= 1.0:
+   210	            raise ValueError("write_threshold must be in [0, 1]")
+   211	        if write_temperature <= 0.0:
+   212	            raise ValueError("write_temperature must be positive")
+   213	        normalized_budgets = tuple(sorted({int(value) for value in allowed_budgets}))
+   214	        if not normalized_budgets:
+   215	            raise ValueError("allowed_budgets must not be empty")
+   216	        if normalized_budgets[0] < 1 or normalized_budgets[-1] > max_budget:
+   217	            raise ValueError("allowed_budgets must be within [1, max_budget]")
+   218	
+   219	        self.input_dim = input_dim
+   220	        self.hidden_dim = hidden_dim
+   221	        self.output_dim = output_dim
+   222	        self.max_budget = max_budget
+   223	        self.allowed_budgets = normalized_budgets
+   224	        self.key_dim = key_dim or hidden_dim
+   225	        self.value_dim = value_dim or hidden_dim
+   226	        self.retrieval_k = min(retrieval_k, max_budget)
+   227	        self.backbone_name = backbone
+   228	        self.write_threshold = write_threshold
+   229	        self.write_temperature = write_temperature
+   230	        self.detach_memory_writes = detach_memory_writes
+   231	
+   232	        if backbone == "rnn":
+   233	            self.recurrent_cell: nn.Module = nn.RNNCell(input_dim, hidden_dim)
+   234	        elif backbone == "gru":
+   235	            self.recurrent_cell = nn.GRUCell(input_dim, hidden_dim)
+   236	        elif backbone == "lstm":
+   237	            self.recurrent_cell = nn.LSTMCell(input_dim, hidden_dim)
+   238	        else:
+   239	            raise ValueError(f"unsupported recurrent backbone: {backbone}")
+   240	
+   241	        self.key_projection = nn.Linear(hidden_dim, self.key_dim)
+   242	        self.value_projection = nn.Linear(hidden_dim, self.value_dim)
+   243	        self.query_projection = nn.Linear(hidden_dim, self.key_dim)
+   244	        self.budget_conditioner = BudgetConditioner(budget_embedding_dim)
+   245	        self.write_controller = WriteController(hidden_dim, budget_embedding_dim)
+   246	        self.utility_controller = UtilityController(
+   247	            key_dim=self.key_dim,
+   248	            value_dim=self.value_dim,
+   249	            hidden_dim=hidden_dim,
+   250	            budget_embedding_dim=budget_embedding_dim,
+   251	        )
+   252	        self.fusion = MemoryFusion(
+   253	            hidden_dim=hidden_dim,
+   254	            value_dim=self.value_dim,
+   255	            mode=fusion,
+   256	        )
+   257	        self.output_head = nn.Linear(hidden_dim, output_dim)
+   258	        self.auxiliary_head = nn.Linear(hidden_dim, input_dim * 2)
+   259	
+   260	    def sample_budgets(self, batch_size: int, device: torch.device) -> Tensor:
+   261	        """Sample one allowed deployment budget per sample."""
+   262	        choices = torch.tensor(self.allowed_budgets, device=device, dtype=torch.long)
+   263	        indices = torch.randint(
+   264	            0, len(self.allowed_budgets), (batch_size,), device=device
+   265	        )
+   266	        return choices[indices]
+   267	
+   268	    def _resolve_budgets(
+   269	        self,
+   270	        budget: int | Tensor | None,
+   271	        *,
+   272	        batch_size: int,
+   273	        device: torch.device,
+   274	    ) -> Tensor:
+   275	        if budget is None:
+   276	            if self.training:
+   277	                budgets = self.sample_budgets(batch_size, device)
+   278	            else:
+   279	                budgets = torch.full(
+   280	                    (batch_size,),
+   281	                    fill_value=self.allowed_budgets[-1],
+   282	                    device=device,
+   283	                    dtype=torch.long,
+   284	                )
+   285	        elif isinstance(budget, int):
+   286	            budgets = torch.full(
+   287	                (batch_size,),
+   288	                fill_value=budget,
+   289	                device=device,
+   290	                dtype=torch.long,
+   291	            )
+   292	        else:
+   293	            budgets = budget.to(device=device, dtype=torch.long)
+   294	            if budgets.ndim == 0:
+   295	                budgets = budgets.repeat(batch_size)
+   296	        if budgets.shape != (batch_size,):
+   297	            raise ValueError(
+   298	                "budget must be an integer, scalar tensor, or [batch] tensor"
+   299	            )
+   300	        if torch.any(budgets < 1) or torch.any(budgets > self.max_budget):
+   301	            raise ValueError("every requested budget must be within [1, max_budget]")
+   302	        return budgets
+   303	
+   304	    def _recurrent_step(
+   305	        self,
+   306	        input_t: Tensor,
+   307	        hidden: Tensor,
+   308	        cell: Tensor | None,
+   309	    ) -> tuple[Tensor, Tensor | None]:
+   310	        if self.backbone_name == "lstm":
+   311	            assert cell is not None
+   312	            next_hidden, next_cell = self.recurrent_cell(input_t, (hidden, cell))
+   313	            return next_hidden, next_cell
+   314	        next_hidden = self.recurrent_cell(input_t, hidden)
+   315	        return next_hidden, cell
+   316	
+   317	    def _retrieve(
+   318	        self,
+   319	        *,
+   320	        hidden: Tensor,
+   321	        memory: ExternalMemoryState,
+   322	    ) -> tuple[Tensor, Tensor, ExternalMemoryState]:
+   323	        query = self.query_projection(hidden)
+   324	        scores = torch.einsum("bd,bsd->bs", query, memory.keys)
+   325	        scores = scores / math.sqrt(float(self.key_dim))
+   326	        scores = scores.masked_fill(~memory.valid, -1.0e9)
+   327	
+   328	        top_scores, top_indices = torch.topk(scores, k=self.retrieval_k, dim=1)
+   329	        top_valid = torch.gather(memory.valid, dim=1, index=top_indices)
+   330	        stable_scores = torch.where(
+   331	            top_valid, top_scores, torch.full_like(top_scores, -1.0e9)
+   332	        )
+   333	        weights = torch.softmax(stable_scores, dim=1) * top_valid.to(scores.dtype)
+   334	        weights = weights / weights.sum(dim=1, keepdim=True).clamp_min(1.0e-8)
+   335	
+   336	        gather_index = top_indices.unsqueeze(-1).expand(-1, -1, self.value_dim)
+   337	        top_values = torch.gather(memory.values, dim=1, index=gather_index)
+   338	        retrieved = (weights.unsqueeze(-1) * top_values).sum(dim=1)
+   339	
+   340	        dense_weights = torch.zeros_like(scores)
+   341	        dense_weights = dense_weights.scatter_add(1, top_indices, weights)
+   342	        memory.retrieval_count = memory.retrieval_count + dense_weights.detach()
+   343	        return retrieved, dense_weights, memory
+   344	
+   345	    def _novelty(self, key: Tensor, memory: ExternalMemoryState) -> Tensor:
+   346	        normalized_key = F.normalize(key, p=2, dim=-1, eps=1.0e-8)
+   347	        normalized_memory = F.normalize(memory.keys, p=2, dim=-1, eps=1.0e-8)
+   348	        similarities = torch.einsum("bd,bsd->bs", normalized_key, normalized_memory)
+   349	        similarities = similarities.masked_fill(~memory.valid, -1.0)
+   350	        maximum_similarity = similarities.max(dim=1).values
+   351	        has_memory = memory.valid.any(dim=1)
+   352	        novelty = (1.0 - maximum_similarity).clamp(min=0.0, max=2.0)
+   353	        return torch.where(has_memory, novelty, torch.ones_like(novelty))
+   354	
+   355	    def _agreement(self, hidden: Tensor, retrieved: Tensor) -> Tensor:
+   356	        projected = self.fusion.memory_projection(retrieved)
+   357	        similarity = F.cosine_similarity(hidden, projected, dim=-1, eps=1.0e-8)
+   358	        return (similarity + 1.0) * 0.5
+   359	
+   360	    def _write_gate(self, logits: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+   361	        probabilities = torch.sigmoid(logits)
+   362	        if self.training:
+   363	            uniform = torch.rand_like(logits).clamp_(1.0e-6, 1.0 - 1.0e-6)
+   364	            logistic_noise = torch.log(uniform) - torch.log1p(-uniform)
+   365	            relaxed = torch.sigmoid((logits + logistic_noise) / self.write_temperature)
+   366	            hard = (relaxed >= self.write_threshold).to(logits.dtype)
+   367	            straight_through = hard.detach() - relaxed.detach() + relaxed
+   368	            return probabilities, hard, straight_through
+   369	        hard = (probabilities >= self.write_threshold).to(logits.dtype)
+   370	        return probabilities, hard, hard
+   371	
+   372	    def _choose_write_slots(
+   373	        self,
+   374	        *,
+   375	        hard_write: Tensor,
+   376	        memory: ExternalMemoryState,
+   377	        utility_scores: Tensor,
+   378	    ) -> tuple[Tensor, Tensor, Tensor]:
+   379	        batch_size = memory.batch_size
+   380	        allowed = memory.allowed_slot_mask()
+   381	        free = allowed & ~memory.valid
+   382	        has_free = free.any(dim=1)
+   383	        first_free = free.to(torch.int64).argmax(dim=1)
+   384	        free_selection = F.one_hot(
+   385	            first_free,
+   386	            num_classes=memory.max_budget,
+   387	        ).to(utility_scores.dtype)
+   388	
+   389	        eviction_logits = (-utility_scores).masked_fill(~memory.valid, -1.0e9)
+   390	        if self.training:
+   391	            eviction_selection = F.gumbel_softmax(
+   392	                eviction_logits,
+   393	                tau=self.write_temperature,
+   394	                hard=True,
+   395	                dim=1,
+   396	            )
+   397	        else:
+   398	            eviction_slot = utility_scores.masked_fill(
+   399	                ~memory.valid,
+   400	                torch.inf,
+   401	            ).argmin(dim=1)
+   402	            eviction_selection = F.one_hot(
+   403	                eviction_slot,
+   404	                num_classes=memory.max_budget,
+   405	            ).to(utility_scores.dtype)
+   406	
+   407	        selection = torch.where(
+   408	            has_free.unsqueeze(1),
+   409	            free_selection,
+   410	            eviction_selection,
+   411	        )
+   412	        selection = selection * hard_write.unsqueeze(1)
+   413	        selected = selection.argmax(dim=1)
+   414	        no_write_value = torch.full_like(selected, -1)
+   415	        selected = torch.where(
+   416	            hard_write.to(torch.bool),
+   417	            selected,
+   418	            no_write_value,
+   419	        )
+   420	        evicted = hard_write.to(torch.bool) & ~has_free
+   421	        if selected.shape != (batch_size,):
+   422	            raise RuntimeError("internal write-slot selection failure")
+   423	        return selected, evicted, selection
+   424	
+   425	    def _apply_writes(
+   426	        self,
+   427	        *,
+   428	        memory: ExternalMemoryState,
+   429	        candidate_key: Tensor,
+   430	        candidate_value: Tensor,
+   431	        write_slots: Tensor,
+   432	        selection_weights: Tensor,
+   433	        hard_write: Tensor,
+   434	        straight_through_gate: Tensor,
+   435	        step: int,
+   436	    ) -> ExternalMemoryState:
+   437	        active = write_slots >= 0
+   438	        safe_slots = write_slots.clamp_min(0)
+   439	        hard_selected_weights = F.one_hot(
+   440	            safe_slots,
+   441	            num_classes=memory.max_budget,
+   442	        ).to(dtype=memory.keys.dtype)
+   443	        hard_selected_weights = hard_selected_weights * active.unsqueeze(1).to(
+   444	            hard_selected_weights.dtype
+   445	        )
+   446	        gate = selection_weights * straight_through_gate.unsqueeze(1)
+   447	        gate_3d = gate.unsqueeze(-1)
+   448	
+   449	        source_key = (
+   450	            candidate_key.detach() if self.detach_memory_writes else candidate_key
+   451	        )
+   452	        source_value = (
+   453	            candidate_value.detach() if self.detach_memory_writes else candidate_value
+   454	        )
+   455	        memory.keys = memory.keys * (1.0 - gate_3d) + source_key.unsqueeze(1) * gate_3d
+   456	        memory.values = (
+   457	            memory.values * (1.0 - gate_3d) + source_value.unsqueeze(1) * gate_3d
+   458	        )
+   459	
+   460	        hard_selected = hard_selected_weights.to(torch.bool) & hard_write.to(
+   461	            torch.bool
+   462	        ).unsqueeze(1)
+   463	        memory.valid = memory.valid | hard_selected
+   464	        memory.utility = memory.utility * (1.0 - hard_selected_weights)
+   465	        memory.age = memory.age * (1.0 - hard_selected_weights)
+   466	        memory.retrieval_count = memory.retrieval_count * (1.0 - hard_selected_weights)
+   467	        memory.last_write_step = torch.where(
+   468	            hard_write.to(torch.bool),
+   469	            torch.full_like(memory.last_write_step, step),
+   470	            memory.last_write_step,
+   471	        )
+   472	        memory.assert_invariant()
+   473	        return memory
+   474	
+   475	    def forward(
+   476	        self,
+   477	        inputs: Tensor,
+   478	        budget: int | Tensor | None = None,
+   479	    ) -> BudgetMemROutput:
+   480	        """Process ``inputs`` without exposing final task labels to memory control."""
+   481	        if inputs.ndim != 3:
+   482	            raise ValueError("inputs must have shape [batch, sequence, input_dim]")
+   483	        if inputs.shape[-1] != self.input_dim:
+   484	            raise ValueError("the last input dimension does not match input_dim")
+   485	
+   486	        batch_size, sequence_length, _ = inputs.shape
+   487	        if sequence_length < 1:
+   488	            raise ValueError("sequence length must be positive")
+   489	        budgets = self._resolve_budgets(
+   490	            budget,
+   491	            batch_size=batch_size,
+   492	            device=inputs.device,
+   493	        )
+   494	        normalized_budget = budgets.to(inputs.dtype) / float(self.max_budget)
+   495	        budget_embedding = self.budget_conditioner(normalized_budget)
+   496	
+   497	        memory = ExternalMemoryState.empty(
+   498	            batch_size=batch_size,
+   499	            max_budget=self.max_budget,
+   500	            key_dim=self.key_dim,
+   501	            value_dim=self.value_dim,
+   502	            budgets=budgets,
+   503	            device=inputs.device,
+   504	            dtype=inputs.dtype,
+   505	        )
+   506	        hidden = torch.zeros(
+   507	            batch_size, self.hidden_dim, device=inputs.device, dtype=inputs.dtype
+   508	        )
+   509	        cell = torch.zeros_like(hidden) if self.backbone_name == "lstm" else None
+   510	        previous_aux_mean: Tensor | None = None
+   511	        previous_aux_log_variance: Tensor | None = None
+   512	
+   513	        hidden_history: list[Tensor] = []
+   514	        logits_history: list[Tensor] = []
+   515	        write_probability_history: list[Tensor] = []
+   516	        hard_write_history: list[Tensor] = []
+   517	        write_slot_history: list[Tensor] = []
+   518	        eviction_history: list[Tensor] = []
+   519	        retrieval_weight_history: list[Tensor] = []
+   520	        memory_mask_history: list[Tensor] = []
+   521	        memory_size_history: list[Tensor] = []
+   522	        auxiliary_mean_history: list[Tensor] = []
+   523	        auxiliary_log_variance_history: list[Tensor] = []
+   524	
+   525	        for step in range(sequence_length):
+   526	            input_t = inputs[:, step]
+   527	            memory.increment_age()
+   528	            hidden, cell = self._recurrent_step(input_t, hidden, cell)
+   529	
+   530	            retrieved, retrieval_weights, memory = self._retrieve(
+   531	                hidden=hidden,
+   532	                memory=memory,
+   533	            )
+   534	            fused_hidden = self.fusion(hidden, retrieved)
+   535	            key = self.key_projection(hidden)
+   536	            value = self.value_projection(hidden)
+   537	
+   538	            if previous_aux_mean is None or previous_aux_log_variance is None:
+   539	                surprise = torch.zeros(
+   540	                    batch_size, device=inputs.device, dtype=inputs.dtype
+   541	                )
+   542	                uncertainty = torch.zeros_like(surprise)
+   543	            else:
+   544	                inverse_variance = torch.exp(-previous_aux_log_variance)
+   545	                squared_error = (input_t - previous_aux_mean).pow(2)
+   546	                surprise = 0.5 * (
+   547	                    inverse_variance * squared_error + previous_aux_log_variance
+   548	                ).mean(dim=-1)
+   549	                uncertainty = torch.exp(previous_aux_log_variance).mean(dim=-1)
+   550	
+   551	            novelty = self._novelty(key, memory)
+   552	            occupancy = memory.sizes().to(inputs.dtype) / budgets.to(inputs.dtype)
+   553	            recency = (step - memory.last_write_step.clamp_min(0)).to(
+   554	                inputs.dtype
+   555	            ) / float(max(sequence_length, 1))
+   556	            agreement = self._agreement(hidden, retrieved)
+   557	
+   558	            write_logits = self.write_controller(
+   559	                hidden=hidden,
+   560	                novelty=novelty,
+   561	                surprise=surprise,
+   562	                uncertainty=uncertainty,
+   563	                occupancy=occupancy,
+   564	                recency=recency,
+   565	                agreement=agreement,
+   566	                budget_embedding=budget_embedding,
+   567	            )
+   568	            write_probability, hard_write, straight_through_gate = self._write_gate(
+   569	                write_logits
+   570	            )
+   571	            utility_scores = self.utility_controller(
+   572	                memory=memory,
+   573	                hidden=hidden,
+   574	                budget_embedding=budget_embedding,
+   575	                sequence_length=sequence_length,
+   576	            )
+   577	            memory.utility = utility_scores
+   578	            write_slots, evicted, selection_weights = self._choose_write_slots(
+   579	                hard_write=hard_write,
+   580	                memory=memory,
+   581	                utility_scores=utility_scores,
+   582	            )
+   583	            memory = self._apply_writes(
+   584	                memory=memory,
+   585	                candidate_key=key,
+   586	                candidate_value=value,
+   587	                write_slots=write_slots,
+   588	                selection_weights=selection_weights,
+   589	                hard_write=hard_write,
+   590	                straight_through_gate=straight_through_gate,
+   591	                step=step,
+   592	            )
+   593	
+   594	            auxiliary_parameters = self.auxiliary_head(fused_hidden)
+   595	            auxiliary_mean, auxiliary_log_variance = auxiliary_parameters.chunk(
+   596	                2, dim=-1
+   597	            )
+   598	            auxiliary_log_variance = auxiliary_log_variance.clamp(min=-8.0, max=8.0)
+   599	            previous_aux_mean = auxiliary_mean
+   600	            previous_aux_log_variance = auxiliary_log_variance
+   601	
+   602	            step_logits = self.output_head(fused_hidden)
+   603	            hidden = fused_hidden
+   604	
+   605	            hidden_history.append(fused_hidden)
+   606	            logits_history.append(step_logits)
+   607	            write_probability_history.append(write_probability)
+   608	            hard_write_history.append(hard_write)
+   609	            write_slot_history.append(write_slots)
+   610	            eviction_history.append(evicted)
+   611	            retrieval_weight_history.append(retrieval_weights)
+   612	            memory_mask_history.append(memory.valid.clone())
+   613	            memory_size_history.append(memory.sizes())
+   614	            auxiliary_mean_history.append(auxiliary_mean)
+   615	            auxiliary_log_variance_history.append(auxiliary_log_variance)
+   616	
+   617	        sequence_logits = torch.stack(logits_history, dim=1)
+   618	        memory_sizes = torch.stack(memory_size_history, dim=1)
+   619	        if torch.any(memory_sizes > budgets.unsqueeze(1)):
+   620	            raise RuntimeError("strict memory-budget invariant violated during forward")
+   621	
+   622	        return BudgetMemROutput(
+   623	            logits=sequence_logits[:, -1],
+   624	            sequence_logits=sequence_logits,
+   625	            hidden_states=torch.stack(hidden_history, dim=1),
+   626	            write_probabilities=torch.stack(write_probability_history, dim=1),
+   627	            hard_writes=torch.stack(hard_write_history, dim=1),
+   628	            write_slots=torch.stack(write_slot_history, dim=1),
+   629	            eviction_flags=torch.stack(eviction_history, dim=1),
+   630	            retrieval_weights=torch.stack(retrieval_weight_history, dim=1),
+   631	            memory_masks=torch.stack(memory_mask_history, dim=1),
+   632	            memory_sizes=memory_sizes,
+   633	            budgets=budgets,
+   634	            auxiliary_mean=torch.stack(auxiliary_mean_history, dim=1),
+   635	            auxiliary_log_variance=torch.stack(
+   636	                auxiliary_log_variance_history,
+   637	                dim=1,
+   638	            ),
+   639	            inputs=inputs,
+   640	            final_memory=memory,
+   641	        )
+
+=== PILOT CONTROLLER REFERENCES ===
+1:"""Configuration-driven Section 15 pilot experiment for BudgetMem-R.
+52:    write_probabilities: Tensor | None = None
+53:    hard_writes: Tensor | None = None
+56:    retention_ages: list[list[float]] = field(default_factory=list)
+57:    write_counts: Tensor | None = None
+70:    maximum_gradient_norm: float
+170:        "_budgetmem_pilot_synthetic_generator",
+281:    def forward(self, input_ids: Tensor, *, budget: int) -> PilotOutput:
+282:        del budget
+304:        self.max_budget = max(map(int, matrix_cfg["memory_budgets"]))
+326:    def _uniform_schedule(length: int, budget: int) -> dict[int, int]:
+327:        positions = np.linspace(0, length - 1, num=budget, dtype=int).tolist()
+334:        while len(unique) < budget and cursor < length:
+338:        unique = sorted(unique[:budget])
+341:    def forward(self, input_ids: Tensor, *, budget: int) -> PilotOutput:
+342:        if not 1 <= int(budget) <= self.max_budget:
+343:            raise ValueError(f"budget must be in [1, {self.max_budget}]")
+344:        budget = int(budget)
+353:            budget,
+358:        valid = torch.zeros(batch_size, budget, device=device, dtype=torch.bool)
+360:            (batch_size, budget),
+365:        write_counts = torch.zeros(batch_size, device=device, dtype=torch.long)
+368:        hard_writes: list[Tensor] = []
+370:        schedule = self._uniform_schedule(sequence_length, budget)
+400:                if step < budget:
+418:                    replace_mask = selected_slots < budget
+419:                    for slot in range(budget):
+431:            write_counts += wrote.long()
+433:            hard_writes.append(wrote)
+453:            hard_writes=torch.stack(hard_writes, dim=1),
+456:            retention_ages=ages,
+457:            write_counts=write_counts,
+462:class BudgetMemRAdapter(nn.Module):
+463:    """Adapt the Section 13 BudgetMemR implementation to token tasks."""
+475:        self.allowed_budgets = tuple(map(int, matrix_cfg["memory_budgets"]))
+476:        self.max_budget = max(self.allowed_budgets)
+480:        module = importlib.import_module("budgetmem.models.budgetmem_r")
+481:        budgetmem_class = getattr(module, "BudgetMemR")
+482:        self.core_signature = str(inspect.signature(budgetmem_class))
+483:        kwargs = self._constructor_kwargs(budgetmem_class)
+484:        self.core = budgetmem_class(**kwargs)
+486:    def _constructor_kwargs(self, budgetmem_class: type[nn.Module]) -> dict[str, Any]:
+487:        signature = inspect.signature(budgetmem_class)
+498:            "max_budget": self.max_budget,
+499:            "allowed_budgets": self.allowed_budgets,
+500:            "memory_budget": self.max_budget,
+501:            "memory_size": self.max_budget,
+502:            "capacity": self.max_budget,
+505:            "budget_embedding_dim": 8,
+506:            "budget_dim": 8,
+507:            "controller_hidden_dim": self.hidden_dim,
+508:            "retrieval_k": min(self.retrieval_k, self.max_budget),
+509:            "top_k": min(self.retrieval_k, self.max_budget),
+510:            "read_k": min(self.retrieval_k, self.max_budget),
+515:            "write_threshold": 0.5,
+516:            "temperature": 1.0,
+532:                "Cannot construct BudgetMemR. Unmapped required parameters: "
+549:        raise TypeError("BudgetMemR output does not expose logits")
+551:    def _call_core(self, embedded: Tensor, budget: int) -> Any:
+554:        budget_tensor = torch.full(
+556:            int(budget),
+561:        if "budget" in params:
+562:            kwargs["budget"] = budget_tensor
+563:        elif "budgets" in params:
+564:            kwargs["budgets"] = budget_tensor
+565:        elif "memory_budget" in params:
+566:            kwargs["memory_budget"] = budget_tensor
+567:        elif "memory_budgets" in params:
+568:            kwargs["memory_budgets"] = budget_tensor
+571:                "BudgetMemR.forward must accept budget information. Signature: "
+576:    def forward(self, input_ids: Tensor, *, budget: int) -> PilotOutput:
+578:        raw = self._call_core(embedded, int(budget))
+586:                f"Unsupported BudgetMemR logits shape: {tuple(raw_logits.shape)}"
+590:                "BudgetMemR output dimension mismatch. Expected "
+601:        write_probabilities = getattr(raw, "write_probabilities", None)
+602:        hard_writes = getattr(raw, "hard_writes", None)
+605:        if memory_sizes is None or hard_writes is None or final_memory is None:
+607:                "BudgetMemROutput must expose memory_sizes, hard_writes, and "
+625:        write_counts = hard_writes.long().sum(dim=1)
+627:            eviction_counts = torch.zeros_like(write_counts)
+633:            write_probabilities=write_probabilities,
+634:            hard_writes=hard_writes,
+637:            retention_ages=ages,
+638:            write_counts=write_counts,
+662:    if model_name == "budgetmem_r":
+663:        return BudgetMemRAdapter(cfg), "src/budgetmem/models/budgetmem_r.py"
+672:    return F.cross_entropy(
+684:    budget: int,
+688:    if model_name != "budgetmem_r":
+691:    if output.write_probabilities is not None:
+692:        write_rate = output.write_probabilities.float().mean()
+693:        target_rate = float(training_cfg["write_rate_target"])
+696:            + float(training_cfg["write_rate_penalty"])
+697:            * (write_rate - target_rate).square()
+700:        overflow = torch.relu(output.memory_sizes.float() - float(budget)).mean()
+701:        loss = loss + float(training_cfg["budget_violation_penalty"]) * overflow
+794:    budget = min(map(int, cfg["matrix"]["memory_budgets"]))
+800:        reference = original(batch.input_ids, budget=budget).logits
+801:        resumed = restored(batch.input_ids, budget=budget).logits
+867:    budgets = list(map(int, cfg["matrix"]["memory_budgets"]))
+869:    maximum_gradient_norm = 0.0
+878:                budget = budgets[(epoch + batch_index) % len(budgets)]
+880:                output = model(batch.input_ids, budget=budget)
+885:                    budget=budget,
+894:                grad_norm = torch.nn.utils.clip_grad_norm_(
+896:                    max_norm=float(training_cfg["gradient_clip_norm"]),
+899:                maximum_gradient_norm = max(
+900:                    maximum_gradient_norm,
+927:    maximum_allowed = float(training_cfg["maximum_acceptable_gradient_norm"])
+932:        and maximum_gradient_norm <= maximum_allowed
+952:        maximum_gradient_norm=maximum_gradient_norm,
+976:    budget: int,
+988:        seed=seed + 101 + sequence_length + budget,
+998:    relevant_retention: list[float] = []
+999:    irrelevant_retention: list[float] = []
+1002:    retention_ages: list[float] = []
+1003:    write_count = 0
+1016:                output = model(batch.input_ids, budget=int(budget))
+1037:                if output.write_counts is not None:
+1038:                    write_count += int(output.write_counts.sum().detach().cpu().item())
+1039:                elif output.hard_writes is not None:
+1040:                    write_count += int(output.hard_writes.sum().detach().cpu().item())
+1055:                        relevant_retention.append(relevant_hits / max(1, len(relevant)))
+1058:                        irrelevant_retention.append(irrelevant_hits / irrelevant_total)
+1061:                            range(max(0, sequence_length - budget), sequence_length)
+1066:                        if row < len(output.retention_ages):
+1067:                            retention_ages.extend(output.retention_ages[row])
+1080:    write_frequency = (
+1081:        write_count / max(1, external_steps) if model_name != "gru" else 0.0
+1083:    expected_random_retention = min(1.0, float(budget) / float(sequence_length))
+1098:        "memory_budget": int(budget),
+1108:        "relevant_state_retention_rate": _safe_mean(relevant_retention),
+1109:        "irrelevant_state_retention_rate": _safe_mean(irrelevant_retention),
+1111:        "memory_recall": _safe_mean(relevant_retention),
+1112:        "average_retention_duration": _safe_mean(retention_ages),
+1116:            round(sum(max(0.0, 1.0 - value) for value in relevant_retention))
+1118:        "write_frequency": float(write_frequency),
+1120:        "expected_random_retention": expected_random_retention,
+1122:        "budget_pass": bool(max_memory_size <= budget),
+1132:        "maximum_gradient_norm": training_record.maximum_gradient_norm,
+1151:    budgetmem_accuracy = model_mean("budgetmem_r", "token_accuracy")
+1158:        policy: budgetmem_accuracy - score for policy, score in policy_scores.items()
+1164:    budget_rows = [row for row in rows if row["model"] != "gru"]
+1165:    budgetmem_rows = [row for row in rows if row["model"] == "budgetmem_r"]
+1166:    budgetmem_long_rows = [
+1167:        row for row in budgetmem_rows if int(row["sequence_length"]) == long_length
+1169:    write_frequency = _safe_mean(
+1170:        float(row["write_frequency"]) for row in budgetmem_rows
+1173:        float(row["recent_state_overlap"]) for row in budgetmem_long_rows
+1175:    retention_advantage = _safe_mean(
+1176:        float(row["relevant_state_retention_rate"])
+1177:        - float(row["expected_random_retention"])
+1178:        for row in budgetmem_long_rows
+1183:        "strict_memory_budget": all(bool(row["budget_pass"]) for row in budget_rows),
+1184:        "nontrivial_controller_writes": (
+1185:            float(evaluation_cfg["nontrivial_write_frequency_min"])
+1186:            <= write_frequency
+1187:            <= float(evaluation_cfg["nontrivial_write_frequency_max"])
+1190:        < float(evaluation_cfg["recent_overlap_failure_threshold"]),
+1191:        "retention_exceeds_random": retention_advantage
+1192:        >= float(evaluation_cfg["random_retention_margin"]),
+1222:            "budgetmem_r": budgetmem_accuracy,
+1228:        "budgetmem_mean_write_frequency": write_frequency,
+1229:        "budgetmem_mean_recent_state_overlap": recent_overlap,
+1230:        "budgetmem_mean_retention_advantage_over_random": retention_advantage,
+1234:def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+1240:        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+1241:        writer.writeheader()
+1242:        writer.writerows(rows)
+1245:def write_report(
+1297:            "| Task | Model | Length | Budget | Token accuracy | Memory recall | Write frequency | Budget pass |",
+1304:            f"{row['memory_budget']} | {float(row['token_accuracy']):.6f} | "
+1306:            f"{float(row['write_frequency']):.6f} | {row['budget_pass']} |"
+1308:    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+1346:    if list(map(int, cfg["matrix"]["memory_budgets"])) != [16, 32]:
+1347:        raise ValueError("Section 15 requires memory budgets 16 and 32")
+1352:        "budgetmem_r",
+1364:    copied["matrix"]["memory_budgets"] = [16]
+1390:    (output_root / "effective_config.yaml").write_text(
+1426:                for budget in cfg["matrix"]["memory_budgets"]:
+1433:                        budget=int(budget),
+1442:                        f"length={sequence_length} budget={budget} "
+1444:                        f"budget_pass={row['budget_pass']}",
+1454:    write_csv(results_path, rows)
+1456:    summary_path.write_text(
+1473:    gate_path.write_text(json.dumps(gate, indent=2) + "\n", encoding="utf-8")
+1474:    write_report(report_path, rows, training_records, gate)
+
+=== LONG-RANGE BUDGETMEM-R RESULTS ===
+                      task       model  sequence_length  memory_budget  token_accuracy  relevant_state_retention_rate  irrelevant_state_retention_rate  memory_precision  memory_recall  write_frequency  recent_state_overlap  budget_pass  maximum_gradient_norm
+            selective_copy budgetmem_r             1024             16        0.005208                       0.000000                         0.000820          0.000000       0.000000         0.000875                   0.0         True              11.191435
+            selective_copy budgetmem_r             1024             32        0.002604                       0.000000                         0.000328          0.000000       0.000000         0.000326                   0.0         True              11.191435
+        associative_recall budgetmem_r             1024             16        0.000000                       0.000000                         0.000000          0.000000       0.000000         0.000000                   0.0         True              48.022190
+        associative_recall budgetmem_r             1024             32        0.000000                       0.000000                         0.000000          0.000000       0.000000         0.000000                   0.0         True              48.022190
+distractor_heavy_retrieval budgetmem_r             1024             16        0.006944                       0.001736                         0.002820          0.006944       0.001736         0.002808                   0.0         True              92.980972
+distractor_heavy_retrieval budgetmem_r             1024             32        0.000000                       0.001736                         0.002903          0.006944       0.001736         0.002889                   0.0         True              92.980972

@@ -1,0 +1,10 @@
+Section 14.11 Pilot Budget Repair
+Status: PASS
+Rows: 72
+Already valid: 72
+Repaired: 0
+Unresolved or ambiguous: 0
+Audit: reports/evidence/section14_11_budget_repair_20260719T142115Z.csv
+Backup: reports/evidence/backups/pilot_results_before_budget_fix_20260719T142115Z.csv
+Updated: reports/tables/pilot_results.csv
+Budget export audit: PASS

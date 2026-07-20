@@ -1,0 +1,19 @@
+{
+  "generated_utc": "20260720T085343Z",
+  "status": "PASS",
+  "network_used": false,
+  "source": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/data/processed/imdb.offline_tmp_20260720T083702Z",
+  "destination": "data/processed/imdb",
+  "split_sizes": {
+    "train": 22386,
+    "validation": 2491,
+    "test": 25000
+  },
+  "total_rows": 49877,
+  "source_index_unique_and_disjoint": true,
+  "official_test_isolated": true,
+  "temporary_paths_removed": [
+    "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/data/processed/imdb.offline_tmp_20260720T083702Z"
+  ],
+  "candidate_errors": []
+}

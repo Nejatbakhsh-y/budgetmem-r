@@ -36,7 +36,7 @@ training:
   validation_samples: 48
   batch_size: 8
   epochs: 4
-  learning_rate: 0.001
+  learning_rate: 0.000343
   weight_decay: 0.0001
   gradient_clip_norm: 1.0
   maximum_acceptable_gradient_norm: 100.0

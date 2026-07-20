@@ -1,0 +1,31 @@
+{
+  "section": "Section 15 pilot experiment matrix coverage",
+  "expected_seed": 2026,
+  "expected_run_count": 72,
+  "successful_unique_run_count": 72,
+  "missing_run_count": 0,
+  "failed_only_run_count": 0,
+  "pass": true,
+  "tasks_tested": [
+    "associative_recall",
+    "distractor_retrieval",
+    "selective_copy"
+  ],
+  "models_tested": [
+    "BudgetMem-R",
+    "GRU",
+    "GRU + reservoir cache",
+    "GRU + uniform cache"
+  ],
+  "sequence_lengths_tested": [
+    256,
+    512,
+    1024
+  ],
+  "memory_budgets_tested": [
+    16,
+    32
+  ],
+  "scanned_file_count": 60,
+  "evidence_csv": "reports/evidence/section15_matrix_coverage.csv"
+}

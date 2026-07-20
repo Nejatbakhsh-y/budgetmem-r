@@ -1,0 +1,76 @@
+SECTION 15 TARGETED-TUNING INPUTS
+================================================================================
+
+1. FINAL DECISION
+--------------------------------------------------------------------------------
+SECTION 15 FINAL GO/NO-GO DECISION
+==================================
+Decision: NO-GO
+
+Operational gate:
+- Long-range sequence length: >= 1024
+- Comparisons matched by task, sequence length, memory budget, and seed
+- Minimum absolute recall gain per clear win: 0.0200
+- Minimum policy-level clear-win rate: 67.00%
+- Minimum matched cells per policy: 4
+- Required outperformed fixed-policy baselines: 2
+- Policies satisfying the gate: 0
+
+Policy comparisons:
+- uniform_cache: BudgetMem-R=0.3665, policy=0.0114, mean gain=+0.3552, clear wins=4/6 (66.7%), qualifies=NO
+- reservoir_cache: BudgetMem-R=0.3665, policy=0.0546, mean gain=+0.3119, clear wins=4/6 (66.7%), qualifies=NO
+
+Qualified policies:
+- None
+
+Interpretation:
+NO-GO: BudgetMem-R did not clearly outperform at least 2 fixed-policy memory baselines. Return to Sections 14.9 and 14.10, tune the model, rerun the pilot, and rerun this gate.
+
+Source result files:
+- reports/tables/pilot_tuned_results.csv
+
+2. COMPARISON CSV — COMPACT ROW VIEW
+--------------------------------------------------------------------------------
+Columns: ['policy', 'matched_same_budget_cells', 'budgetmem_mean_recall', 'policy_mean_recall', 'mean_absolute_gain', 'minimum_absolute_gain', 'clear_wins', 'clear_win_rate', 'qualifies_as_outperformed']
+CSV row 2: policy=uniform_cache | matched_same_budget_cells=6 | budgetmem_mean_recall=0.3665364583333333 | policy_mean_recall=0.011357060185185166 | mean_absolute_gain=0.35517939814814814 | minimum_absolute_gain=-0.0208333333333333 | clear_wins=4 | clear_win_rate=0.6666666666666666 | qualifies_as_outperformed=False
+CSV row 3: policy=reservoir_cache | matched_same_budget_cells=6 | budgetmem_mean_recall=0.3665364583333333 | policy_mean_recall=0.05461516203703698 | mean_absolute_gain=0.31192129629629634 | minimum_absolute_gain=-0.010416666666666595 | clear_wins=4 | clear_win_rate=0.6666666666666666 | qualifies_as_outperformed=False
+
+3. MATCHED-CELLS CSV — COMPACT ROW VIEW
+--------------------------------------------------------------------------------
+Columns: ['policy', 'task', 'sequence_length', 'budget', 'seed', 'budgetmem_recall', 'policy_recall', 'absolute_gain', 'clear_win']
+CSV row 2: policy=reservoir_cache | task=associative_recall | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.2916666666666667 | policy_recall=0.0520833333333333 | absolute_gain=0.23958333333333337 | clear_win=True
+CSV row 3: policy=reservoir_cache | task=associative_recall | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.5416666666666666 | policy_recall=0.0625 | absolute_gain=0.47916666666666663 | clear_win=True
+CSV row 4: policy=reservoir_cache | task=distractor_heavy_retrieval | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.0069444444444444 | policy_recall=0.0104166666666666 | absolute_gain=-0.0034722222222222003 | clear_win=False
+CSV row 5: policy=reservoir_cache | task=distractor_heavy_retrieval | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.0347222222222222 | policy_recall=0.0451388888888888 | absolute_gain=-0.010416666666666595 | clear_win=False
+CSV row 6: policy=reservoir_cache | task=selective_copy | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.4557291666666667 | policy_recall=0.0494791666666666 | absolute_gain=0.4062500000000001 | clear_win=True
+CSV row 7: policy=reservoir_cache | task=selective_copy | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.8684895833333334 | policy_recall=0.1080729166666666 | absolute_gain=0.7604166666666667 | clear_win=True
+CSV row 8: policy=uniform_cache | task=associative_recall | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.2916666666666667 | policy_recall=0.0 | absolute_gain=0.2916666666666667 | clear_win=True
+CSV row 9: policy=uniform_cache | task=associative_recall | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.5416666666666666 | policy_recall=0.0 | absolute_gain=0.5416666666666666 | clear_win=True
+CSV row 10: policy=uniform_cache | task=distractor_heavy_retrieval | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.0069444444444444 | policy_recall=0.0277777777777777 | absolute_gain=-0.0208333333333333 | clear_win=False
+CSV row 11: policy=uniform_cache | task=distractor_heavy_retrieval | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.0347222222222222 | policy_recall=0.03125 | absolute_gain=0.003472222222222203 | clear_win=False
+CSV row 12: policy=uniform_cache | task=selective_copy | sequence_length=1024 | budget=16 | seed=2026 | budgetmem_recall=0.4557291666666667 | policy_recall=0.0 | absolute_gain=0.4557291666666667 | clear_win=True
+CSV row 13: policy=uniform_cache | task=selective_copy | sequence_length=1024 | budget=32 | seed=2026 | budgetmem_recall=0.8684895833333334 | policy_recall=0.0091145833333333 | absolute_gain=0.8593750000000001 | clear_win=True
+
+4. ORIGINAL COMPARISON CSV
+--------------------------------------------------------------------------------
+policy,matched_same_budget_cells,budgetmem_mean_recall,policy_mean_recall,mean_absolute_gain,minimum_absolute_gain,clear_wins,clear_win_rate,qualifies_as_outperformed
+uniform_cache,6,0.3665364583333333,0.011357060185185166,0.35517939814814814,-0.0208333333333333,4,0.6666666666666666,False
+reservoir_cache,6,0.3665364583333333,0.05461516203703698,0.31192129629629634,-0.010416666666666595,4,0.6666666666666666,False
+
+5. ORIGINAL MATCHED-CELLS CSV
+--------------------------------------------------------------------------------
+policy,task,sequence_length,budget,seed,budgetmem_recall,policy_recall,absolute_gain,clear_win
+reservoir_cache,associative_recall,1024,16,2026,0.2916666666666667,0.0520833333333333,0.23958333333333337,True
+reservoir_cache,associative_recall,1024,32,2026,0.5416666666666666,0.0625,0.47916666666666663,True
+reservoir_cache,distractor_heavy_retrieval,1024,16,2026,0.0069444444444444,0.0104166666666666,-0.0034722222222222003,False
+reservoir_cache,distractor_heavy_retrieval,1024,32,2026,0.0347222222222222,0.0451388888888888,-0.010416666666666595,False
+reservoir_cache,selective_copy,1024,16,2026,0.4557291666666667,0.0494791666666666,0.4062500000000001,True
+reservoir_cache,selective_copy,1024,32,2026,0.8684895833333334,0.1080729166666666,0.7604166666666667,True
+uniform_cache,associative_recall,1024,16,2026,0.2916666666666667,0.0,0.2916666666666667,True
+uniform_cache,associative_recall,1024,32,2026,0.5416666666666666,0.0,0.5416666666666666,True
+uniform_cache,distractor_heavy_retrieval,1024,16,2026,0.0069444444444444,0.0277777777777777,-0.0208333333333333,False
+uniform_cache,distractor_heavy_retrieval,1024,32,2026,0.0347222222222222,0.03125,0.003472222222222203,False
+uniform_cache,selective_copy,1024,16,2026,0.4557291666666667,0.0,0.4557291666666667,True
+uniform_cache,selective_copy,1024,32,2026,0.8684895833333334,0.0091145833333333,0.8593750000000001,True
+
+END OF TARGETED-TUNING INPUTS

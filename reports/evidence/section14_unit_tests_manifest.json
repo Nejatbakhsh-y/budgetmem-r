@@ -1,0 +1,26 @@
+{
+  "section": "14",
+  "generated_utc": "20260720T035312Z",
+  "pytest_exit_code": 1,
+  "final_decision": "NO-GO",
+  "section_status": "INCOMPLETE",
+  "category_status": {
+    "Budget correctness": "FAIL",
+    "Causality": "FAIL",
+    "Determinism": "FAIL",
+    "Synthetic seed isolation": "PASS",
+    "HDFS block isolation": "FAIL",
+    "IMDb official-test isolation": "FAIL",
+    "Gradient flow": "FAIL",
+    "Cached-state graph policy": "FAIL",
+    "Memory reset": "FAIL"
+  },
+  "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "evidence": {
+    "junit": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/junit/section14_unit_tests_20260720T035312Z.xml",
+    "log": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/logs/section14_unit_tests_20260720T035312Z.log",
+    "results_csv": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/tables/section14_unit_test_results.csv",
+    "report": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_unit_tests_report.txt"
+  }
+}

@@ -1,0 +1,24 @@
+name: budgetmem_r
+input_dim: 8
+hidden_dim: 128
+output_dim: 2
+backbone: gru
+fusion: gated
+max_budget: 128
+allowed_budgets: [8, 16, 32, 64, 128]
+key_dim: 64
+value_dim: 128
+budget_embedding_dim: 16
+retrieval_k: 4
+write_threshold: 0.5
+write_temperature: 0.67
+detach_memory_writes: false
+
+loss:
+  task_kind: classification
+  sequence_task: false
+  lambda_budget: 1.0
+  lambda_write: 0.01
+  lambda_auxiliary: 0.1
+  lambda_diversity: 0.01
+  max_write_fraction: 0.25

@@ -1,0 +1,83 @@
+====================================================================================================
+SECTION 15 NO-GO DIAGNOSTIC
+====================================================================================================
+
+SECTION 15 FINAL GO/NO-GO DECISION
+==================================
+Decision: NO-GO
+
+Operational gate:
+- Long-range sequence length: >= 1024
+- Comparisons matched by task, sequence length, memory budget, and seed
+- Minimum absolute recall gain per clear win: 0.0200
+- Minimum policy-level clear-win rate: 67.00%
+- Minimum matched cells per policy: 4
+- Required outperformed fixed-policy baselines: 2
+- Policies satisfying the gate: 0
+
+Policy comparisons:
+- uniform_cache: BudgetMem-R=0.1568, policy=0.0103, mean gain=+0.1464, clear wins=2/6 (33.3%), qualifies=NO
+- reservoir_cache: BudgetMem-R=0.1568, policy=0.0621, mean gain=+0.0946, clear wins=2/6 (33.3%), qualifies=NO
+
+Qualified policies:
+- None
+
+Interpretation:
+NO-GO: BudgetMem-R did not clearly outperform at least 2 fixed-policy memory baselines. Return to Sections 14.9 and 14.10, tune the model, rerun the pilot, and rerun this gate.
+
+Source result files:
+- reports/tables/pilot_tuned_results.csv
+
+====================================================================================================
+POLICY-LEVEL COMPARISON
+====================================================================================================
+         policy  matched_same_budget_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_wins  clear_win_rate  qualifies_as_outperformed
+  uniform_cache                          6               0.156756            0.010344            0.146412              -0.013021           2        0.333333                      False
+reservoir_cache                          6               0.156756            0.062138            0.094618              -0.104167           2        0.333333                      False
+
+====================================================================================================
+POLICIES THAT FAILED THE GO GATE
+====================================================================================================
+         policy  matched_same_budget_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_wins  clear_win_rate  qualifies_as_outperformed
+reservoir_cache                          6               0.156756            0.062138            0.094618              -0.104167           2        0.333333                      False
+  uniform_cache                          6               0.156756            0.010344            0.146412              -0.013021           2        0.333333                      False
+
+====================================================================================================
+WORST MATCHED TASK/BUDGET CELLS
+====================================================================================================
+         policy                       task  sequence_length  budget  seed  budgetmem_recall  policy_recall  absolute_gain  clear_win
+reservoir_cache         associative_recall             1024      32  2026          0.000000       0.104167      -0.104167      False
+reservoir_cache         associative_recall             1024      16  2026          0.000000       0.062500      -0.062500      False
+reservoir_cache distractor_heavy_retrieval             1024      32  2026          0.019965       0.037326      -0.017361      False
+  uniform_cache distractor_heavy_retrieval             1024      32  2026          0.019965       0.032986      -0.013021      False
+  uniform_cache distractor_heavy_retrieval             1024      16  2026          0.018229       0.019965      -0.001736      False
+  uniform_cache         associative_recall             1024      32  2026          0.000000       0.000000       0.000000      False
+  uniform_cache         associative_recall             1024      16  2026          0.000000       0.000000       0.000000      False
+reservoir_cache distractor_heavy_retrieval             1024      16  2026          0.018229       0.011285       0.006944      False
+reservoir_cache             selective_copy             1024      16  2026          0.398438       0.049479       0.348958       True
+reservoir_cache             selective_copy             1024      32  2026          0.503906       0.108073       0.395833       True
+  uniform_cache             selective_copy             1024      16  2026          0.398438       0.000000       0.398438       True
+  uniform_cache             selective_copy             1024      32  2026          0.503906       0.009115       0.494792       True
+
+====================================================================================================
+TASK-LEVEL SUMMARY
+====================================================================================================
+                      task  matched_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_win_rate
+        associative_recall              4               0.000000            0.041667           -0.041667              -0.104167             0.0
+distractor_heavy_retrieval              4               0.019097            0.025391           -0.006293              -0.017361             0.0
+            selective_copy              4               0.451172            0.041667            0.409505               0.348958             1.0
+
+====================================================================================================
+BUDGET-LEVEL SUMMARY
+====================================================================================================
+ budget  matched_cells  budgetmem_mean_recall  policy_mean_recall  mean_absolute_gain  minimum_absolute_gain  clear_win_rate
+     16              6               0.138889            0.023872            0.115017              -0.062500        0.333333
+     32              6               0.174624            0.048611            0.126013              -0.104167        0.333333
+
+====================================================================================================
+REQUIRED NEXT ACTION
+====================================================================================================
+Weakest task: associative_recall (mean gain -0.041667)
+Weakest budget: 16
+
+Do not rerun the unchanged full pilot. Target the weakest task and budget in the next tuning revision.
