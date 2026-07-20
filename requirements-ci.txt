@@ -1,0 +1,10 @@
+# GitHub Actions test dependencies.
+# Generated from imports in committed src/ and tests/ files.
+# PyTorch is installed separately from the official CPU wheel index.
+
+numpy
+pandas
+psutil
+pytest
+pytest-cov
+PyYAML
