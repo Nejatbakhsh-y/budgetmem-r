@@ -90,3 +90,6 @@ logs/
 
 # Section 15 tuned-pilot runtime artifacts
 outputs/pilot_tuned/
+
+# Local automation backups
+reports/evidence/backups/

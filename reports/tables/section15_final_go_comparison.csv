@@ -1,0 +1,3 @@
+policy,matched_same_budget_cells,budgetmem_mean_recall,policy_mean_recall,mean_absolute_gain,minimum_absolute_gain,clear_wins,clear_win_rate,qualifies_as_outperformed
+uniform_cache,6,0.3665364583333333,0.011357060185185166,0.35517939814814814,-0.0208333333333333,4,0.6666666666666666,False
+reservoir_cache,6,0.3665364583333333,0.05461516203703698,0.31192129629629634,-0.010416666666666595,4,0.6666666666666666,False

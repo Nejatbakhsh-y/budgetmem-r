@@ -306,6 +306,19 @@ class BudgetMemR(nn.Module):
             last_write_step=state.last_write_step,
         )
 
+    def _write_gate(self, logits: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        """Calculate probabilities and a deterministic hard-write decision."""
+        probabilities = torch.sigmoid(logits)
+        hard = (probabilities >= self.write_threshold).to(logits.dtype)
+
+        if self.training:
+            relaxed = torch.sigmoid(logits / self.write_temperature)
+            gate = hard.detach() - relaxed.detach() + relaxed
+        else:
+            gate = hard
+
+        return probabilities, hard, gate
+
     def _choose_write_slots(
         self,
         *,
@@ -594,13 +607,17 @@ class BudgetMemR(nn.Module):
                 retrieved_agreement=agreement,
                 budget_embedding=budget_embedding,
             )
-            write_gate = self.write_controller.differentiable_gate(
-                write_probability,
-                training=self.training,
-                threshold=self.write_threshold,
-                temperature=self.write_temperature,
+            epsilon = torch.finfo(write_probability.dtype).eps
+            write_logits = torch.logit(
+                write_probability.clamp(
+                    min=epsilon,
+                    max=1.0 - epsilon,
+                )
             )
-            hard_write = write_gate.detach() >= 0.5
+            write_probability, hard_write_value, write_gate = self._write_gate(
+                write_logits
+            )
+            hard_write = hard_write_value.to(torch.bool)
 
             future_utility = self.eviction_controller.future_utility(
                 state.values,

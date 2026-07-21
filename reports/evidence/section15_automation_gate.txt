@@ -1,0 +1,30 @@
+Section 15 Pilot Experiment — Independent Automation Gate
+=========================================================
+Generated UTC: 2026-07-21T22:11:55.086051+00:00
+Mode: full
+Result rows: 72 / 72
+Operational status: PASS
+Scientific performance status: PASS
+
+PASS  pilot_matrix_has_exactly_72_unique_required_cells
+PASS  model_trains_without_instability
+PASS  memory_budget_never_violated
+PASS  controller_writes_nontrivially
+PASS  controller_does_not_retain_every_recent_state
+PASS  relevant_state_retention_exceeds_random
+PASS  resource_measurements_are_valid
+PASS  checkpoint_resumption_works
+PASS  results_are_configuration_driven
+PASS  budgetmem_r_beats_two_deterministic_policies
+
+Long-range comparison metric: memory_recall
+Clear-gain requirement: 0.02
+Matched long-range cells: 6
+Cells beating both policies: 3
+Uniform-cache mean gain: 0.09592013888888888
+Reservoir-cache mean gain: 0.05063657407407409
+
+Final decision: GO
+Proceed to the full experiment matrix.
+JSON evidence: reports/evidence/section15_automation_gate.json
+Comparison table: reports/tables/section15_long_range_comparison.csv

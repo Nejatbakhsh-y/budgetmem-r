@@ -1,0 +1,25 @@
+SECTION 15 FINAL GO/NO-GO DECISION
+==================================
+Decision: NO-GO
+
+Operational gate:
+- Long-range sequence length: >= 1024
+- Comparisons matched by task, sequence length, memory budget, and seed
+- Minimum absolute recall gain per clear win: 0.0200
+- Minimum policy-level clear-win rate: 67.00%
+- Minimum matched cells per policy: 4
+- Required outperformed fixed-policy baselines: 2
+- Policies satisfying the gate: 0
+
+Policy comparisons:
+- uniform_cache: BudgetMem-R=0.3665, policy=0.0114, mean gain=+0.3552, clear wins=4/6 (66.7%), qualifies=NO
+- reservoir_cache: BudgetMem-R=0.3665, policy=0.0546, mean gain=+0.3119, clear wins=4/6 (66.7%), qualifies=NO
+
+Qualified policies:
+- None
+
+Interpretation:
+NO-GO: BudgetMem-R did not clearly outperform at least 2 fixed-policy memory baselines. Return to Sections 14.9 and 14.10, tune the model, rerun the pilot, and rerun this gate.
+
+Source result files:
+- reports/tables/pilot_tuned_results.csv
