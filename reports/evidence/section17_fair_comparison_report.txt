@@ -1,0 +1,40 @@
+Section 17 — Fair Comparison Protocol Audit
+==============================================
+Protocol definition: PASS
+Exact parameter-count audit: NOT_RUN
+Experiment-run audit: NOT_RUN
+Overall structural audit: PASS
+
+Frozen controls
+---------------
+Small parameter target: 1,000,000 ±5%
+Medium parameter target: 5,000,000 ±5%
+Training tokens: 10485760
+Maximum optimization steps: 10000
+Gradient accumulation: 1
+Precision: fp32
+Hardware: Linux | 6.18.33.2-microsoft-standard-WSL2 | x86_64 | x86_64 | CPU
+Hyperparameter-search trials: 10
+Evaluation frequency: 500 steps
+Tokens per step: 8192
+Training batch schedule: {'256': 32, '512': 16, '1024': 8}
+Latency batch sizes: [1, 8]
+Memory budgets: [8, 16, 32, 64, 128]
+Primary memory budgets: [32, 64]
+Retrieval budgets: [1, 4, 8]
+Primary retrieval budget: 4
+Training sequence lengths: [256, 512, 1024]
+Testing sequence lengths: [256, 512, 1024, 2048, 4096, 8192]
+
+Parameter rows audited: 0
+Run rows audited: 0
+
+Violations
+----------
+None.
+
+Completion note
+---------------
+The protocol infrastructure is valid. Exact model parameter counts and
+completed experiment rows remain NOT_RUN until their CSV tables contain
+records produced by model construction and experiment execution.
