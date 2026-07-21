@@ -1,0 +1,74 @@
+schema_version: "1.0"
+section: 17
+title: "Fair Comparison Protocol"
+generated_at_utc: "2026-07-21T23:39:10Z"
+generated_from_git_commit: "f0301a664cad83375f061998368fc289931365cd"
+
+parameter_matching:
+  tolerance_fraction: 0.05
+  regimes:
+    small:
+      target_trainable_parameters: 1000000
+      minimum_trainable_parameters: 950000
+      maximum_trainable_parameters: 1050000
+    medium:
+      target_trainable_parameters: 5000000
+      minimum_trainable_parameters: 4750000
+      maximum_trainable_parameters: 5250000
+  exact_parameter_counts_required: true
+  architecture_exception:
+    permitted_only_when_architecture_cannot_match: true
+    written_reason_required: true
+
+training_budget:
+  training_tokens: 10485760
+  maximum_optimization_steps: 10000
+  gradient_accumulation_steps: 1
+  precision: "fp32"
+  hardware: "Linux | 6.18.33.2-microsoft-standard-WSL2 | x86_64 | x86_64 | CPU"
+  hyperparameter_search_trials: 10
+  evaluation_frequency_steps: 500
+  batch_control: "fixed_tokens_per_step"
+  tokens_per_step: 8192
+  timeout_seconds: 3600
+
+training_batch_schedule:
+  "256": 32
+  "512": 16
+  "1024": 8
+
+latency_testing:
+  fixed_batch_sizes: [1, 8]
+  warmup_iterations: 10
+  measured_iterations: 100
+  report_median: true
+  report_p95: true
+
+memory_budget:
+  allowed: [8, 16, 32, 64, 128]
+  primary: [32, 64]
+
+retrieval_budget:
+  allowed: [1, 4, 8]
+  primary: 4
+
+sequence_lengths:
+  training: [256, 512, 1024]
+  testing: [256, 512, 1024, 2048, 4096, 8192]
+  length_8192_requires_reliability_qualification: true
+
+failure_reporting:
+  allowed_statuses: ["completed", "oom", "timeout", "failed"]
+  oom_must_be_reported: true
+  timeout_must_be_reported: true
+  failure_reason_required: true
+  elapsed_time_required: true
+
+primary_comparison:
+  memory_budgets: [32, 64]
+  retrieval_k: 4
+  same_task: true
+  same_sequence_length: true
+  same_seed: true
+  same_parameter_regime: true
+  same_training_budget: true
