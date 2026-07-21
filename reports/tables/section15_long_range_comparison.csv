@@ -1,0 +1,13 @@
+task,sequence_length,memory_budget,seed,metric,budgetmem_r,policy,policy_value,gain,required_clear_gain,cell_policy_pass
+associative_recall,1024,16,2026,memory_recall,0.0416666666666666,gru_uniform_cache,0.0,0.0416666666666666,0.02,True
+associative_recall,1024,16,2026,memory_recall,0.0416666666666666,gru_reservoir_cache,0.0625,-0.020833333333333398,0.02,False
+associative_recall,1024,32,2026,memory_recall,0.0833333333333333,gru_uniform_cache,0.0,0.0833333333333333,0.02,True
+associative_recall,1024,32,2026,memory_recall,0.0833333333333333,gru_reservoir_cache,0.0416666666666666,0.0416666666666667,0.02,True
+distractor_heavy_retrieval,1024,16,2026,memory_recall,0.0,gru_uniform_cache,0.0277777777777777,-0.0277777777777777,0.02,False
+distractor_heavy_retrieval,1024,16,2026,memory_recall,0.0,gru_reservoir_cache,0.0208333333333333,-0.0208333333333333,0.02,False
+distractor_heavy_retrieval,1024,32,2026,memory_recall,0.0347222222222222,gru_uniform_cache,0.0069444444444444,0.027777777777777804,0.02,True
+distractor_heavy_retrieval,1024,32,2026,memory_recall,0.0347222222222222,gru_reservoir_cache,0.0486111111111111,-0.013888888888888895,0.02,False
+selective_copy,1024,16,2026,memory_recall,0.1614583333333333,gru_uniform_cache,0.0,0.1614583333333333,0.02,True
+selective_copy,1024,16,2026,memory_recall,0.1614583333333333,gru_reservoir_cache,0.0494791666666666,0.11197916666666669,0.02,True
+selective_copy,1024,32,2026,memory_recall,0.3020833333333333,gru_uniform_cache,0.0130208333333333,0.2890625,0.02,True
+selective_copy,1024,32,2026,memory_recall,0.3020833333333333,gru_reservoir_cache,0.0963541666666666,0.2057291666666667,0.02,True

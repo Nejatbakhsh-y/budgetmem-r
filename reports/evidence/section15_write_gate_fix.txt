@@ -1,0 +1,6 @@
+Section 15 write-gate repair: PASS
+Timestamp UTC: 20260721T213735Z
+Model: src/budgetmem/models/budgetmem_r.py
+Exact failed test: PASS
+Pilot tests: PASS
+Backup: reports/evidence/backups/write_gate_20260721T213735Z

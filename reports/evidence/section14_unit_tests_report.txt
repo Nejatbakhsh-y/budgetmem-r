@@ -1,0 +1,25 @@
+Section 14 — Authoritative Unit Tests Required Before Training
+Generated UTC: 20260720T091415Z
+
+Budget correctness: PASS
+Causality: PASS
+Determinism: PASS
+Synthetic seed isolation: PASS
+HDFS block isolation: PASS
+IMDb official-test isolation: PASS
+Gradient flow: PASS
+Cached-state graph policy: PASS
+Memory reset: PASS
+Production BudgetMem-R tests: PASS
+All selected authoritative tests: PASS
+Pytest exit code: 0
+
+Final decision: GO
+Section 14: COMPLETE
+
+Determinism scope: exact CPU execution. CUDA limitations remain outside this CPU pre-training gate and must be documented separately.
+Cached-state graph evidence: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_cached_state_graph_policy_20260720T091415Z.json
+JUnit evidence: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/junit/section14_graph_policy_20260720T091415Z.xml
+Detailed log: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/logs/section14_graph_policy_20260720T091415Z.log
+Result table: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/tables/section14_unit_test_results.csv
+Gate manifest: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/reports/evidence/section14_authoritative_gate_manifest.json

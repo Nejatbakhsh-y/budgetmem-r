@@ -1,0 +1,96 @@
+{
+  "section": "15",
+  "generated_at_utc": "2026-07-21T22:11:55.086051+00:00",
+  "mode": "full",
+  "runner_exit_code": 0,
+  "status": "GO",
+  "operational_status": "PASS",
+  "scientific_performance_status": "PASS",
+  "decision": "Proceed to the full experiment matrix.",
+  "expected_result_rows": 72,
+  "observed_result_rows": 72,
+  "unique_required_cells": 72,
+  "missing_cells": [],
+  "unexpected_cells": [],
+  "config_path": "configs/experiments/pilot.yaml",
+  "config_sha256": "7b7d7641a613ee26d55aee6e64f61dda4ca2fa3f26c2e260ef039e454955157a",
+  "result_table": "reports/tables/pilot_results.csv",
+  "summary_json": "reports/evidence/pilot_summary.json",
+  "runner_gate_json": "reports/evidence/pilot_go_no_go.json",
+  "runner_gate": {
+    "schema_version": "1.0",
+    "status": "NO_GO",
+    "decision": "Do not begin the full experiment matrix.",
+    "criteria": {
+      "training_stability": true,
+      "strict_memory_budget": true,
+      "nontrivial_controller_writes": true,
+      "not_recent_state_copying": true,
+      "retention_exceeds_random": true,
+      "resource_measurements_valid": true,
+      "checkpoint_resumption": true,
+      "configuration_provenance": true,
+      "outperforms_two_memory_policies": false
+    },
+    "long_range_sequence_length": 1024,
+    "long_range_token_accuracy": {
+      "budgetmem_r": 0.005208333333333333,
+      "gru_uniform_cache": 0.0078125,
+      "gru_reservoir_cache": 0.005931712962962962
+    },
+    "accuracy_gains": {
+      "gru_uniform_cache": -0.002604166666666667,
+      "gru_reservoir_cache": -0.0007233796296296294
+    },
+    "minimum_clear_accuracy_gain": 0.02,
+    "policies_clearly_outperformed": [],
+    "budgetmem_mean_write_frequency": 0.1180419921875,
+    "budgetmem_mean_recent_state_overlap": 0.04806857638888889,
+    "budgetmem_mean_retention_advantage_over_random": 0.08043981481481481
+  },
+  "checks": {
+    "pilot_matrix_has_exactly_72_unique_required_cells": true,
+    "model_trains_without_instability": true,
+    "memory_budget_never_violated": true,
+    "controller_writes_nontrivially": true,
+    "controller_does_not_retain_every_recent_state": true,
+    "relevant_state_retention_exceeds_random": true,
+    "resource_measurements_are_valid": true,
+    "checkpoint_resumption_works": true,
+    "results_are_configuration_driven": true,
+    "budgetmem_r_beats_two_deterministic_policies": true
+  },
+  "metrics": {
+    "gradient_column": "maximum_gradient_norm",
+    "maximum_gradient_norm": 2.633641242980957,
+    "max_memory_column": "max_memory_size",
+    "maximum_memory_size": 32.0,
+    "write_frequency_column": "write_frequency",
+    "budgetmem_write_frequency_min": 0.0606892903645833,
+    "budgetmem_write_frequency_mean": 0.11804199218749994,
+    "budgetmem_write_frequency_max": 0.185546875,
+    "recent_overlap_column": "recent_state_overlap",
+    "budgetmem_recent_overlap_max": 0.113608664560759,
+    "relevant_retention_column": "relevant_state_retention_rate",
+    "mean_retention_gain_over_random": 0.1106288580246913,
+    "resource_wall_columns": [
+      "wall_seconds"
+    ],
+    "resource_memory_columns": [
+      "peak_rss_mb"
+    ],
+    "long_range_comparison_metric": "memory_recall",
+    "clear_gain_required": 0.02,
+    "matched_long_range_cells": 6,
+    "cells_beating_both_policies": 3,
+    "policy_mean_gains": {
+      "gru_uniform_cache": 0.09592013888888888,
+      "gru_reservoir_cache": 0.05063657407407409
+    },
+    "outperformed_policies": [
+      "gru_uniform_cache",
+      "gru_reservoir_cache"
+    ]
+  },
+  "comparison_csv": "reports/tables/section15_long_range_comparison.csv"
+}

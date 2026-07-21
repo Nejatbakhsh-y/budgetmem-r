@@ -1,0 +1,40 @@
+schema_version: "1.0"
+section: 12
+seed: 2026
+
+fairness_controls:
+  reference_model: gru
+  target_training_tokens: 1000000
+  identical_optimizer_schedule: true
+  identical_dataset_order: true
+  identical_task_splits: true
+  parameter_budget_tolerance: 0.20
+  report_compute_and_peak_memory: true
+
+stages:
+  stage_1:
+    name: simple_recurrent
+    models: [vanilla_rnn, gru, lstm]
+  stage_2:
+    name: deterministic_caching
+    recurrent_backbone: gru
+    policies:
+      [uniform, most_recent, fifo, lru, random, reservoir, novelty, surprise]
+  stage_3:
+    name: attention
+    models: [transformer_full, transformer_sliding]
+    sliding_window: 128
+  stage_4:
+    name: modern_sequence
+    preferred_backend: official_mamba
+    cpu_fallback: s4d_reference
+  stage_5:
+    name: recurrent_memory
+    model: recurrent_memory_transformer
+    segment_length: 128
+    memory_tokens: 8
+  stage_6:
+    name: memory_caching
+    variants: [mean, gated, sparse_selective]
+
+implementation_order: [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6]
