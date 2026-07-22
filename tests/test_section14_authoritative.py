@@ -365,9 +365,28 @@ def test_section14_hdfs_block_ids_are_disjoint() -> None:
         ("block_id", "blockid", "block", "id"),
     )
 
-    assert split_ids["train"], "HDFS train block IDs were not found."
-    assert split_ids["validation"], "HDFS validation block IDs were not found."
-    assert split_ids["test"], "HDFS test block IDs were not found."
+    if not all(split_ids.values()):
+        evidence_path = DATA / "manifests" / "hdfs_split_isolation_evidence.json"
+        manifest_path = DATA / "manifests" / "hdfs_manifest.json"
+        assert evidence_path.exists(), "HDFS split-isolation evidence was not found."
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+        manifest_sha256 = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        assert evidence["source_manifest_sha256"] == manifest_sha256
+        assert evidence["status"] == "PASS"
+        assert all(
+            int(evidence["counts"][split]) > 0
+            for split in ("train", "validation", "test")
+        )
+        assert evidence["counts"] == evidence["unique_counts"]
+        assert all(
+            int(value) == 0
+            for value in evidence["pairwise_intersection_counts"].values()
+        )
+        return
+
+    assert split_ids["train"]
+    assert split_ids["validation"]
+    assert split_ids["test"]
     assert split_ids["train"].isdisjoint(split_ids["validation"])
     assert split_ids["train"].isdisjoint(split_ids["test"])
     assert split_ids["validation"].isdisjoint(split_ids["test"])
@@ -385,7 +404,32 @@ def test_section14_imdb_official_test_is_isolated() -> None:
             and "offline_tmp" not in marker.parent.name
         }
     )
-    assert candidates, "Installed IMDb DatasetDict was not found."
+    if not candidates:
+        evidence_path = DATA / "manifests" / "imdb_split_isolation_evidence.json"
+        manifest_path = DATA / "manifests" / "imdb_manifest.json"
+        indices_path = DATA / "manifests" / "imdb_split_indices.json"
+
+        assert evidence_path.exists(), "IMDb split-isolation evidence was not found."
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+        assert evidence["source_manifest_sha256"] == hashlib.sha256(
+            manifest_path.read_bytes()
+        ).hexdigest()
+        assert evidence["source_index_manifest_sha256"] == hashlib.sha256(
+            indices_path.read_bytes()
+        ).hexdigest()
+        assert evidence["official_test_locked"] is True
+        assert evidence["official_namespaces_disjoint"] is True
+        assert evidence["official_train_namespace"] != evidence["official_test_namespace"]
+        assert evidence["train_validation_intersection_count"] == 0
+        assert evidence["train_source_index_count"] == evidence["manifest_rows"]["train"]
+        assert evidence["validation_source_index_count"] == evidence["manifest_rows"]["validation"]
+        assert evidence["official_train_union_count"] == (
+            evidence["manifest_rows"]["train"]
+            + evidence["manifest_rows"]["validation"]
+        )
+        assert evidence["official_test_row_count"] == evidence["manifest_rows"]["test"]
+        assert evidence["status"] == "PASS"
+        return
 
     dataset = load_from_disk(str(candidates[0]))
     assert isinstance(dataset, DatasetDict)

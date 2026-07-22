@@ -75,3 +75,12 @@ class BudgetMemoryState:
             raise RuntimeError(
                 f"Hard memory budget violated: sizes={sizes}, budgets={budgets}"
             )
+
+    def assert_invariant(self) -> None:
+        """Validate all hard memory-state invariants.
+
+        This compatibility method currently delegates to the strict
+        per-sample budget invariant.
+        """
+        self.assert_within_budget()
+

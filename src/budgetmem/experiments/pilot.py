@@ -469,6 +469,12 @@ class BudgetMemRAdapter(nn.Module):
         training_cfg = cfg["training"]
         self.write_threshold = float(training_cfg.get("write_threshold", 0.5))
         self.write_temperature = float(training_cfg.get("write_temperature", 0.67))
+        self.detach_memory_writes = bool(
+            model_cfg.get(
+                "detach_memory_writes",
+                training_cfg.get("detach_memory_writes", False),
+            )
+        )
         self.vocab_size = int(model_cfg["vocabulary_size"])
         self.embedding_dim = int(model_cfg["embedding_dim"])
         self.hidden_dim = int(model_cfg["hidden_dim"])
@@ -520,7 +526,8 @@ class BudgetMemRAdapter(nn.Module):
             "temperature": self.write_temperature,
             "dropout": 0.0,
             "num_layers": 1,
-            "detach_memory": False,
+            "detach_memory_writes": self.detach_memory_writes,
+            "detach_memory": self.detach_memory_writes,
         }
         kwargs: dict[str, Any] = {}
         unresolved: list[str] = []
