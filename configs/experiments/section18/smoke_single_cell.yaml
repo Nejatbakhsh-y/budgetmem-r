@@ -1,0 +1,38 @@
+schema_version: "1.0"
+section: 18
+
+experiment:
+  name: section18_runner_release_gate
+  phase: release_smoke
+  run_id: section18_release_smoke
+  output_dir: artifacts/section18/release_gate/smoke_single_cell
+
+task:
+  name: selective_copy
+  dataset: synthetic
+  sequence_length: 256
+
+data:
+  dataset: synthetic
+  sequence_length: 256
+  split_seed: 2026
+
+model:
+  name: budgetmem_r
+  embedding_dim: 32
+  hidden_dim: 64
+
+memory:
+  budget: 32
+  retrieval_k: 4
+  strict_budget_enforcement: true
+
+training:
+  seed: 2026
+  deterministic: true
+  resume: false
+
+evaluation:
+  seed: 2026
+  sequence_length: 256
+  save_metrics: true

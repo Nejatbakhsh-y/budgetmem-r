@@ -1,0 +1,31 @@
+Section 18 BGL + Dedicated Runner Release Gate
+
+BGL preparation/loader: PASS
+  Parsed events: 96
+  Prepared sequences: 24
+  Split counts: {'test': 3, 'train': 19, 'validation': 2}
+  Split event intersections: {'train_test': 0, 'train_validation': 0, 'validation_test': 0}
+Dedicated scripts/run_section18.py: PASS
+Section 12/15 model integration: PASS
+Substantive single-cell training: PASS
+  Backend: pilot
+  Model: budgetmem_r
+  Task: selective_copy
+  Sequence length: 256
+  Memory budget: 32
+  Observed metric: token_accuracy=0.005208333333333333
+Existing readiness audit: PASS
+
+Safety controls
+  Full Section 18 matrix launched: NO
+  Generated matrix files staged: NO
+  Git commit created: NO
+  Git push performed: NO
+  Source backup: reports/evidence/backups/section18_runner_release_20260722T031403Z
+  Smoke log: reports/evidence/section18/section18_single_cell_smoke_20260722T031403Z.log
+  Audit report: reports/evidence/section18/section18_runner_readiness_latest.txt
+
+FINAL DECISION: SECTION 18 RUNNER RELEASE GATE PASSED
+
+The two previously identified blockers are resolved. Do not run the
+full matrix until the final screen and readiness report have been reviewed.

@@ -1,0 +1,17 @@
+Section 18 Main Experiment Matrix Summary
+planned_runs=2755
+attempted_unique_runs=2755
+pass=2755
+failed=0
+oom=0
+remaining_not_passed=0
+phase=bgl;planned=15;pass=15;failed=0;oom=0
+phase=hdfs;planned=70;pass=70;failed=0;oom=0
+phase=imdb;planned=210;pass=210;failed=0;oom=0
+phase=synthetic-primary;planned=2100;pass=2100;failed=0;oom=0
+phase=synthetic-secondary;planned=360;pass=360;failed=0;oom=0
+primary_synthetic_complete=PASS
+hdfs_complete=PASS
+imdb_complete=PASS
+bgl_complete=PASS
+memory_budget_violations=PASS

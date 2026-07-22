@@ -1,0 +1,51 @@
+{
+  "backend": "pilot",
+  "cell": {
+    "budget": 32,
+    "dataset": "synthetic",
+    "model": "budgetmem_r",
+    "output_dir": "artifacts/section18/release_gate/smoke_single_cell",
+    "retrieval_k": 4,
+    "run_id": "section18_release_smoke",
+    "seed": 2026,
+    "sequence_length": 256,
+    "task": "selective_copy"
+  },
+  "config_sha256": "921d9b5efa69008d727a2a8137a52b693a94bfd9c7673cd5d6f29d24fdf7229e",
+  "registry": {
+    "available_aliases": [
+      "budgetmem-r",
+      "budgetmem_r",
+      "gru",
+      "gru_reservoir",
+      "gru_reservoir_cache",
+      "gru_uniform",
+      "gru_uniform_cache",
+      "lstm",
+      "mamba",
+      "memory_caching",
+      "memory_caching_recurrent",
+      "recurrent_memory_transformer",
+      "reservoir_cache",
+      "rmt",
+      "state_space",
+      "transformer",
+      "transformer_full",
+      "uniform_cache"
+    ],
+    "missing_aliases": [],
+    "required_aliases": [
+      "budgetmem_r",
+      "gru",
+      "gru_reservoir",
+      "gru_uniform",
+      "lstm",
+      "mamba",
+      "memory_caching",
+      "rmt",
+      "transformer"
+    ],
+    "status": "PASS"
+  },
+  "status": "PASS"
+}
