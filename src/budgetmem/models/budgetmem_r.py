@@ -142,6 +142,11 @@ class BudgetMemR(nn.Module):
             nn.Sigmoid(),
         )
 
+    @property
+    def utility_controller(self) -> nn.Module:
+        """Compatibility alias for the learned initial-utility controller."""
+        return self.initial_utility_head
+
     def sample_budgets(
         self,
         batch_size: int,

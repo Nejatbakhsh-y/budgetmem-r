@@ -1,0 +1,36 @@
+{
+  "dataset": "IMDb",
+  "dataset_name": "stanfordnlp/imdb",
+  "manifest_file_sha256": {
+    "test": "afdf7ab4f8689eca43a9d24fbd2ca9ab290b1f4e66e563fdf34be0f96afc0650",
+    "train": "f20ba6f1ff7787b6e7785450571e653c4027d5509c06082469df3e806088c08b",
+    "validation": "ca628e17d244e340a6d8a88d15d26969ee0edbc3e9975f8e47af125ff0b92fe5"
+  },
+  "manifest_rows": {
+    "test": 25000,
+    "train": 22500,
+    "validation": 2500
+  },
+  "official_namespaces_disjoint": true,
+  "official_test_locked": true,
+  "official_test_namespace": "stanfordnlp/imdb:official_test",
+  "official_test_row_count": 25000,
+  "official_train_namespace": "stanfordnlp/imdb:official_train",
+  "official_train_union_count": 25000,
+  "processed_text_hash_check": {
+    "reason": "Large processed IMDb Parquet files are excluded from Git. Direct text-hash isolation remains exercised when an installed DatasetDict is present; clean CI validates locked official-split provenance and committed source-index partition evidence.",
+    "status": "NOT_AVAILABLE_IN_CI"
+  },
+  "schema_version": "1.0",
+  "source_index_manifest": "data/manifests/imdb_split_indices.json",
+  "source_index_manifest_sha256": "092696eda1c38b423846484cdf7bfae6d175d25261bcb7953d7a2bab9e414a7c",
+  "source_manifest": "data/manifests/imdb_manifest.json",
+  "source_manifest_sha256": "529a6ffd63c1295e1796a62f40f29b4b23d1e27022dc08dd22124353372eac3c",
+  "status": "PASS",
+  "train_source_index_count": 22500,
+  "train_source_index_set_sha256": "733543bffffa60c5b183c868950db047e05847789cf340723b7d900f8e3f4699",
+  "train_validation_intersection_count": 0,
+  "validation_source_index_count": 2500,
+  "validation_source_index_set_sha256": "24517e7e7eca5faa1816e9a86c6f98b9bcb5d7f805ca329ff991ff694467060e",
+  "verification_basis": "provenance_qualified_source_indices"
+}

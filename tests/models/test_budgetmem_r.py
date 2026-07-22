@@ -100,7 +100,7 @@ def test_all_fusion_modes_produce_expected_shapes(fusion: str) -> None:
     output = model(torch.randn(2, 5, 6), budget=3)
     assert output.logits.shape == (2, 3)
     assert output.sequence_logits.shape == (2, 5, 3)
-    assert output.retrieval_weights.shape == (2, 5, 5)
+    assert output.retrieval_weights.shape == (2, 5, model.retrieval_k)
 
 
 @pytest.mark.parametrize("backbone", ["rnn", "gru", "lstm"])
@@ -113,5 +113,5 @@ def test_all_recurrent_backbones_run(backbone: str) -> None:
 def test_invalid_budget_is_rejected() -> None:
     model = _model().eval()
     inputs = torch.randn(2, 4, 6)
-    with pytest.raises(ValueError, match="requested budget"):
+    with pytest.raises(ValueError, match="Budgets must be within"):
         model(inputs, budget=6)

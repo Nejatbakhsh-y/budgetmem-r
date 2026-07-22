@@ -1,0 +1,34 @@
+{
+  "counts": {
+    "test": 57485,
+    "train": 460193,
+    "validation": 57383
+  },
+  "dataset": "HDFS",
+  "pairwise_intersection_counts": {
+    "train_test": 0,
+    "train_validation": 0,
+    "validation_test": 0
+  },
+  "schema_version": "1.0",
+  "source_files": [
+    "data/processed/hdfs/development_subset/train/data.parquet",
+    "data/processed/hdfs/development_subset/validation/data.parquet",
+    "data/processed/hdfs/test/data.parquet",
+    "data/processed/hdfs/train/data.parquet",
+    "data/processed/hdfs/validation/data.parquet"
+  ],
+  "source_manifest": "data/manifests/hdfs_manifest.json",
+  "source_manifest_sha256": "a0fb65bca2a4d05a592fc40be7c70bcee249b8b989d6359cad3809dbb95b5a8d",
+  "split_id_sha256": {
+    "test": "8e8a276b5255fe45faa970894a70f0ade852b157245b5663c9bed7f48d58e64d",
+    "train": "f4b99b28415b73281d41f1b53f6fdd69454f8a5168627fb6836b569715b8f0d9",
+    "validation": "3631f589db3cb0e642fa77657f8b3055ad0fb135606f992976fcaa90926ccb35"
+  },
+  "status": "PASS",
+  "unique_counts": {
+    "test": 57485,
+    "train": 460193,
+    "validation": 57383
+  }
+}
