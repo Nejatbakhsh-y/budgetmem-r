@@ -1,0 +1,38 @@
+{
+  "anomaly_sequence_counts": {
+    "test": 2,
+    "train": 8,
+    "validation": 1
+  },
+  "format": "jsonl_authoritative",
+  "malformed_line_count": 0,
+  "output_dir": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/artifacts/section18/release_gate/bgl_processed",
+  "output_sha256": {
+    "test.jsonl": "b9f6e63a1af66337babc645d773b8eec4a9666fffd19ffb31a29a8edebbd20b7",
+    "train.jsonl": "ff907a4aebb7073aaea9f8c58b6ea20e2168e5510b7776dbec086632b1bccba0",
+    "validation.jsonl": "3d1d8d2f22d9204d837ea0be9185902c4eb80bd5f29d6bb3f8ffdea463f0e195"
+  },
+  "parquet_written": {
+    "test": true,
+    "train": true,
+    "validation": true
+  },
+  "parsed_event_count": 96,
+  "raw_path": "/mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r/artifacts/section18/release_gate/bgl_fixture/BGL.log",
+  "seed": 2026,
+  "sequence_count": 24,
+  "sequence_length": 4,
+  "source_line_count": 96,
+  "source_sha256": "ed627e167e6002558b7745b3a6eaff311f64e61d3b8be3b3c7817c7d0cae0711",
+  "split_counts": {
+    "test": 3,
+    "train": 19,
+    "validation": 2
+  },
+  "split_event_intersections": {
+    "train_test": 0,
+    "train_validation": 0,
+    "validation_test": 0
+  },
+  "stride": 4
+}

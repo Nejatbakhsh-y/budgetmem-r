@@ -1,0 +1,86 @@
+Section 18 Fast Dedicated-Runner Readiness Audit
+
+Repository: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r
+Files scanned: 147
+Readiness verdict: PASS
+
+Synthetic generator
+  Path: scripts/data/generate_synthetic.py
+  Task count: 8
+    - associative_recall
+    - delayed_xor
+    - distractor_heavy_retrieval
+    - multiple_key_retrieval
+    - nested_parentheses
+    - rare_event_recall
+    - selective_copy
+    - sequence_reversal
+
+Matrix checks
+  six_tasks: PASS
+  seven_lengths: PASS
+  five_primary_models: PASS
+  five_seeds: PASS
+  budgets_32_64: PASS
+
+Model implementation evidence
+  gru: PASS
+    - scripts/verify_section12_baselines.py [check_forward_and_gradient, main]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+    - src/budgetmem/experiments/pilot.py [BudgetMemRAdapter, CachedGRUPilotModel, GRUPilotModel, PilotBatch, PilotOutput, ResourceMonitor, SyntheticPilotDataset, TrainingRecord]
+  gru_uniform_cache: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+    - src/budgetmem/experiments/pilot.py [BudgetMemRAdapter, CachedGRUPilotModel, GRUPilotModel, PilotBatch, PilotOutput, ResourceMonitor, SyntheticPilotDataset, TrainingRecord]
+  gru_reservoir_cache: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+    - src/budgetmem/experiments/pilot.py [BudgetMemRAdapter, CachedGRUPilotModel, GRUPilotModel, PilotBatch, PilotOutput, ResourceMonitor, SyntheticPilotDataset, TrainingRecord]
+  memory_caching: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - scripts/verify_section12_baselines.py [check_forward_and_gradient, main]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+  budgetmem_r: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - src/budgetmem/experiments/pilot.py [BudgetMemRAdapter, CachedGRUPilotModel, GRUPilotModel, PilotBatch, PilotOutput, ResourceMonitor, SyntheticPilotDataset, TrainingRecord]
+    - src/budgetmem/memory/budget.py [BudgetConditioner, __init__, forward, normalize, sample_training_budgets]
+    - src/budgetmem/memory/budget_state.py [ExternalMemoryState, allowed_slot_mask, assert_invariant, batch_size, empty, increment_age, max_budget, sizes]
+  lstm: PASS
+    - scripts/verify_section12_baselines.py [check_forward_and_gradient, main]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+  transformer: PASS
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+  mamba: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+  rmt: PASS
+    - scripts/run_section18.py [EmbeddedBudgetMemR, EmbeddedControlledModel, PreparedSequenceDataset, __getitem__, __init__, __len__, _candidate_dataset_roots, _classification_metrics]
+    - scripts/verify_section12_baselines.py [check_forward_and_gradient, main]
+    - src/budgetmem/baselines/controlled.py [CachePolicy, DiagonalSSMBaseline, FIFOPolicy, GRUBaseline, LRUPolicy, LSTMBaseline, MemoryCachingBaseline, MostRecentPolicy]
+
+Real-world dataset loader evidence
+  hdfs: PASS
+    - scripts/data/prepare_hdfs.py [assign_split, event_id, load_labels, main, normalize_template, rows_from_db, write_batch]
+    - scripts/data/validate_datasets.py [main, validate_hdfs, validate_imdb, validate_synthetic]
+    - scripts/preprocess_hdfs.py
+    - scripts/validate_pretraining_gates.py [_required_dataset_paths, _run, main]
+  imdb: PASS
+    - scripts/data/prepare_imdb.py [main, make_frame, sha256]
+    - scripts/data/validate_datasets.py [main, validate_hdfs, validate_imdb, validate_synthetic]
+    - scripts/preprocess_imdb.py
+    - scripts/validate_pretraining_gates.py [_required_dataset_paths, _run, main]
+  bgl: PASS
+    - scripts/data/prepare_bgl.py [main, parse_args]
+    - src/budgetmem/data/__init__.py
+    - src/budgetmem/data/bgl.py [BGLEvent, BGLPreparationSummary, BGLSequenceDataset, Dataset, __getitem__, __init__, __len__, _deterministic_split]
+
+Runner evidence
+  Section 15 pilot runner: PASS
+  Dedicated Section 18 runner: PASS
+    - scripts/run_section18.py
+
+Blocking reasons
+  - None
+
+FINAL DECISION: READY FOR SECTION 18 EXECUTION
+JSON evidence: reports/evidence/section18/section18_runner_readiness_fast_20260722T031913Z.json

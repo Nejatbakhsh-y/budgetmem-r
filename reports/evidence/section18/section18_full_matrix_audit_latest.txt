@@ -1,0 +1,69 @@
+======================================================================
+SECTION 18 FULL MATRIX AUDIT
+======================================================================
+UTC timestamp: 20260722T134213Z
+Repository: /mnt/c/Users/nejat/OneDrive/Desktop/UN/Skills/GitHub 2026/budgetmem-r
+Branch: feature/18-main-experiment-matrix
+
+Summary: reports/evidence/section18/section18_summary.txt
+Matrix log: reports/evidence/section18/section18_full_matrix_20260722T033258Z.log
+
+Execution completion marker: PASS
+Completion evidence: matrix-runner completion marker and summary reference
+memory_budget_violations=PASS
+bgl_complete=PASS
+
+Fatal-log scan: PASS
+
+Structured result audit
+  Result files discovered: 16
+  Parsed result rows: 5516
+  Distinct datasets: 4
+  Distinct tasks: 9
+  Distinct models: 11
+  Distinct seeds: 5
+  Distinct sequence lengths: 8
+  Distinct memory budgets: 3
+  Explicitly reported OOM rows: 0
+  Duplicate identities: 2755
+  Result manifest: reports/evidence/section18/section18_result_file_manifest_20260722T134213Z.csv
+  JSON audit: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.json
+
+Required coverage
+  hdfs: PASS
+  imdb: PASS
+  bgl: PASS
+  gru: PASS
+  budgetmem_r: PASS
+  transformer: PASS
+  mamba: PASS
+  rmt: PASS
+  lstm: PASS
+  bgl_three_methods: PASS
+
+Dimensional fallback
+  synthetic_tasks_at_least_6: PASS
+  synthetic_sequence_lengths_at_least_7: PASS
+  synthetic_seeds_at_least_5: PASS
+  synthetic_budgets_at_least_2: PASS
+
+Warnings
+  - No machine-readable Section 18 plan manifest was discovered; dimensional fallback checks were used.
+  - 2755 duplicate experiment identities were found. This may be legitimate for retries, but the duplicate manifest must be reviewed before committing results.
+
+Blocking reasons
+  - None
+
+PYTHON_AUDIT_DECISION=PASS
+
+======================================================================
+SECTION 18 FULL MATRIX AUDIT RESULT
+======================================================================
+FINAL DECISION: SECTION 18 FULL MATRIX AUDIT PASSED
+Generated result artifacts staged: NO
+Git commit created by this audit: NO
+Git push performed by this audit: NO
+Audit report: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.txt
+JSON evidence: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.json
+Result-file manifest: reports/evidence/section18/section18_result_file_manifest_20260722T134213Z.csv
+

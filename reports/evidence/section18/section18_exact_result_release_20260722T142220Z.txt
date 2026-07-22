@@ -1,0 +1,17 @@
+Section 18 Exact Audited Result Release
+
+Audit decision: PASS
+Audit JSON: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.json
+Audit report: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.txt
+Result-file manifest: reports/evidence/section18/section18_result_file_manifest_20260722T134213Z.csv
+Exact audited result files selected: 16
+Explicit durable/evidence files selected: 16
+Controlled files before release-evidence insertion: 32
+Controlled source bytes: 2888611
+Recursive configs/docs scan used: NO
+Recursive report scan used: NO
+Per-cell directory expansion used: NO
+Result rows rewritten: NO
+Full experiment matrix rerun: NO
+
+FINAL DECISION: SECTION 18 EXACT AUDITED RESULT BUNDLE APPROVED FOR COMMIT

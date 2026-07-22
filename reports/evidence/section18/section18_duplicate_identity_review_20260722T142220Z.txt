@@ -1,0 +1,23 @@
+Section 18 Duplicate-Identity Review
+
+Audit JSON: reports/evidence/section18/section18_full_matrix_audit_20260722T134213Z.json
+Audit decision: PASS
+Parsed result rows: 5516
+Observed unique experiment identities: 2760
+Duplicate identities retained in audit JSON sample: 200
+Audited structured result files: 16
+
+Audit warning:
+- 2755 duplicate experiment identities were found. This may be legitimate for retries, but the duplicate manifest must be reviewed before committing results.
+
+Observed multiplicities in the audit JSON sample:
+- multiplicity 2: 200 sampled identities
+
+Release treatment:
+- The substantive audit classified duplicate identities as non-blocking.
+- The exact audit manifest and audit JSON are retained for traceability.
+- No recursive directory expansion is used by this release automation.
+- No result row is altered, deduplicated, or rewritten during release.
+- Duplicate identities remain a documented analytical caveat for downstream tables.
+
+REVIEW DECISION: ACCEPT AUDIT-PASSED RESULTS WITH DUPLICATE CAVEAT RECORDED
