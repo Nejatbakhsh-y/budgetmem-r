@@ -8,3 +8,5 @@ psutil
 pytest
 pytest-cov
 PyYAML
+
+datasets
