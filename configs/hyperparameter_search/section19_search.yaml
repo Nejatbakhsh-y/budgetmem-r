@@ -1,0 +1,63 @@
+schema_version: "1.0"
+section: 19
+selection_split: validation
+objective:
+  name: validation_primary_metric
+  direction: maximize
+fairness:
+  trials_per_architecture_family: 20
+  enforce_equal_trials: true
+  permit_test_set_selection: false
+search_cell:
+  task: associative_recall
+  sequence_length: 256
+  memory_budget: 32
+  seed: 2026
+  train_samples: 128
+  validation_samples: 48
+  max_steps: 100
+model_families:
+  - gru
+  - gru_uniform
+  - gru_reservoir
+  - memory_caching
+  - budgetmem_r
+  - lstm
+  - transformer
+  - mamba
+  - rmt
+search_space:
+  learning_rate:
+    type: log_float
+    low: 0.0001
+    high: 0.003
+  weight_decay:
+    type: categorical
+    values: [0.0, 0.000001, 0.00001, 0.0001, 0.001]
+  hidden_dimension:
+    type: categorical
+    values: [64, 96, 128, 192]
+  number_of_layers:
+    type: categorical
+    values: [1, 2, 3]
+  dropout:
+    type: categorical
+    values: [0.0, 0.1, 0.2, 0.3]
+  gradient_clipping:
+    type: categorical
+    values: [0.5, 1.0, 2.0, 5.0]
+  memory_controller_temperature:
+    type: categorical
+    values: [0.5, 0.67, 0.85, 1.0, 1.25]
+  auxiliary_loss_coefficient:
+    type: categorical
+    values: [0.0, 0.01, 0.05, 0.1]
+  budget_penalty:
+    type: categorical
+    values: [1.0, 5.0, 10.0, 20.0]
+  retrieval_top_k:
+    type: categorical
+    values: [1, 4, 8]
+  write_threshold:
+    type: categorical
+    values: [0.3, 0.4, 0.5, 0.6, 0.7]

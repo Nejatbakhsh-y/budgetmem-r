@@ -93,3 +93,13 @@ outputs/pilot_tuned/
 
 # Local automation backups
 reports/evidence/backups/
+
+# BEGIN SECTION 18 RUNTIME OUTPUTS
+artifacts/section18/
+reports/evidence/section18/logs/
+*.section18.tmp
+# END SECTION 18 RUNTIME OUTPUTS
+
+# Section 19 runtime search logs and checkpoints
+reports/logs/hyperparameter_search/**
+!reports/logs/hyperparameter_search/.gitkeep

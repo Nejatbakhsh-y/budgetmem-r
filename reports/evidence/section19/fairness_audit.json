@@ -1,0 +1,29 @@
+{
+  "attempted_trials_by_family": {
+    "budgetmem_r": 20,
+    "gru": 20,
+    "gru_reservoir": 20,
+    "gru_uniform": 20,
+    "lstm": 20,
+    "mamba": 20,
+    "memory_caching": 20,
+    "rmt": 20,
+    "transformer": 20
+  },
+  "complete_trials_by_family": {
+    "budgetmem_r": 20,
+    "gru": 20,
+    "gru_reservoir": 20,
+    "gru_uniform": 20,
+    "lstm": 20,
+    "mamba": 20,
+    "memory_caching": 20,
+    "rmt": 20,
+    "transformer": 20
+  },
+  "equal_trial_budget": true,
+  "selection_split": "validation",
+  "status": "PASS",
+  "test_set_selection_used": false,
+  "trials_per_family_required": 20
+}
